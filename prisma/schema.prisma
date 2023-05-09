@@ -1,0 +1,23 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "windows", "linux-musl", "debian-openssl-1.1.x"]
+}
+
+model User {
+  id         Int @id @default(autoincrement())
+  login      String @db.VarChar(255)
+  password   String @db.VarChar(255)
+  email      String @unique @db.VarChar(255)
+  phone      String @db.VarChar(255)
+  name       String @db.VarChar(255)
+  status     Boolean
+  createdAt DateTime @default(now()) @db.Timestamp() @map(name: "created_at")
+  updatedAt DateTime @updatedAt @db.Timestamp() @map(name: "updated_at")
+
+  @@map("users")
+}

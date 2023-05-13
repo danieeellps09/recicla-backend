@@ -23,19 +23,6 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @ApiOperation({ summary: 'Verifica se um email já está cadastrado.' })
-  @ApiOkResponse({ description: 'Verifica se um email já está cadastrado.' })
-  @ApiBadRequestResponse({ description: 'Email não fornecido.' })
-  @Get('email/:email')
-  async checkEmailExists(@Param('email') email: string): Promise<{ exists: boolean }> {
-    if (!email) {
-      throw new BadRequestException('Email não fornecido.');
-    }
-    const user = await this.userService.findByEmail(email);
-    return { exists: !!user };
-  }
-
-
   @ApiOperation({ summary: 'Retorna uma lista de todos os usuários cadastrados.' })
   @ApiOkResponse({ description: 'A lista de usuários.', type: [CreateUserDto] })
   @Get()

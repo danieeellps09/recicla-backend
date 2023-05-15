@@ -21,8 +21,8 @@ async function bootstrap() {
 
   // Define a documentação da API usando o Swagger
   const config = new DocumentBuilder()
-    .setTitle('User Service')
-    .setDescription('Serviço criado para operações CRUD de usuários.')
+    .setTitle('Back-end Service')
+    .setDescription('Serviço criado para operações no banco de dados')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

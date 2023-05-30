@@ -5,15 +5,17 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
-
+import {JwtModule} from '@nestjs/jwt';
 
 @Module({
   imports: [PrismaModule,UserModule,
     ConfigModule.forRoot(),
     AuthModule,
-    UserModule
+    UserModule,
+    JwtModule
     ],
-  controllers: [AuthController],
-  providers: [AuthService],
-})
+  controllers: [AuthController], //AuthController
+  providers: [AuthService], //AuthService
+}) 
 export class AppModule {}
+

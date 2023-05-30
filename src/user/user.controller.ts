@@ -6,6 +6,7 @@ import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiO
 import { User } from './entities/user.entity';
 
 
+
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {
@@ -34,7 +35,6 @@ export class UserController {
     const user = await this.userService.findByEmail(email);
     return { exists: !!user };
   }
-
 
   @ApiOperation({ summary: 'Retorna uma lista de todos os usuários cadastrados.' })
   @ApiOkResponse({ description: 'A lista de usuários.', type: [CreateUserDto] })

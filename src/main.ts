@@ -3,6 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cors from 'cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { config } from 'dotenv';
+config();
+
 
 async function bootstrap() {
   // Cria uma instância da aplicação
@@ -42,3 +45,6 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+
+

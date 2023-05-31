@@ -9,13 +9,12 @@ import { LoginDTO } from 'src/user/dto/login-user-dto';
 export class AuthController {
     constructor (private readonly authService: AuthService){}
 
-    @Post('login')
+    @Post('/login')
     @HttpCode(HttpStatus.OK)
-    @UseGuards(LocalAuthGuard)
     @UseGuards(LocalAuthGuard)  
     @ApiBody({ type: LoginDTO })
-    login(@Request() req: AuthRequest){
-        return this.authService.login(req.user);
+    async login(@Request() req: AuthRequest){
+        return await this.authService.login(req.user);
     }
 
 

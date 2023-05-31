@@ -10,13 +10,10 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Module({
-    imports: [PrismaModule, UserModule, JwtModule.register({
-        secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '30d'},
-    })],
+    imports: [PrismaModule, UserModule, JwtModule],
     controllers: [AuthController],
     providers: [AuthService, LocalStrategy],
 })
 export class AuthModule {
-  
+
 }

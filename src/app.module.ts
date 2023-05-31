@@ -6,16 +6,31 @@ import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import {JwtModule} from '@nestjs/jwt';
+import { join } from 'path';
+import * as dotenv from "dotenv";
+dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
   imports: [PrismaModule,UserModule,
     ConfigModule.forRoot(),
     AuthModule,
     UserModule,
-    JwtModule
+    JwtModule.register({
+      privateKey: process.env.JWT_SECRET_KEY,
+      signOptions: {expiresIn: '30d'} 
+  })
     ],
-  controllers: [AuthController], //AuthController
-  providers: [AuthService], //AuthService
+  controllers: [AuthController], 
+  providers: [AuthService], 
 }) 
-export class AppModule {}
+export class AppModule {
+
+  constructor() {}
+
+  onModuleInit() {
+    console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY);
+  }
+
+
+}
 

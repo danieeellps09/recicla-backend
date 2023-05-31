@@ -5,8 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
+import { RoleModule } from './role/role.module';
 import {JwtModule} from '@nestjs/jwt';
-import { join } from 'path';
 import * as dotenv from "dotenv";
 dotenv.config({ path: `${__dirname}../.env` })
 
@@ -14,6 +14,7 @@ dotenv.config({ path: `${__dirname}../.env` })
   imports: [PrismaModule,UserModule,
     ConfigModule.forRoot(),
     AuthModule,
+    RoleModule,
     UserModule,
     JwtModule.register({
       privateKey: process.env.JWT_SECRET_KEY,

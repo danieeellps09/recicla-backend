@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 import * as bcrypt from 'bcryptjs';
+import { LoginDTO } from 'src/auth/dto/login-user-dto';
 
 
 @Injectable()
@@ -32,6 +33,13 @@ export class UserService {
       where: { id },
     });
   }
+
+  findByLogin(login: string) {
+    return this.prisma.user.findUnique({
+      where: { login },
+    });
+  }
+
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } });

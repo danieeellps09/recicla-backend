@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './role/role.module';
 import {JwtModule} from '@nestjs/jwt';
 import * as dotenv from "dotenv";
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
@@ -19,10 +23,15 @@ dotenv.config({ path: `${__dirname}../.env` })
     JwtModule.register({
       privateKey: process.env.JWT_SECRET_KEY,
       signOptions: {expiresIn: '30d'} 
-  })
+  }),
+  AppModule
     ],
-  controllers: [AuthController], 
-  providers: [AuthService], 
+  controllers: [AuthController, AppController], 
+  providers: [AuthService, AppService,
+  {
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard
+  }], 
 }) 
 export class AppModule {
 }

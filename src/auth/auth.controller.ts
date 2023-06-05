@@ -28,6 +28,7 @@ export class AuthController {
   async login(@Request() req: AuthRequest) {
     return await this.authService.login(req.user);
   }
+  
   @Get('/current_user')
   getUsuarioAtual(@CurrentUserLogged() user: User) {
     return user;

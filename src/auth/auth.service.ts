@@ -38,7 +38,7 @@ export class AuthService {
       }
 
     }
-    throw new Error('Email ou senha está incorreta')
+    throw new Error('Login ou senha está incorreta')
   }
 
 

@@ -11,7 +11,7 @@ config();
 async function bootstrap() {
   // Cria uma instância da aplicação
   const app = await NestFactory.create(AppModule);
-  app.use()
+
   // Configura o CORS
   const corsOptions: cors.CorsOptions = {
     origin: true,

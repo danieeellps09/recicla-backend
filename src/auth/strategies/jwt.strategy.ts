@@ -9,28 +9,20 @@ import { Request } from 'express';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        JwtStrategy.extractJWT,
-        ExtractJwt.fromAuthHeaderAsBearerToken()
-      ]),
+      jwtFromRequest: (req: Request) => {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        return token;
+      },
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET_KEY,
     });
   }
-
-  private static extractJWT(req: Request): string || null{
-    if(req.cookies && req.cookies.acess_token){
-      return req.cookies.token
-    }
-      return null
-  }
-
 
   async validate(payload: UserPayload): Promise<UserFromJwt> {
     return {
       id: payload.sub,
       email: payload.email,
       name: payload.name,
-    }
+    };
   }
 }

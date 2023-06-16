@@ -22,8 +22,8 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
   @isPublic()
+  @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDTO })
   async login(@Request() req: AuthRequest) {
     return await this.authService.login(req.user);

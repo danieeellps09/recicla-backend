@@ -5,10 +5,12 @@ import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
-import {JwtModule} from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlwares/login-validation.middlware';
+import { JwtCookieToHeaderMiddleware } from './middlwares/JwtCookieToHeaderMiddleware';
+
 dotenv.config();
 
 @Module({
@@ -16,8 +18,10 @@ dotenv.config();
     controllers: [AuthController],
     providers: [AuthService, LocalStrategy, JwtStrategy],
 })
-export class AuthModule implements NestModule{
-configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoginValidationMiddleware).forRoutes('login')
-}
+export class AuthModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoginValidationMiddleware).forRoutes('login')
+        consumer.apply(JwtCookieToHeaderMiddleware).forRoutes('*');
+    }
+
 }

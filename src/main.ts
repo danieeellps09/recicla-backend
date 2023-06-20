@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import * as cors from 'cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
+import * as cookieParser from 'cookie-parser';
+
 
 config();
 
@@ -11,6 +13,7 @@ config();
 async function bootstrap() {
   // Cria uma instância da aplicação
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
 
   // Configura o CORS
   const corsOptions: cors.CorsOptions = {

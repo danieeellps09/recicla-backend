@@ -4,9 +4,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { isPublic } from 'src/auth/decorators/is-public.decorator';
 
 
 
+@isPublic()
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {

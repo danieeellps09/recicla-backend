@@ -9,7 +9,6 @@ import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlwares/login-validation.middlware';
-import { JwtCookieToHeaderMiddleware } from './middlwares/JwtCookieToHeaderMiddleware';
 
 dotenv.config();
 
@@ -21,7 +20,6 @@ dotenv.config();
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(LoginValidationMiddleware).forRoutes('login')
-        consumer.apply(JwtCookieToHeaderMiddleware).forRoutes('*');
     }
 
 }

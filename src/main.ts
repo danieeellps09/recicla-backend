@@ -31,6 +31,7 @@ async function bootstrap() {
     .setTitle('Back-end Service')
     .setDescription('Serviço criado para operações no banco de dados')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);

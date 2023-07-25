@@ -15,6 +15,7 @@ import { LoginDTO } from 'src/auth/dto/login-user-dto';
 import { isPublic } from './decorators/is-public.decorator';
 import { CurrentUserLogged } from './decorators/current-users-decorator';
 import { User } from 'src/user/entities/user.entity';
+import { ApiBearerAuth } from '@nestjs/swagger';
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
@@ -30,6 +31,7 @@ export class AuthController {
   }
   
   @Get('/current_user')
+  @ApiBearerAuth()
   getUsuarioAtual(@CurrentUserLogged() user: User) {
     return user;
   }

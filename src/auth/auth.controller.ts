@@ -15,6 +15,7 @@ import { LoginDTO } from 'src/auth/dto/login-user-dto';
 import { isPublic } from './decorators/is-public.decorator';
 import { CurrentUserLogged } from './decorators/current-users-decorator';
 import { User } from 'src/user/entities/user.entity';
+import { ApiBearerAuth } from '@nestjs/swagger';
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
@@ -22,14 +23,15 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
   @isPublic()
+  @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDTO })
   async login(@Request() req: AuthRequest) {
-    return await this.authService.login(req.user);
+    return await this.authService.login(req.user, req);
   }
   
   @Get('/current_user')
+  @ApiBearerAuth()
   getUsuarioAtual(@CurrentUserLogged() user: User) {
     return user;
   }

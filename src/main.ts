@@ -4,12 +4,16 @@ import { AppModule } from './app.module';
 import * as cors from 'cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
+import * as cookieParser from 'cookie-parser';
+
+
 config();
 
 
 async function bootstrap() {
   // Cria uma instância da aplicação
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
 
   // Configura o CORS
   const corsOptions: cors.CorsOptions = {
@@ -27,6 +31,7 @@ async function bootstrap() {
     .setTitle('Back-end Service')
     .setDescription('Serviço criado para operações no banco de dados')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);

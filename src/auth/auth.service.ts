@@ -5,28 +5,27 @@ import * as bcrypt from 'bcryptjs';
 import { UserPayload } from './models/UserPayload';
 import { JwtService } from '@nestjs/jwt';
 
-
 @Injectable()
 export class AuthService {
   constructor(private userService: UserService, private readonly jwtService: JwtService) { }
 
-  login(user: User) {
+  login(user: User, req) {
     const payload: UserPayload = {
       sub: user.id,
       email: user.email,
       name: user.name
     }
     const jwtToken = this.jwtService.sign(payload);
+    req.res.cookie('token', 'Bearer ' + jwtToken, { httpOnly: true });
+
     return {
       access_token: jwtToken
     };
 
   }
 
-
   async validateUser(login: string, password: string) {
     const user = await this.userService.findByLogin(login);
-
     if (user) {
       const senhaValida = bcrypt.compare(password, user.password)
       if (senhaValida) {
@@ -34,13 +33,8 @@ export class AuthService {
           ...user,
           password: undefined
         }
-
       }
-
     }
     throw new Error('Login ou senha está incorreta')
   }
-
-
-
 }

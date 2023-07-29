@@ -12,6 +12,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { CookieModule } from 'nestjs-cookie';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
@@ -32,6 +33,7 @@ dotenv.config({ path: `${__dirname}../.env` })
     provide: APP_GUARD,
     useClass: JwtAuthGuard
   }], 
+  
 }) 
 export class AppModule {
 }

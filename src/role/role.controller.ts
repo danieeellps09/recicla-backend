@@ -4,8 +4,10 @@ import { Role } from "@prisma/client";
 import { RoleService } from "./role.service";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
+import { isPublic } from "src/auth/decorators/is-public.decorator";
 
 @ApiTags('Roles')
+@isPublic()
 @Controller('api/v1/roles')
 export class RoleController {
 

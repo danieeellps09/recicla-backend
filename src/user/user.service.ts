@@ -23,6 +23,7 @@ export class UserService {
       name: createUserDto.name,
       phone: createUserDto.phone,
       password: hashedPassword,
+      role: createUserDto.role
     };
     const createdUser = await this.prisma.user.create({ data });
     return createdUser;

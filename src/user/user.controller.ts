@@ -1,10 +1,13 @@
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
+import { Roles } from 'src/role/decorators/role.decorator';
+import { UserRole } from 'src/role/enums/roles.enum';
+import { RolesGuard } from 'src/role/guards/role.guard';
 
 
 
@@ -54,6 +57,8 @@ export class UserController {
   @ApiOperation({ summary: 'Deleta um usuário existente.' })
   @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
   @Delete(':id')
+  @Roles(UserRole.ADMIN) 
+  @UseGuards(RolesGuard)
   async delete(@Param('id') id: number) {
     return await this.userService.delete(id);
   }

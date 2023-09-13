@@ -56,4 +56,15 @@ export class CreateUserDto {
   @IsBoolean()
   status: boolean;
 
+  @ApiProperty({
+    example: 'user',
+    description: 'Papel do usuario',
+  })
+
+  @IsString()
+  role: string;
+
+ 
+
+
 }

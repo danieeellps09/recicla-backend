@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, Param, NotFoundException, Put, Delete } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBody, ApiOkResponse } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBody, ApiOkResponse, ApiBearerAuth } from "@nestjs/swagger";
 import { Role } from "@prisma/client";
 import { RoleService } from "./role.service";
 import { CreateRoleDto } from "./dto/create-role.dto";
@@ -7,6 +7,8 @@ import { UpdateRoleDto } from "./dto/update-role.dto";
 
 @ApiTags('Roles')
 @Controller('api/v1/roles')
+@ApiBearerAuth()
+
 export class RoleController {
 
     constructor(private readonly roleService: RoleService) { }

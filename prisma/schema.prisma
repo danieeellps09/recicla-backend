@@ -16,6 +16,7 @@ model User {
   phone      String @db.VarChar(255)
   name       String @db.VarChar(255)
   status     Boolean
+  role       String
   createdAt  DateTime @default(now()) @db.Timestamp() @map(name: "created_at")
   updatedAt  DateTime @updatedAt @db.Timestamp() @map(name: "updated_at")
 

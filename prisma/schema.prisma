@@ -33,7 +33,7 @@ model UserRole {
 
 model Role {
   id                Int @id @default(autoincrement())
-  name              String @db.VarChar(255)
+  name              String @db.VarChar(255) @unique
   description       String @db.VarChar(255)
   status            Boolean
   createdAt         DateTime @default(now()) @db.Timestamp() @map(name: "created_at")

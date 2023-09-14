@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { Roles } from 'src/role/decorators/role.decorator';
@@ -12,8 +12,8 @@ import { AddRolesDto } from './dto/add-roles-user.dto';
 
 
 
-@isPublic()
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('api/v1/users')
 export class UserController {
 
@@ -68,8 +68,8 @@ export class UserController {
   @ApiOkResponse({ description: 'As funções foram associadas com sucesso ao usuário.', type: CreateUserDto })
  
   @Post(':userId/add-roles-by-name')
-  async addRolesByName(@Param('userId') userId: number, @Body() body: { roleNames: string[] }) {
-    const { roleNames } = body;
+  async addRolesByName(@Param('userId') userId: number, @Body() addRolesDto: AddRolesDto) {
+    const { roleNames } = addRolesDto;
     const roleIds = await this.userService.getRoleIdsByName(roleNames);
     
     await this.userService.addRolesToUser(userId, roleIds);

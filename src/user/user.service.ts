@@ -58,6 +58,12 @@ export class UserService {
 
 
   async delete(id: number) {
+    await this.prisma.userRole.deleteMany({
+      where: {
+        userId: id,
+      },
+    });
+
     return await this.prisma.user.delete({
       where: { id },
     });
@@ -75,6 +81,9 @@ export class UserService {
       },
     });
 
+    
+    console.log(roleNames)
+
     if (roles.length !== roleNames.length) {
       throw new NotFoundException('Uma ou mais funções não foram encontradas.');
     }
@@ -89,13 +98,13 @@ export class UserService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
   
     if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+      throw new NotFoundException(`Usuario com  ${userId} não foi encontrado`);
     }
   
     const roles = await this.prisma.role.findMany({ where: { id: { in: roleIds } } });
   
     if (roles.length !== roleIds.length) {
-      throw new NotFoundException('One or more roles not found');
+      throw new NotFoundException('Uma ou mais roles não foram encontradas');
     }
   
     await Promise.all(

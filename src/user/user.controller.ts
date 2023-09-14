@@ -8,6 +8,7 @@ import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { Roles } from 'src/role/decorators/role.decorator';
 import { UserRole } from 'src/role/enums/roles.enum';
 import { RolesGuard } from 'src/role/guards/role.guard';
+import { AddRolesDto } from './dto/add-roles-user.dto';
 
 
 
@@ -63,4 +64,17 @@ export class UserController {
     return await this.userService.delete(id);
   }
 
+  @ApiOperation({ summary: 'Associa funções a um usuário existente.' })
+  @ApiOkResponse({ description: 'As funções foram associadas com sucesso ao usuário.', type: CreateUserDto })
+ 
+  @Post(':userId/add-roles-by-name')
+  async addRolesByName(@Param('userId') userId: number, @Body() body: { roleNames: string[] }) {
+    const { roleNames } = body;
+    const roleIds = await this.userService.getRoleIdsByName(roleNames);
+    
+    await this.userService.addRolesToUser(userId, roleIds);
+
+    return 'Funções adicionadas com sucesso ao usuário.';
+  }
+  
 }

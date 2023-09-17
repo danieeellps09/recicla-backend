@@ -46,8 +46,11 @@ export class RoleService {
 
 
   async delete(id: number) {
-    return await this.prisma.role.delete({
-      where: { id },
-    });
+    const role = await this.prisma.role.findUnique({ where: { id } });
+
+    if (!role) {
+      throw new NotFoundException(`Role with ID ${id} not found`);
+    }
+    return await this.prisma.role.delete({ where: { id } });
   }
 }

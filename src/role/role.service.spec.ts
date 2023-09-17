@@ -4,6 +4,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateRoleDto } from './dto/update-role.dto';
 
 describe('RoleService', () => {
     let roleService: RoleService;
@@ -121,6 +122,111 @@ describe('RoleService', () => {
         });
     });
 
+    describe('update', () => {
+        it('should update a role when it exists', async () => {
+            const roleId = 1; 
+            const updateRoleDto: UpdateRoleDto = {
+              name: 'Novo Nome',
+              description: 'Nova Descrição',
+              status: false,
+            };
+        
+            const existingRole: Role = {
+              id: roleId,
+              name: 'Papel Existente',
+              description: 'Descrição Existente',
+              status: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+        
+            jest.spyOn(prismaService.role, 'findUnique').mockResolvedValue(existingRole);
+        
+            jest.spyOn(prismaService.role, 'update').mockResolvedValue({
+              ...existingRole,
+              ...updateRoleDto,
+            });
+        
+            const updatedRole = await roleService.update(roleId, updateRoleDto);
+        
+            expect(prismaService.role.findUnique).toHaveBeenCalledWith({
+              where: { id: roleId },
+            });
+        
+            expect(prismaService.role.update).toHaveBeenCalledWith({
+              where: { id: roleId },
+              data: updateRoleDto,
+            });
+        
+            expect(updatedRole).toEqual({
+              ...existingRole,
+              ...updateRoleDto,
+            });
+          });
+        
+          it('should throw NotFoundException when trying to update a non-existing role', async () => {
+            const roleId = 999;  
+            const updateRoleDto: UpdateRoleDto = {
+              name: 'Novo Nome',
+              description: 'Nova Descrição',
+              status: false,
+            };
+        
+     
 
+            jest.spyOn(prismaService.role, 'findUnique').mockResolvedValue(null);
+        
+            try {
+              await roleService.update(roleId, updateRoleDto);
+            } catch (error) {
+              expect(error).toBeInstanceOf(NotFoundException);
+              expect(error.message).toBe(`Role with ID ${roleId} not found`);
+            }
+          });
+    })
+
+    describe('delete',() =>{
+        it('should delete a role when it exists', async () => {
+            const roleId = 1; 
+        
+            const existingRole: Role = {
+              id: roleId,
+              name: 'Papel Existente',
+              description: 'Descrição Existente',
+              status: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+        
+            jest.spyOn(prismaService.role, 'findUnique').mockResolvedValue(existingRole);
+        
+            jest.spyOn(prismaService.role, 'delete').mockResolvedValue(existingRole);
+        
+            const deletedRole = await roleService.delete(roleId);
+        
+            expect(prismaService.role.findUnique).toHaveBeenCalledWith({
+              where: { id: roleId },
+            });
+        
+            expect(prismaService.role.delete).toHaveBeenCalledWith({
+              where: { id: roleId },
+            });
+        
+            expect(deletedRole).toEqual(existingRole);
+          });
+        
+          it('should throw NotFoundException when trying to delete a non-existing role', async () => {
+            const roleId = 999; 
+        
+            jest.spyOn(prismaService.role, 'findUnique').mockResolvedValue(null);
+        
+            try {
+              await roleService.delete(roleId);
+            } catch (error) {
+              expect(error).toBeInstanceOf(NotFoundException);
+              expect(error.message).toBe(`Role with ID ${roleId} not found`);
+            }
+          });
+    })
 
 });

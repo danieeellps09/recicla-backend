@@ -5,7 +5,7 @@ import { CreateRoleDto } from "./create-role.dto";
 export class UpdateRoleDto extends PartialType(CreateRoleDto) {
 
     @IsNumber()
-    id: number;
+    id?: number;
 
     @ApiProperty({
         example: 'Analista de Sistemas',

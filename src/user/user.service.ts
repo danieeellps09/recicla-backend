@@ -58,8 +58,69 @@ export class UserService {
 
 
   async delete(id: number) {
+    await this.prisma.userRole.deleteMany({
+      where: {
+        userId: id,
+      },
+    });
+
     return await this.prisma.user.delete({
       where: { id },
     });
   }
+
+  async getRoleIdsByName(roleNames: string[]): Promise<number[]> {
+    const roles = await this.prisma.role.findMany({
+      where: {
+        name: {
+          in: roleNames,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    
+    console.log(roleNames)
+
+    if (roles.length !== roleNames.length) {
+      throw new NotFoundException('Uma ou mais funções não foram encontradas.');
+    }
+
+    const roleIds = roles.map((role) => role.id);
+
+    return roleIds;
+  }
+
+
+  async addRolesToUser(userId: number, roleIds: number[]): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+  
+    if (!user) {
+      throw new NotFoundException(`Usuario com  ${userId} não foi encontrado`);
+    }
+  
+    const roles = await this.prisma.role.findMany({ where: { id: { in: roleIds } } });
+  
+    if (roles.length !== roleIds.length) {
+      throw new NotFoundException('Uma ou mais roles não foram encontradas');
+    }
+  
+    await Promise.all(
+      roleIds.map(async (roleId) => {
+        await this.prisma.userRole.create({
+          data: {
+            userId,
+            roleId,
+          },
+        });
+      }),
+    );
+  
+    return this.prisma.user.findUnique({ where: { id: userId } });
+  }
+  
+
+
 }

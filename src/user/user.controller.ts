@@ -1,15 +1,19 @@
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
+import { Roles } from 'src/role/decorators/role.decorator';
+import { UserRole } from 'src/role/enums/roles.enum';
+import { RolesGuard } from 'src/role/guards/role.guard';
+import { AddRolesDto } from './dto/add-roles-user.dto';
 
 
 
-@isPublic()
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('api/v1/users')
 export class UserController {
 
@@ -54,8 +58,23 @@ export class UserController {
   @ApiOperation({ summary: 'Deleta um usuário existente.' })
   @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
   @Delete(':id')
+  @Roles(UserRole.ADMIN) 
+  @UseGuards(RolesGuard)
   async delete(@Param('id') id: number) {
     return await this.userService.delete(id);
   }
 
+  @ApiOperation({ summary: 'Associa funções a um usuário existente.' })
+  @ApiOkResponse({ description: 'As funções foram associadas com sucesso ao usuário.', type: CreateUserDto })
+ 
+  @Post(':userId/add-roles-by-name')
+  async addRolesByName(@Param('userId') userId: number, @Body() addRolesDto: AddRolesDto) {
+    const { roleNames } = addRolesDto;
+    const roleIds = await this.userService.getRoleIdsByName(roleNames);
+    
+    await this.userService.addRolesToUser(userId, roleIds);
+
+    return 'Funções adicionadas com sucesso ao usuário.';
+  }
+  
 }

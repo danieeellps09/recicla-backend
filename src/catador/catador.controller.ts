@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { ApiOkResponse, ApiCreatedResponse, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Catador } from './entities/catador.entity';
 import { CatadorService } from './catador.service';
 import { CatadorDto } from './dto/create-catador.dto';
@@ -7,28 +8,40 @@ import { CatadorDto } from './dto/create-catador.dto';
 export class CatadorController {
   constructor(private readonly catadorService: CatadorService) {}
 
+  @ApiOperation({ summary: 'Cria um novo catador.' })
+  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: Catador })
+  @ApiBody({ type: CatadorDto })
   @Post()
-  create(@Body() catador: CatadorDto): Promise<Catador> {
+  async create(@Body() catador: CatadorDto): Promise<Catador> {
     return this.catadorService.create(catador);
   }
 
+  @ApiOperation({ summary: 'Obtém todos os catadores.' })
+  @ApiOkResponse({ description: 'Retorna todos os catadores.', type: Catador, isArray: true })
   @Get()
-  findAll(): Promise<Catador[]> {
+  async findAll(): Promise<Catador[]> {
     return this.catadorService.findAll();
   }
 
+  @ApiOperation({ summary: 'Obtém um catador pelo ID.' })
+  @ApiOkResponse({ description: 'Retorna um catador pelo ID.', type: Catador })
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Catador> {
+  async findOne(@Param('id') id: string): Promise<Catador> {
     return this.catadorService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Atualiza um catador pelo ID.' })
+  @ApiOkResponse({ description: 'O catador foi atualizado com sucesso.', type: Catador })
+  @ApiBody({ type: Catador })
   @Put(':id')
-  update(@Param('id') id: string, @Body() catador: Catador): Promise<Catador> {
+  async update(@Param('id') id: string, @Body() catador: Catador): Promise<Catador> {
     return this.catadorService.update(+id, catador);
   }
 
+  @ApiOperation({ summary: 'Remove um catador pelo ID.' })
+  @ApiOkResponse({ description: 'O catador foi removido com sucesso.' })
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.catadorService.remove(+id);
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.catadorService.remove(+id);
   }
 }

@@ -12,11 +12,10 @@ export class CatadorDto {
     @IsNumber()
     userId: number;
 
-    @IsOptional()
     @IsString()
     associacao?: string;
 
-    @IsOptional()
+    
     @IsString()
     veiculo?: string;
 }

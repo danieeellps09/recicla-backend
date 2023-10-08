@@ -1,19 +1,22 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
-import { ApiOkResponse, ApiCreatedResponse, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req } from '@nestjs/common';
+import { ApiOkResponse, ApiCreatedResponse, ApiBody, ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Catador } from './entities/catador.entity';
 import { CatadorService } from './catador.service';
 import { CatadorDto } from './dto/create-catador.dto';
+import { AuthRequest } from 'src/auth/models/AuthRequest';
 
-@Controller('catadores')
+@ApiTags('Catadores')
+@ApiBearerAuth()
+@Controller('Catadores')
 export class CatadorController {
   constructor(private readonly catadorService: CatadorService) {}
 
   @ApiOperation({ summary: 'Cria um novo catador.' })
-  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: Catador })
+  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: CatadorDto })
   @ApiBody({ type: CatadorDto })
   @Post()
-  async create(@Body() catador: CatadorDto): Promise<Catador> {
-    return this.catadorService.create(catador);
+  async create(@Body() catador: CatadorDto,  @Req() req: AuthRequest): Promise<Catador> {
+    return this.catadorService.create(catador, req);
   }
 
   @ApiOperation({ summary: 'Obtém todos os catadores.' })

@@ -1,16 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException,Request } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CatadorDto } from './dto/create-catador.dto';
 import { Catador } from './entities/catador.entity';
+import { User } from 'src/user/entities/user.entity';
+import { AuthRequest } from 'src/auth/models/AuthRequest';
 @Injectable()
 export class CatadorService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(catadorDto: CatadorDto): Promise<Catador> {
-
+  async create(catadorDto: CatadorDto,@Request() req: AuthRequest): Promise<Catador> {
+    const user = req.user as User;
     const data = {
-        id: catadorDto.id,
-        userId: catadorDto.userId,
+        userId: user.id,
         assosciacao: catadorDto.associacao,
         tipoDeVeiculo: catadorDto.veiculo
     }

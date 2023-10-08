@@ -29,7 +29,7 @@ dotenv.config({ path: `${__dirname}../.env` })
   AppModule,
   CatadorModule
     ],
-  controllers: [AuthController, AppController], 
+  controllers: [AuthController, AppController, CatadoresController], 
   providers: [AuthService, AppService,
   {
     provide: APP_GUARD,

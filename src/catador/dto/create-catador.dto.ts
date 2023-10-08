@@ -1,11 +1,22 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CatadorDto {
+
+
+    @IsOptional()
+    @IsNumber()
+    id: number;
+
+
+    @IsOptional()
+    @IsNumber()
+    userId: number;
+
     @IsOptional()
     @IsString()
-    associacaoPertencente?: string;
-  
+    associacao?: string;
+
     @IsOptional()
     @IsString()
     veiculo?: string;
-  }
+}

@@ -33,9 +33,6 @@ export class CreateUserDto {
   @IsString()
   endereco: string;
 
-
-
-
   @ApiProperty({
     example: 'gianfelipe@example.com',
     description: 'O email do usuário',
@@ -56,7 +53,7 @@ export class CreateUserDto {
     example: 'suasenha',
     description: 'A senha do usuário',
   })
-
+  @IsOptional()
   @IsString()
   password: string;
 

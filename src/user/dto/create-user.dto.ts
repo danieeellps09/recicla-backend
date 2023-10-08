@@ -16,6 +16,26 @@ export class CreateUserDto {
   @IsString()
   name: string;
   
+
+  @ApiProperty({
+    example: 'Mucuripe',
+    description: 'O nome do bairro' ,
+  })
+
+  @IsString()
+  bairro: string;
+
+  @ApiProperty({
+    example: 'Rua 305, Conjunto São Cristóvão',
+    description: 'O endereco ' ,
+  })
+
+  @IsString()
+  endereco: string;
+
+
+
+
   @ApiProperty({
     example: 'gianfelipe@example.com',
     description: 'O email do usuário',

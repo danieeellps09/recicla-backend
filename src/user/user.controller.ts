@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
@@ -26,9 +26,20 @@ export class UserController {
   })
   @ApiBody({ type: CreateUserDto })
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const user = await this.userService.create(createUserDto);
+      const roleIds = await this.userService.getRoleIdsByName(createUserDto.roleNames);
+
+      await this.userService.addRolesToUser(user.id, roleIds);
+
+      return user;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Ocorreu um erro ao criar o usuário.');
+    }
   }
+  
   
   @ApiOperation({ summary: 'Retorna uma lista de todos os usuários cadastrados.' })
   @ApiOkResponse({ description: 'A lista de usuários.', type: [CreateUserDto] })
@@ -64,17 +75,6 @@ export class UserController {
     return await this.userService.delete(id);
   }
 
-  @ApiOperation({ summary: 'Associa funções a um usuário existente.' })
-  @ApiOkResponse({ description: 'As funções foram associadas com sucesso ao usuário.', type: CreateUserDto })
- 
-  @Post(':userId/add-roles-by-name')
-  async addRolesByName(@Param('userId') userId: number, @Body() addRolesDto: AddRolesDto) {
-    const { roleNames } = addRolesDto;
-    const roleIds = await this.userService.getRoleIdsByName(roleNames);
-    
-    await this.userService.addRolesToUser(userId, roleIds);
-
-    return 'Funções adicionadas com sucesso ao usuário.';
-  }
+  
   
 }

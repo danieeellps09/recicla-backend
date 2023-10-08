@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserDto {
 
@@ -55,6 +55,13 @@ export class CreateUserDto {
 
   @IsBoolean()
   status: boolean;
+  
+  @ApiProperty({
+    example: ['admin', 'user', 'catador'],
+    description: 'As roles do usuário',
+  })
+  @IsArray()
+  roleNames: string[]; 
 
 
 }

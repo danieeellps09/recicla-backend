@@ -1,0 +1,39 @@
+version: '3'
+services:
+  db:
+    image: mariadb
+    
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: America/Fortaleza
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/var/lib/mysql
+    networks:
+      - internal-network
+
+  app:
+    image: node:18-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    environment:
+      DATABASE_URL: "mysql://${MYSQL_ROOT_USER}:${MYSQL_ROOT_PASSWORD}@db:3306/projeto"
+      TZ: America/Fortaleza
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      # - /app/node_modules
+    # command: sh -c "npm install && npm run build && npm run start"
+    networks:
+      - internal-network
+    depends_on:
+      - db
+
+networks:
+  internal-network:
+    driver: bridge

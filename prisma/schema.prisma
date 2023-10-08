@@ -21,6 +21,9 @@ model User {
   createdAt  DateTime @default(now()) @db.Timestamp() @map(name: "created_at")
   updatedAt  DateTime @updatedAt @db.Timestamp() @map(name: "updated_at")
   role       UserRole[]
+  catador    Catador? @relation("CatadorToUser")
+
+
   @@map("users")
 }
 model UserRole {
@@ -43,4 +46,14 @@ model Role {
   users             UserRole[]
 
   @@map("roles")
+}
+
+
+model Catador {
+  id                  Int     @id @default(autoincrement())
+  userId              Int     @unique
+  associacao String?
+  veiculo             String?
+  @@map("catadores")
+  user                 User   @relation("CatadorToUser",fields: [userId], references: [id])
 }

@@ -12,25 +12,34 @@ export class CatadorService {
     const user = req.user as User;
     const data = {
         userId: user.id,
-        assosciacao: catadorDto.associacao,
-        tipoDeVeiculo: catadorDto.veiculo
+        associacao: catadorDto.associacao,
+        veiculo: catadorDto.veiculo
     }
     const Catador =  await this.prismaService.catador.create({data});
     return Catador
   }
 
   async findAll(): Promise<Catador[]> {
-    return this.prismaService.catador.findMany();
-  }
+    return this.prismaService.catador.findMany({
+        include: {
+          user: true, 
+        },
+      });
+}
 
   async findOne(id: number): Promise<Catador> {
     const catador = await this.prismaService.catador.findUnique({
-      where: { id },
-    });
-    if (!catador) {
-      throw new NotFoundException('Catador not found');
-    }
-    return catador;
+        where: { id },
+        include: {
+          user: true, // Inclua o relacionamento com o usuário
+        },
+      });
+    
+      if (!catador) {
+        throw new NotFoundException('Catador not found');
+      }
+    
+      return catador;
   }
 
   async update(id: number, catador: Catador): Promise<Catador> {

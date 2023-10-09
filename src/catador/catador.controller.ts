@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Param, Put, Delete, Req } from '@nestjs/co
 import { ApiOkResponse, ApiCreatedResponse, ApiBody, ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Catador } from './entities/catador.entity';
 import { CatadorService } from './catador.service';
-import { CatadorDto } from './dto/create-catador.dto';
+import { CreateCatadorDto } from './dto/create-catador.dto';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
+import { UpdateCatadorDto } from './dto/update-catador.dto';
 
 @ApiTags('Catadores')
 @ApiBearerAuth()
@@ -12,14 +13,14 @@ export class CatadorController {
   constructor(private readonly catadorService: CatadorService) {}
 
   @ApiOperation({ summary: 'Cria um novo catador.' })
-  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: CatadorDto })
-  @ApiBody({ type: CatadorDto })
+  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: CreateCatadorDto })
+  @ApiBody({ type: CreateCatadorDto })
   @Post()
-  async create(@Body() catador: CatadorDto,  @Req() req: AuthRequest): Promise<Catador> {
+  async create(@Body() catador: CreateCatadorDto,  @Req() req: AuthRequest): Promise<Catador> {
     return this.catadorService.create(catador, req);
   }
 
-  @ApiOperation({ summary: 'Obtém todos os catadores.' })
+  @ApiOperation({ summary: 'Obtém todos os catadores.'})
   @ApiOkResponse({ description: 'Retorna todos os catadores.', type: Catador, isArray: true })
   @Get()
   async findAll(): Promise<Catador[]> {
@@ -37,8 +38,8 @@ export class CatadorController {
   @ApiOkResponse({ description: 'O catador foi atualizado com sucesso.', type: Catador })
   @ApiBody({ type: Catador })
   @Put(':id')
-  async update(@Param('id') id: string, @Body() catador: Catador): Promise<Catador> {
-    return this.catadorService.update(+id, catador);
+  async update(@Param('id') id: string, @Body() updateCatadorDto: UpdateCatadorDto): Promise<Catador> {
+    return this.catadorService.update(+id, updateCatadorDto);
   }
 
   @ApiOperation({ summary: 'Remove um catador pelo ID.' })

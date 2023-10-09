@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 
-export class CatadorDto {
+export class CreateCatadorDto {
 
 
     @IsOptional()

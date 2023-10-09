@@ -53,7 +53,23 @@ model Catador {
   id                  Int     @id @default(autoincrement())
   userId              Int     @unique
   associacao String?
-  veiculo             String?
+  veiculo             CatadorVeiculo[]
   @@map("catadores")
   user                 User   @relation("CatadorToUser",fields: [userId], references: [id])
+}
+
+model Veiculo {
+  id       Int    @id @default(autoincrement())
+  tipo_veiculo String?
+  catadores CatadorVeiculo[]
+}
+
+
+model CatadorVeiculo {
+  catadorId Int
+  veiculoId Int
+  catador   Catador  @relation(fields: [catadorId], references: [id])
+  veiculo   Veiculo  @relation(fields: [veiculoId], references: [id])
+
+  @@id([catadorId, veiculoId])
 }

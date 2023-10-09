@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CatadorDto {
 
@@ -22,10 +22,10 @@ export class CatadorDto {
     associacao?: string;
 
     @ApiProperty({
-        example: 'bike eletrica',
-        description: 'Veículo do catador',
+        example: ['Bicicleta elétrica', 'caminhão'],
+        description: 'Veículos do catador',
       })
-    
-    @IsString()
-    veiculo?: string;
+      @IsArray()
+      @IsString({ each: true })
+      veiculo: string[]; 
 }

@@ -11,8 +11,12 @@ export class CatadorService {
   async create(catadorDto: CatadorDto,@Request() req: AuthRequest): Promise<Catador> {
     const user = req.user as User;
     
-  
-    const catador = await this.prismaService.catador.create({});
+  const data = {
+    id: catadorDto.id,
+    userId: catadorDto.userId,
+    associacao: catadorDto.associacao
+  }
+    const catador = await this.prismaService.catador.create({data});
   
     if (!catador) {
       throw new NotFoundException('Failed to create catador');

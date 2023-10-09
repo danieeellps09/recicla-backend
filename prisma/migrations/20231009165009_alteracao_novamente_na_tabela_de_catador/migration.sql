@@ -20,23 +20,10 @@ ALTER TABLE `users` MODIFY `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMES
     MODIFY `updated_at` TIMESTAMP NOT NULL;
 
 -- CreateTable
-CREATE TABLE `Veiculo` (
+CREATE TABLE `veiculos` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `tipo_veiculo` VARCHAR(191) NULL,
+    `nomeVeiculo` VARCHAR(255) NULL,
 
+    UNIQUE INDEX `veiculos_nomeVeiculo_key`(`nomeVeiculo`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `CatadorVeiculo` (
-    `catadorId` INTEGER NOT NULL,
-    `veiculoId` INTEGER NOT NULL,
-
-    PRIMARY KEY (`catadorId`, `veiculoId`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- AddForeignKey
-ALTER TABLE `CatadorVeiculo` ADD CONSTRAINT `CatadorVeiculo_catadorId_fkey` FOREIGN KEY (`catadorId`) REFERENCES `catadores`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `CatadorVeiculo` ADD CONSTRAINT `CatadorVeiculo_veiculoId_fkey` FOREIGN KEY (`veiculoId`) REFERENCES `Veiculo`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

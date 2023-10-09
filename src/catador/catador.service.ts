@@ -58,13 +58,7 @@ export class CatadorService {
   }
 
 
-  async getVeiculoByName(nomeVeiculo: string): Promise<Veiculo | null> {
-    const veiculo = await this.prismaService.veiculo.findUnique({
-      where: { nomeVeiculo },
-    });
-  
-    return veiculo;
-  }
+ 
 
  
 }

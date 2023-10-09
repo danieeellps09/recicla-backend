@@ -10,13 +10,43 @@ export class CatadorService {
 
   async create(catadorDto: CatadorDto,@Request() req: AuthRequest): Promise<Catador> {
     const user = req.user as User;
-    const data = {
-        userId: user.id,
-        associacao: catadorDto.associacao,
-        veiculo: catadorDto.veiculo
+    const { associacao, veiculos: nomesVeiculos } = catadorDto;
+
+    const veiculosCriados: { id: number }[] = [];
+  
+    for (const nomeVeiculo of nomesVeiculos) {
+      let veiculo = await this.prismaService.veiculo.findUnique({
+        where: { nomeVeiculo: nomeVeiculo },
+      });
+  
+      if (!veiculo) {
+        veiculo = await this.prismaService.veiculo.create({
+          data: {
+            nomeVeiculo: nomeVeiculo,
+          },
+        });
+      }
+  
+veiculosCriados.push({ id: veiculo.id });
     }
-    const Catador =  await this.prismaService.catador.create({data});
-    return Catador
+  
+    const catador = await this.prismaService.catador.create({
+      data: {
+        associacao,
+        veiculos: {
+          connect: veiculosCriados.map((veiculo) => ({ id: veiculo.id })),
+        },
+      },
+      include: {
+        veiculos: true,
+      },
+    });
+  
+    if (!catador) {
+      throw new NotFoundException('Failed to create catador');
+    }
+  
+    return catador;
   }
 
   async findAll(): Promise<Catador[]> {
@@ -31,7 +61,7 @@ export class CatadorService {
    const catador = await this.prismaService.catador.findUnique({
     where: { id },
     include: {
-      user: true, // Inclua o relacionamento com o usuário
+      user: true, 
     },
   });
 
@@ -54,4 +84,15 @@ export class CatadorService {
       where: { id },
     });
   }
+
+
+  async getVeiculoByName(nomeVeiculo: string): Promise<Veiculo | null> {
+    const veiculo = await this.prismaService.veiculo.findUnique({
+      where: { nomeVeiculo },
+    });
+  
+    return veiculo;
+  }
+
+ 
 }

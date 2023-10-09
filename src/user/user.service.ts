@@ -21,6 +21,8 @@ export class UserService {
       status: createUserDto.status,
       email: createUserDto.email,
       name: createUserDto.name,
+      bairro: createUserDto.bairro,
+      endereco: createUserDto.endereco,
       phone: createUserDto.phone,
       password: hashedPassword,
     };

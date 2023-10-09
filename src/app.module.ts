@@ -13,6 +13,7 @@ import { AppService } from './app.service';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CookieModule } from 'nestjs-cookie';
+import { CatadorModule } from './catador/catador.module';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
@@ -25,7 +26,8 @@ dotenv.config({ path: `${__dirname}../.env` })
       privateKey: process.env.JWT_SECRET_KEY,
       signOptions: {expiresIn: '30d'} 
   }),
-  AppModule
+  AppModule,
+  CatadorModule
     ],
   controllers: [AuthController, AppController], 
   providers: [AuthService, AppService,

@@ -53,7 +53,6 @@ model Catador {
   id                  Int     @id @default(autoincrement())
   userId              Int     @unique
   associacao String?
-  veiculos         CatadorVeiculo[]            
   @@map("catadores")
   user                 User   @relation("CatadorToUser",fields: [userId], references: [id])
 }
@@ -61,13 +60,6 @@ model Catador {
 model Veiculo {
   id       Int    @id @default(autoincrement())
   nomeVeiculo String?  @db.VarChar(255) @unique
-  catadores CatadorVeiculo[]
-}
-model CatadorVeiculo {
-  catadorId Int
-  veiculoId Int
-  catador   Catador  @relation(fields: [catadorId], references: [id])
-  veiculo   Veiculo  @relation(fields: [veiculoId], references: [id])
+  @@map("veiculos")
 
-  @@id([catadorId, veiculoId])
 }

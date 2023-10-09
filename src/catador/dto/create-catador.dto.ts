@@ -21,11 +21,5 @@ export class CatadorDto {
     @IsString()
     associacao?: string;
 
-    @ApiProperty({
-      example: ['Bicicleta elétrica', 'Caminhão'],
-      description: 'Veículos do catador',
-    })
-    @IsArray()
-    @IsString({ each: true }) 
-    veiculos: string[];
+ 
 }

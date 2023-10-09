@@ -28,18 +28,18 @@ export class CatadorService {
 }
 
   async findOne(id: number): Promise<Catador> {
-    const catador = await this.prismaService.catador.findUnique({
-        where: { id },
-        include: {
-          user: true, // Inclua o relacionamento com o usuário
-        },
-      });
-    
-      if (!catador) {
-        throw new NotFoundException('Catador not found');
-      }
-    
-      return catador;
+   const catador = await this.prismaService.catador.findUnique({
+    where: { id },
+    include: {
+      user: true, // Inclua o relacionamento com o usuário
+    },
+  });
+
+  if (!catador) {
+    throw new NotFoundException('Catador not found');
+  }
+
+  return catador;
   }
 
   async update(id: number, catador: Catador): Promise<Catador> {

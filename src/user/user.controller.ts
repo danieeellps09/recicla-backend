@@ -13,7 +13,7 @@ import { AddRolesDto } from './dto/add-roles-user.dto';
 
 
 @ApiTags('Users')
-@ApiBearerAuth()
+@isPublic()
 @Controller('api/v1/users')
 export class UserController {
 

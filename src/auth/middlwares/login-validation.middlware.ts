@@ -14,7 +14,7 @@ import { LoginBody } from '../models/LoginBody';
       const body = req.body;
   
       const loginBody = new LoginBody();
-      loginBody.login = body.login;
+      loginBody.email = body.email;
       loginBody.password = body.password;
   
       const validations = await validate(loginBody);

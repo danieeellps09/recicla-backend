@@ -5,7 +5,6 @@
   - You are about to alter the column `updated_at` on the `roles` table. The data in that column could be lost. The data in that column will be cast from `Timestamp(0)` to `Timestamp`.
   - You are about to alter the column `created_at` on the `users` table. The data in that column could be lost. The data in that column will be cast from `Timestamp(0)` to `Timestamp`.
   - You are about to alter the column `updated_at` on the `users` table. The data in that column could be lost. The data in that column will be cast from `Timestamp(0)` to `Timestamp`.
-  - A unique constraint covering the columns `[name]` on the table `roles` will be added. If there are existing duplicate values, this will fail.
 
 */
 -- AlterTable
@@ -16,5 +15,13 @@ ALTER TABLE `roles` MODIFY `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMES
 ALTER TABLE `users` MODIFY `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     MODIFY `updated_at` TIMESTAMP NOT NULL;
 
--- CreateIndex
-CREATE UNIQUE INDEX `roles_name_key` ON `roles`(`name`);
+-- CreateTable
+CREATE TABLE `associacoes` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `nome` VARCHAR(255) NULL,
+    `CNPJ` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `associacoes_nome_key`(`nome`),
+    UNIQUE INDEX `associacoes_CNPJ_key`(`CNPJ`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

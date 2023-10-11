@@ -63,3 +63,12 @@ model Veiculo {
   @@map("veiculos")
 
 }
+
+
+model Associacao {
+  id       Int    @id @default(autoincrement())
+  nome String?  @db.VarChar(255) @unique
+  CNPJ  String    @unique
+  @@map("associacoes")
+
+}

@@ -32,9 +32,18 @@
 
 ```bash
 $ npm install
-```
+$ npm install -g prisma
+$ npm install @prisma/client
+$ npm install -g @nestjs/cli
+
 
 ## Running the app
+
+## One once to install all the dependencies
+$ docker compose up
+$ prisma migration dev
+
+
 
 ```bash
 # development

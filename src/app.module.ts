@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CookieModule } from 'nestjs-cookie';
 import { CatadorModule } from './catador/catador.module';
 import { VeiculoModule } from './veiculo/veiculo.module';
+import { EmailModule } from './email/email.module';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
@@ -29,7 +30,8 @@ dotenv.config({ path: `${__dirname}../.env` })
   }),
   AppModule,
   CatadorModule,
-  VeiculoModule
+  VeiculoModule,
+  EmailModule
     ],
   controllers: [AuthController, AppController], 
   providers: [AuthService, AppService,

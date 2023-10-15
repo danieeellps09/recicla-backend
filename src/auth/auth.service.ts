@@ -4,13 +4,13 @@ import { User } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { UserPayload } from './models/UserPayload';
 import { JwtService } from '@nestjs/jwt';
-import jwt from 'jsonwebtoken'
+const jwt = require('jsonwebtoken');
 import * as nodemailer from 'nodemailer';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService,
-    private readonly user: User) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
 
   private readonly transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -63,7 +63,6 @@ export class AuthService {
 
 async generateResetToken(users:User):Promise<string>{
   const user = await this.userService.findByEmail(users.email)
-  console.log(user)
   
 
   if (!user) {
@@ -110,25 +109,39 @@ async generateResetToken(users:User):Promise<string>{
 
   async validateResetToken(token: string): Promise<boolean> {
     try {
+      if(!token){
+      throw new NotFoundException('Token não encontrado')
+      }
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      console.log('Token decodificado:', decodedToken);
       return true;
     } catch (error) {
+      console.error('Erro ao validar token:', error.message);
       return false;
     }
   }
 
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
     try {
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      const userId = (decodedToken as any).userId;
-
-      const userIndex = this.userService.findById(userId);
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY) as DecodedToken;
+      const userId = decodedToken.id;
+      console.log("token:",token)
+      console.log('userID:',userId)
+      let userIndex = await this.userService.findById(userId);
       if (!userIndex) {
         throw new NotFoundException('Usuário não encontrado');
       }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      this.user.password = hashedPassword;
+      
+      const passwordUpdate:UpdateUserDto = {
+        id: userId,
+        login: decodedToken.login,
+        password: hashedPassword,
+        status: true,    
+      };
+  
 
+      await this.userService.update(userId, passwordUpdate);
 
       return true;
     } catch (error) {

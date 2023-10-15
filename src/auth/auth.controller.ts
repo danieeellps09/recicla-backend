@@ -64,7 +64,7 @@ async forgotPassword(@Body() forgotEmailDto: ForgotEmailDto) {
   return { message: 'E-mail de redefinição de senha enviado com sucesso' };
 }
 
-
+@isPublic()
 @Post('reset-password/:token')
 async resetPassword(@Param('token') token: string, @Body() changePasswordDto:ChangePasswordDto ) {
   const isValidToken = await this.authService.validateResetToken(token);

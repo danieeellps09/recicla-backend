@@ -6,6 +6,8 @@ import {
   UseGuards,
   Request,
   Get,
+  NotFoundException,
+  Body,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -35,4 +37,25 @@ export class AuthController {
   getUsuarioAtual(@CurrentUserLogged() user: User) {
     return user;
   }
+
+
+
+
+@Post('forgot-password')
+async forgotPassword(@Body() body: { email: string}) {
+  const {email} = body
+  const user = await this.authService.findUserByEmail(email);
+
+  if (!user) {
+    throw new NotFoundException('E-mail não cadastrado');
+  }
+
+  const resetToken = await this.authService.generateResetToken(user);
+
+  await this.authService.sendPasswordResetEmail(user.email, resetToken);
+
+  // Retornar uma resposta de sucesso
+  return { message: 'E-mail de redefinição de senha enviado com sucesso' };
+}
+
 }

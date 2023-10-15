@@ -5,11 +5,21 @@ import * as bcrypt from 'bcryptjs';
 import { UserPayload } from './models/UserPayload';
 import { JwtService } from '@nestjs/jwt';
 import jwt from 'jsonwebtoken'
+import * as nodemailer from 'nodemailer';
+
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private readonly jwtService: JwtService,
-    private readonly users: User) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
 
+  private readonly transporter = nodemailer.createTransport({
+    host: 'gmail',
+    port: 587,
+    secure: false, 
+    auth: {
+      user: 'danieltricolorlps@gmail.com',
+      pass: 'QueDeusPerdoeEssasPessoasRuins*@',
+    },
+  });
   login(user: User, req) {
     const payload: UserPayload = {
       sub: user.id,
@@ -50,23 +60,43 @@ export class AuthService {
   }
 
 
-async generateResetToken(email:string):Promise<string>{
-
-    const user = this.users.find(user => user.email === email);
-
-    if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+async generateResetToken(users:User):Promise<string>{
+  const user = this.userService.findByEmail(users.email)
+    const payload = {
+      id: (await user).id,
+      email: (await user).email
     }
-
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
       expiresIn: process.env.JWT_EXPIRATION_TIME,
     });
 
 
     return token;
   }
-}
 
+
+
+  async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+
+
+    const resetLink = `http://seu-app.com/resetar-senha/${resetToken}`; 
+
+    try {
+      // Enviar e-mail
+      await this.transporter.sendMail({
+        from: 'danieltricolorlps@gmail.com',
+        to: email,
+        subject: 'Redefinição de Senha',
+        html: `<p>Você solicitou a redefinição de senha. Clique no link a seguir para redefinir sua senha:</p>
+               <a href="${resetLink}">${resetLink}</a>`,
+      });
+
+      console.log('E-mail de redefinição de senha enviado com sucesso.');
+    } catch (error) {
+      console.error('Erro ao enviar e-mail de redefinição de senha:', error);
+      throw new Error('Erro ao enviar e-mail de redefinição de senha');
+    }
+  }
 
 
 }

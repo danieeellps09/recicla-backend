@@ -49,7 +49,6 @@ export class AuthController {
 @Post('forgot-password')
 async forgotPassword(@Body() forgotEmailDto: ForgotEmailDto) {
   const user = await this.authService.findUserByEmail(forgotEmailDto.email);
-
   if (!user) {
     throw new NotFoundException('E-mail não cadastrado');
   }

@@ -12,12 +12,12 @@ export class AuthService {
   constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
 
   private readonly transporter = nodemailer.createTransport({
-    host: 'gmail',
+    host: 'smtp.gmail.com',
     port: 587,
     secure: false, 
     auth: {
       user: 'danieltricolorlps@gmail.com',
-      pass: 'QueDeusPerdoeEssasPessoasRuins*@',
+      pass: 'xukn intb nznw crtq',
     },
   });
   login(user: User, req) {
@@ -61,15 +61,20 @@ export class AuthService {
 
 
 async generateResetToken(users:User):Promise<string>{
-  const user = this.userService.findByEmail(users.email)
-    const payload = {
-      id: (await user).id,
-      email: (await user).email
-    }
-    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-      expiresIn: process.env.JWT_EXPIRATION_TIME,
-    });
+  const user = await this.userService.findByEmail(users.email)
+  console.log(user)
+  
 
+  if (!user) {
+    throw new NotFoundException('Usuário não encontrado');
+  }
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+
+    const token = this.jwtService.sign(payload)
 
     return token;
   }
@@ -82,7 +87,6 @@ async generateResetToken(users:User):Promise<string>{
     const resetLink = `http://seu-app.com/resetar-senha/${resetToken}`; 
 
     try {
-      // Enviar e-mail
       await this.transporter.sendMail({
         from: 'danieltricolorlps@gmail.com',
         to: email,
@@ -93,8 +97,13 @@ async generateResetToken(users:User):Promise<string>{
 
       console.log('E-mail de redefinição de senha enviado com sucesso.');
     } catch (error) {
-      console.error('Erro ao enviar e-mail de redefinição de senha:', error);
-      throw new Error('Erro ao enviar e-mail de redefinição de senha');
+      if (error.message === 'Invalid login') {
+        console.error('Erro de autenticação:', error);
+        throw new Error('Credenciais de e-mail inválidas');
+      } else {
+        console.error('Erro ao enviar e-mail de redefinição de senha:', error);
+        throw new Error('Erro ao enviar e-mail de redefinição de senha');
+      }
     }
   }
 

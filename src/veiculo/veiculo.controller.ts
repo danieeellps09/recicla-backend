@@ -8,7 +8,7 @@ import { UpdateVeiculo } from './dto/update-veiculo.dto';
 
 @isPublic()
 @ApiTags("Veículos")
-@Controller('veiculo')
+@Controller('api/v1/veiculos')
 export class VeiculoController {
     constructor(private readonly veiculoService: VeiculoService){}
 

@@ -8,7 +8,7 @@ import { UpdateCatadorDto } from './dto/update-catador.dto';
 
 @ApiTags('Catadores')
 @ApiBearerAuth()
-@Controller('Catadores')
+@Controller('api/v1/catadores')
 export class CatadorController {
   constructor(private readonly catadorService: CatadorService) {}
 

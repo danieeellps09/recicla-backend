@@ -8,10 +8,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNumber()
   id: number;
 
-  @ApiProperty({ example: 'gian.silva', description: 'O login do usuário',})
-
-  @IsString()
-  login: string;
+ 
 
   @ApiProperty({ example: 'suasenha', description: 'A senha do usuário', })
   @IsOptional()

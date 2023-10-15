@@ -7,20 +7,16 @@ import { JwtService } from '@nestjs/jwt';
 const jwt = require('jsonwebtoken');
 import * as nodemailer from 'nodemailer';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
 
-  private readonly transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, 
-    auth: {
-      user: 'danieltricolorlps@gmail.com',
-      pass: 'xukn intb nznw crtq',
-    },
-  });
+    ) { }
+
+ 
   login(user: User, req) {
     const payload: UserPayload = {
       sub: user.id,
@@ -87,13 +83,7 @@ async generateResetToken(users:User):Promise<string>{
     const resetLink = `http://seu-app.com/resetar-senha/${resetToken}`; 
 
     try {
-      await this.transporter.sendMail({
-        from: 'danieltricolorlps@gmail.com',
-        to: email,
-        subject: 'Redefinição de Senha',
-        html: `<p>Você solicitou a redefinição de senha. Clique no link a seguir para redefinir sua senha:</p>
-               <a href="${resetLink}">${resetLink}</a>`,
-      });
+      await this.emailService.sendEmail(email, 'Redefinição de Senha', `<p>Você solicitou a redefinição de senha. Clique <a href="${resetLink}">aqui</a> para redefinir sua senha.</p>`);
 
       console.log('E-mail de redefinição de senha enviado com sucesso.');
     } catch (error) {
@@ -113,7 +103,6 @@ async generateResetToken(users:User):Promise<string>{
       throw new NotFoundException('Token não encontrado')
       }
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      console.log('Token decodificado:', decodedToken);
       return true;
     } catch (error) {
       console.error('Erro ao validar token:', error.message);
@@ -133,7 +122,6 @@ async generateResetToken(users:User):Promise<string>{
       
       const passwordUpdate:UpdateUserDto = {
         id: userId,
-        login: decodedToken.login,
         password: hashedPassword,
         status: true,    
       };

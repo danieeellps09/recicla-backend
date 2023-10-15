@@ -41,14 +41,7 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
   
-  @ApiProperty({
-    example: 'gian.silva',
-    description: 'O login do usuário',
-  })
-
-  @IsString()
-  login: string;
-
+ 
   @ApiProperty({
     example: 'suasenha',
     description: 'A senha do usuário',

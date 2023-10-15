@@ -9,13 +9,15 @@ import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlwares/login-validation.middlware';
+import { EmailModule } from 'src/email/email.module';
+import { EmailService } from 'src/email/email.service';
 
 dotenv.config();
 
 @Module({
-    imports: [PrismaModule, UserModule, JwtModule],
+    imports: [PrismaModule, UserModule, JwtModule,EmailModule],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, UserService,JwtStrategy ],
+    providers: [AuthService, LocalStrategy, EmailService,UserService,JwtStrategy ],
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

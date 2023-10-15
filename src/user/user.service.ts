@@ -17,7 +17,6 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
     const data = {
-      login: createUserDto.login,
       status: createUserDto.status,
       email: createUserDto.email,
       name: createUserDto.name,
@@ -36,11 +35,7 @@ export class UserService {
     });
   }
 
-  findByLogin(login: string) {
-    return this.prisma.user.findUnique({
-      where: { login },
-    });
-  }
+  
 
 
   findByEmail(email: string) {

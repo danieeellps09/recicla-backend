@@ -7,7 +7,7 @@ export class EmailService {
 
     constructor() {
         this.transporter = nodemailer.createTransport({
-            service: process.env.EMAIL_SERVICE, // e.g., 'Gmail', 'Outlook'
+            host: process.env.EMAIL_HOST, // e.g., 'Gmail', 'Outlook'
             auth: {
                 user: process.env.EMAIL_USERNAME,
                 pass: process.env.EMAIL_PASSWORD,

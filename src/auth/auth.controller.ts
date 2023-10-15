@@ -8,6 +8,9 @@ import {
   Get,
   NotFoundException,
   Body,
+  UnauthorizedException,
+  InternalServerErrorException,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -19,6 +22,7 @@ import { CurrentUserLogged } from './decorators/current-users-decorator';
 import { User } from 'src/user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ForgotEmailDto } from './dto/forgot-email-dto';
+import { ChangePasswordDto } from './dto/change-password-dto';
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
@@ -57,8 +61,26 @@ async forgotPassword(@Body() forgotEmailDto: ForgotEmailDto) {
 
   await this.authService.sendPasswordResetEmail(user.email, resetToken);
 
-  // Retornar uma resposta de sucesso
   return { message: 'E-mail de redefinição de senha enviado com sucesso' };
 }
+
+
+@Post('reset-password/:token')
+async resetPassword(@Param('token') token: string, @Body() changePasswordDto:ChangePasswordDto ) {
+  const isValidToken = await this.authService.validateResetToken(token);
+
+  if (!isValidToken) {
+    throw new UnauthorizedException('Token inválido ou expirado');
+  }
+
+  const success = await this.authService.resetPassword(token, changePasswordDto.password);
+
+  if (!success) {
+    throw new InternalServerErrorException('Falha ao redefinir a senha');
+  }
+
+  return { message: 'Senha redefinida com sucesso' };
+}
+
 
 }

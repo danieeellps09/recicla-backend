@@ -9,7 +9,8 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService,
+    private readonly user: User) { }
 
   private readonly transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -104,6 +105,35 @@ async generateResetToken(users:User):Promise<string>{
         console.error('Erro ao enviar e-mail de redefinição de senha:', error);
         throw new Error('Erro ao enviar e-mail de redefinição de senha');
       }
+    }
+  }
+
+  async validateResetToken(token: string): Promise<boolean> {
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const userId = (decodedToken as any).userId;
+
+      const userIndex = this.userService.findById(userId);
+      if (!userIndex) {
+        throw new NotFoundException('Usuário não encontrado');
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      this.user.password = hashedPassword;
+
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   }
 

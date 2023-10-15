@@ -11,18 +11,21 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthRequest } from './models/AuthRequest';
 import { LoginDTO } from 'src/auth/dto/login-user-dto';
 import { isPublic } from './decorators/is-public.decorator';
 import { CurrentUserLogged } from './decorators/current-users-decorator';
 import { User } from 'src/user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ForgotEmailDto } from './dto/forgot-email-dto';
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({ summary: 'Faz o login do usuário' })
+  @ApiOkResponse({ description: 'login feito com sucesso', type: LoginDTO })
   @Post('/login')
   @HttpCode(HttpStatus.OK)
   @isPublic()
@@ -40,11 +43,12 @@ export class AuthController {
 
 
 
-
+@ApiOperation({ summary: 'Atualiza as informações de um usuário existente.' })
+ @ApiOkResponse({ description: 'email encaminhado para redefinição de senha' })
+ @isPublic()
 @Post('forgot-password')
-async forgotPassword(@Body() body: { email: string}) {
-  const {email} = body
-  const user = await this.authService.findUserByEmail(email);
+async forgotPassword(@Body() forgotEmailDto: ForgotEmailDto) {
+  const user = await this.authService.findUserByEmail(forgotEmailDto.email);
 
   if (!user) {
     throw new NotFoundException('E-mail não cadastrado');

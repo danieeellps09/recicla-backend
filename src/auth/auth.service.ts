@@ -103,7 +103,6 @@ async generateResetToken(users:User):Promise<string>{
       throw new NotFoundException('Token não encontrado')
       }
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      console.log('Token decodificado:', decodedToken);
       return true;
     } catch (error) {
       console.error('Erro ao validar token:', error.message);
@@ -123,7 +122,6 @@ async generateResetToken(users:User):Promise<string>{
       
       const passwordUpdate:UpdateUserDto = {
         id: userId,
-        login: decodedToken.login,
         password: hashedPassword,
         status: true,    
       };

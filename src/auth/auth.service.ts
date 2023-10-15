@@ -125,8 +125,6 @@ async generateResetToken(users:User):Promise<string>{
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY) as DecodedToken;
       const userId = decodedToken.id;
-      console.log("token:",token)
-      console.log('userID:',userId)
       let userIndex = await this.userService.findById(userId);
       if (!userIndex) {
         throw new NotFoundException('Usuário não encontrado');

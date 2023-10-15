@@ -1,14 +1,26 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { UserPayload } from './models/UserPayload';
 import { JwtService } from '@nestjs/jwt';
+const jwt = require('jsonwebtoken');
+import * as nodemailer from 'nodemailer';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private readonly jwtService: JwtService) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
 
+  private readonly transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, 
+    auth: {
+      user: 'danieltricolorlps@gmail.com',
+      pass: 'xukn intb nznw crtq',
+    },
+  });
   login(user: User, req) {
     const payload: UserPayload = {
       sub: user.id,
@@ -37,4 +49,104 @@ export class AuthService {
     }
     throw new Error('Login ou senha está incorreta')
   }
+
+
+  async findUserByEmail(email: string) {
+    const userEmail = await this.userService.findByEmail(email);
+    if (userEmail) {
+      return userEmail;
+    }
+    throw new Error("Email não encontrado")
+
+  }
+
+
+async generateResetToken(users:User):Promise<string>{
+  const user = await this.userService.findByEmail(users.email)
+  
+
+  if (!user) {
+    throw new NotFoundException('Usuário não encontrado');
+  }
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+
+    const token = this.jwtService.sign(payload)
+
+    return token;
+  }
+
+
+
+  async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+
+
+    const resetLink = `http://seu-app.com/resetar-senha/${resetToken}`; 
+
+    try {
+      await this.transporter.sendMail({
+        from: 'danieltricolorlps@gmail.com',
+        to: email,
+        subject: 'Redefinição de Senha',
+        html: `<p>Você solicitou a redefinição de senha. Clique no link a seguir para redefinir sua senha:</p>
+               <a href="${resetLink}">${resetLink}</a>`,
+      });
+
+      console.log('E-mail de redefinição de senha enviado com sucesso.');
+    } catch (error) {
+      if (error.message === 'Invalid login') {
+        console.error('Erro de autenticação:', error);
+        throw new Error('Credenciais de e-mail inválidas');
+      } else {
+        console.error('Erro ao enviar e-mail de redefinição de senha:', error);
+        throw new Error('Erro ao enviar e-mail de redefinição de senha');
+      }
+    }
+  }
+
+  async validateResetToken(token: string): Promise<boolean> {
+    try {
+      if(!token){
+      throw new NotFoundException('Token não encontrado')
+      }
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      console.log('Token decodificado:', decodedToken);
+      return true;
+    } catch (error) {
+      console.error('Erro ao validar token:', error.message);
+      return false;
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY) as DecodedToken;
+      const userId = decodedToken.id;
+      let userIndex = await this.userService.findById(userId);
+      if (!userIndex) {
+        throw new NotFoundException('Usuário não encontrado');
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      const passwordUpdate:UpdateUserDto = {
+        id: userId,
+        login: decodedToken.login,
+        password: hashedPassword,
+        status: true,    
+      };
+  
+
+      await this.userService.update(userId, passwordUpdate);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+
 }

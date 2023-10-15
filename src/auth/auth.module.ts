@@ -15,7 +15,7 @@ dotenv.config();
 @Module({
     imports: [PrismaModule, UserModule, JwtModule],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtStrategy],
+    providers: [AuthService, LocalStrategy, UserService,JwtStrategy ],
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

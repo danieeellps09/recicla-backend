@@ -16,6 +16,7 @@ import { CookieModule } from 'nestjs-cookie';
 import { CatadorModule } from './catador/catador.module';
 import { VeiculoModule } from './veiculo/veiculo.module';
 import { EmailModule } from './email/email.module';
+import { MaterialModule } from './material/material.module';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
@@ -31,7 +32,8 @@ dotenv.config({ path: `${__dirname}../.env` })
   AppModule,
   CatadorModule,
   VeiculoModule,
-  EmailModule
+  EmailModule,
+  MaterialModule
     ],
   controllers: [AuthController, AppController], 
   providers: [AuthService, AppService,

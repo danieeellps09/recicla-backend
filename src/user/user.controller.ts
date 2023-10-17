@@ -28,6 +28,10 @@ export class UserController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     try {
+      if(createUserDto.roleNames.length === 0){
+        throw new BadRequestException("role não fornecido")
+      }
+    
       const user = await this.userService.create(createUserDto);
       const roleIds = await this.userService.getRoleIdsByName(createUserDto.roleNames);
 
@@ -35,8 +39,7 @@ export class UserController {
 
       return user;
     } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException('Ocorreu um erro ao criar o usuário.');
+      throw new BadRequestException(error.message);
     }
   }
   

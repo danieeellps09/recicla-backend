@@ -18,8 +18,10 @@ import { Logger } from '@nestjs/common';
 @Controller('api/v1/users')
 export class UserController {
 
-  constructor(private readonly userService: UserService) { }
-
+  constructor(private readonly userService: UserService,) { 
+    
+  }
+  private readonly logger = new Logger(UserController.name);
   @ApiOperation({ summary: 'Cria um novo usuário.' })
   @ApiCreatedResponse({
     description: 'O usuário foi criado com sucesso.',
@@ -61,6 +63,7 @@ export class UserController {
       const users = await this.userService.findAll();
       return users;
     } catch (error) {
+      
       throw new InternalServerErrorException('Erro ao buscar a lista de usuários.');
     }
   }
@@ -76,7 +79,9 @@ export class UserController {
       }
       return user;
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar o usuário.');
+      const errorMessage = `Erro ao buscar o usuário: ${error.message}`;
+
+      throw new InternalServerErrorException(errorMessage);
     }
   }
 
@@ -103,8 +108,6 @@ export class UserController {
     @ApiOperation({ summary: 'Deleta um usuário existente.' })
     @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
     @Delete(':id')
-    @Roles(UserRole.ADMIN)
-    @UseGuards(RolesGuard)
     async  delete(@Param('id') id: number) {
       try {
         const deletedUser = await this.userService.delete(id);
@@ -117,6 +120,7 @@ export class UserController {
           throw error;
         } else {
           const errorMessage = error.message || 'Erro desconhecido ao deletar o usuário.';
+         
           throw new InternalServerErrorException(errorMessage);
         }
       }

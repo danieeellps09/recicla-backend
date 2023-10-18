@@ -35,7 +35,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   
   handleRequest(err, user, info: Error, context: ExecutionContext) {
     if (err || info instanceof Error) {
-      throw err || new UnauthorizedException('Você não tem permissão para acessar este recurso, faça o login.');
+      throw err || new UnauthorizedException('Você não tem permissão para acessar este recurso, faça o login ou fale com administrador.');
     }
     return user;
   }

@@ -1,5 +1,5 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -11,43 +11,63 @@ import { LoginDTO } from 'src/auth/dto/login-user-dto';
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(UserService.name);
+
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-
-    const data = {
-      status: createUserDto.status,
-      email: createUserDto.email,
-      name: createUserDto.name,
-      bairro: createUserDto.bairro,
-      endereco: createUserDto.endereco,
-      phone: createUserDto.phone,
-      password: hashedPassword,
-    };
-    const createdUser = await this.prisma.user.create({ data });
-    return createdUser;
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+  
+      const data = {
+        status: createUserDto.status,
+        email: createUserDto.email,
+        name: createUserDto.name,
+        bairro: createUserDto.bairro,
+        endereco: createUserDto.endereco,
+        phone: createUserDto.phone,
+        password: hashedPassword,
+      };
+  
+      const createdUser = await this.prisma.user.create({ data });
+      return createdUser;
+    } catch (error) {
+      this.logger.error(`Erro ao criar o usuário: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Erro ao criar o usuário. Por favor, tente novamente mais tarde.');
+    }
   }
 
-  findById(id: number) {
-    return this.prisma.user.findUnique({
+  async findById(id: number) {
+    const user = await this.prisma.user.findUnique({
       where: { id },
     });
+  
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+    }
+  
+    return user;
   }
 
   
 
 
-  findByEmail(email: string) {
-    return this.prisma.user.findUnique({
+  async findByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
       where: { email },
     });
+  
+    if (!user) {
+      throw new NotFoundException(`Usuário com o e-mail ${email} não encontrado.`);
+    }
+  
+    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Usuario com ${id} não encontrado`);
     }
     return await this.prisma.user.update({
       where: { id },
@@ -61,7 +81,13 @@ export class UserService {
 
 
   async delete(id: number) {
-    await this.prisma.userRole.deleteMany({
+    
+  const user = await this.prisma.user.findUnique({ where: { id } });
+
+  if (!user) {
+    throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+  }
+   await this.prisma.userRole.deleteMany({
       where: {
         userId: id,
       },

@@ -9,6 +9,7 @@ import { Roles } from 'src/role/decorators/role.decorator';
 import { UserRole } from 'src/role/enums/roles.enum';
 import { RolesGuard } from 'src/role/guards/role.guard';
 import { AddRolesDto } from './dto/add-roles-user.dto';
+import { Logger } from '@nestjs/common';
 
 
 
@@ -28,17 +29,17 @@ export class UserController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     try {
-   
+
       if (!createUserDto.roleNames || createUserDto.roleNames.length === 0) {
         throw new BadRequestException("O campo 'roleNames' é obrigatório.");
       }
-  
+
       const roleIds = await this.userService.getRoleIdsByName(createUserDto.roleNames);
-  
+
       if (roleIds.length !== createUserDto.roleNames.length) {
         throw new BadRequestException("Uma ou mais roles fornecidas não existem.");
       }
-  
+
       const user = await this.userService.create(createUserDto);
 
 
@@ -47,46 +48,80 @@ export class UserController {
 
       return user;
     } catch (error) {
-      console.error(error);
       throw new BadRequestException(error.message);
     }
   }
-  
-  
+
+
   @ApiOperation({ summary: 'Retorna uma lista de todos os usuários cadastrados.' })
   @ApiOkResponse({ description: 'A lista de usuários.', type: [CreateUserDto] })
   @Get()
   async findAll(): Promise<User[]> {
-    return this.userService.findAll();
+    try {
+      const users = await this.userService.findAll();
+      return users;
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao buscar a lista de usuários.');
+    }
   }
 
   @ApiOperation({ summary: 'Retorna um usuário pelo seu ID.' })
   @ApiOkResponse({ description: 'O usuário encontrado.', type: CreateUserDto })
   @Get(':id')
   async findById(@Param('id') id: number): Promise<User> {
-    const user = await this.userService.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+    try {
+      const user = await this.userService.findById(id);
+      if (!user) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+      }
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao buscar o usuário.');
     }
-    return user;
   }
 
   @ApiOperation({ summary: 'Atualiza as informações de um usuário existente.' })
   @ApiOkResponse({ description: 'As informações do usuário atualizado.', type: CreateUserDto })
   @Put(':id')
   async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.update(id, updateUserDto);
-  }
+    try {
+      const updatedUser = await this.userService.update(id, updateUserDto);
 
-  @ApiOperation({ summary: 'Deleta um usuário existente.' })
-  @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
-  @Delete(':id')
-  @Roles(UserRole.ADMIN) 
-  @UseGuards(RolesGuard)
-  async delete(@Param('id') id: number) {
-    return await this.userService.delete(id);
-  }
+      if (!updatedUser) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+      }
 
-  
-  
-}
+      return updatedUser;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; 
+      } else {
+        throw new InternalServerErrorException('Erro ao atualizar as informações do usuário.');
+      }
+    }
+  }
+    @ApiOperation({ summary: 'Deleta um usuário existente.' })
+    @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
+    @Delete(':id')
+    @Roles(UserRole.ADMIN)
+    @UseGuards(RolesGuard)
+    async  delete(@Param('id') id: number) {
+      try {
+        const deletedUser = await this.userService.delete(id);
+        if (!deletedUser) {
+          throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+        }
+        return deletedUser;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        } else {
+          const errorMessage = error.message || 'Erro desconhecido ao deletar o usuário.';
+          throw new InternalServerErrorException(errorMessage);
+        }
+      }
+    }
+
+
+
+  }

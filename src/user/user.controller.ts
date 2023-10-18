@@ -28,19 +28,26 @@ export class UserController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     try {
-      if(!createUserDto.roleNames || createUserDto.roleNames.length === 0){
-        throw new BadRequestException("role não fornecido")
+   
+      if (!createUserDto.roleNames || createUserDto.roleNames.length === 0) {
+        throw new BadRequestException("O campo 'roleNames' é obrigatório.");
       }
-    
+  
       const roleIds = await this.userService.getRoleIdsByName(createUserDto.roleNames);
+  
       if (roleIds.length !== createUserDto.roleNames.length) {
         throw new BadRequestException("Uma ou mais roles fornecidas não existem.");
       }
+  
       const user = await this.userService.create(createUserDto);
+
+
+
       await this.userService.addRolesToUser(user.id, roleIds);
 
       return user;
     } catch (error) {
+      console.error(error);
       throw new BadRequestException(error.message);
     }
   }

@@ -40,10 +40,12 @@ export class VeiculoService {
         return veiculo;
     }
 
-    async update(updateVeiculo: UpdateVeiculo):Promise<Veiculo>{
+    async update(id:number, updateVeiculo: UpdateVeiculo):Promise<Veiculo>{
 
-        const id = updateVeiculo.id;
-        await this.findById(id);
+        const veiculo = await this.prismaService.veiculo.findUnique({ where: { id } });
+        if (!veiculo) {
+          throw new NotFoundException(`Usuario com ${id} não encontrado`);
+        }
 
         return await this.prismaService.veiculo.update({
             where: { id },

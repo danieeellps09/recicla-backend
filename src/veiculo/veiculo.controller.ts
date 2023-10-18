@@ -52,9 +52,14 @@ export class VeiculoController {
   @ApiOkResponse({ description: 'Veículo atualizado.', type: UpdateVeiculo })
   @ApiBody({ type: UpdateVeiculo })
   @Put()
-  async update(@Body() updateVeiculo: UpdateVeiculo): Promise<Veiculo> {
+  async update(@Param('id') id: number, @Body() updateVeiculo: UpdateVeiculo): Promise<Veiculo> {
     try {
-      return await this.veiculoService.update(updateVeiculo);
+      const veiculoAtualizado =  await this.veiculoService.update(id,updateVeiculo);
+      if (!veiculoAtualizado) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+      }
+
+      return veiculoAtualizado;
     } catch (error) {
       throw new NotFoundException(error.message); 
     }

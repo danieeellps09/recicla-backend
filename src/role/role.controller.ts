@@ -7,7 +7,7 @@ import { UpdateRoleDto } from "./dto/update-role.dto";
 import { isPublic } from "src/auth/decorators/is-public.decorator";
 
 @ApiTags('Roles')
-@ApiBearerAuth()
+@isPublic()
 @Controller('api/v1/roles')
 
 export class RoleController {

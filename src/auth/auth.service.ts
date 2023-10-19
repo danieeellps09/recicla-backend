@@ -8,11 +8,13 @@ const jwt = require('jsonwebtoken');
 import * as nodemailer from 'nodemailer';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { EmailService } from 'src/email/email.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService, private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
+    private configService: ConfigService
 
     ) { }
 
@@ -112,7 +114,7 @@ async generateResetToken(users:User):Promise<string>{
 
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
     try {
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY) as DecodedToken;
+      const decodedToken = jwt.verify(token, this.configService.get<string>('jwtSecretKey')) as DecodedToken;
       const userId = decodedToken.id;
       let userIndex = await this.userService.findById(userId);
       if (!userIndex) {

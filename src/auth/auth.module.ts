@@ -11,15 +11,31 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlwares/login-validation.middlware';
 import { EmailModule } from 'src/email/email.module';
 import { EmailService } from 'src/email/email.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 dotenv.config();
 
 @Module({
-    imports: [PrismaModule, UserModule, JwtModule,EmailModule],
+    imports: [PrismaModule, UserModule,EmailModule, JwtModule.registerAsync({
+        imports: [ConfigModule], 
+        useFactory: (configService: ConfigService) => ({
+          secret: configService.get<string>('jwtSecretKey'), 
+          signOptions: { expiresIn: 3600 },
+        }),
+        inject: [ConfigService], 
+      })],
     controllers: [AuthController],
     providers: [AuthService, LocalStrategy, EmailService,UserService,JwtStrategy ],
 })
 export class AuthModule implements NestModule {
+
+    constructor(private configService: ConfigService) {}
+
+    async onModuleInit() {
+        const jwtSecretKey = this.configService.get<string>('jwtSecretKey');
+        console.log(`JWT_SECRET_KEY: ${jwtSecretKey}`);
+      
+}
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(LoginValidationMiddleware).forRoutes('login')
     }

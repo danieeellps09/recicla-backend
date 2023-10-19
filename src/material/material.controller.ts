@@ -9,7 +9,6 @@ import { Roles } from 'src/role/decorators/role.decorator';
 import { UserRole } from 'src/role/enums/roles.enum';
 import { RolesGuard } from 'src/role/guards/role.guard';
 
-@isPublic()
 @ApiTags("Materiais Recicláveis")
 @Controller('api/v1/material')
 export class MaterialController {
@@ -28,6 +27,7 @@ export class MaterialController {
 
     @ApiOperation({summary: "Retorna todos os materiais cadastrados."})
     @ApiOkResponse({description: "Materiais encontrados", type: [UpdateMaterial]})
+    @isPublic()
     @Get()
     async findAll():Promise<Material[]>{
         return await this.materialService.findAll();
@@ -35,6 +35,7 @@ export class MaterialController {
 
     @ApiOperation({summary: 'Retorna um material ao buscar por seu identificador'})
     @ApiOkResponse({description:'O material procurado.', type: UpdateMaterial} )
+    @isPublic()
     @Get(':id')
     async findById(@Param('id') id:number): Promise<Material>{
         return this.materialService.findById(id);

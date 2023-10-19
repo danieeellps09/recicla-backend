@@ -50,7 +50,7 @@ export class AuthController {
 @ApiOperation({ summary: 'Atualiza as informações de um usuário existente.' })
  @ApiOkResponse({ description: 'email encaminhado para redefinição de senha' })
  @isPublic()
-@Post('forgot-password')
+@Post('esqueceu-senha')
 async forgotPassword(@Body() forgotEmailDto: ForgotEmailDto) {
   const user = await this.authService.findUserByEmail(forgotEmailDto.email);
   if (!user) {
@@ -65,7 +65,7 @@ async forgotPassword(@Body() forgotEmailDto: ForgotEmailDto) {
 }
 
 @isPublic()
-@Post('reset-password/:token')
+@Post('resetar-senha/:token')
 async resetPassword(@Param('token') token: string, @Body() changePasswordDto:ChangePasswordDto ) {
   const isValidToken = await this.authService.validateResetToken(token);
 

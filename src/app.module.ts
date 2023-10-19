@@ -16,11 +16,14 @@ import { CookieModule } from 'nestjs-cookie';
 import { CatadorModule } from './catador/catador.module';
 import { VeiculoModule } from './veiculo/veiculo.module';
 import { EmailModule } from './email/email.module';
+import config from './config/config';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
   imports: [PrismaModule,UserModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({isGlobal: true,
+      load: [config]
+      }),
     AuthModule,
     RoleModule,
     UserModule,

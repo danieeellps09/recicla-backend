@@ -31,7 +31,7 @@ export class AuthModule implements NestModule {
 
     constructor(private configService: ConfigService) {}
 
-}
+
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(LoginValidationMiddleware).forRoutes('login')
     }

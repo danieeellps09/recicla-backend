@@ -16,7 +16,7 @@ export class CatadorService {
     id: createCatadorDto.id,
     userId: user.id,
     associacao: createCatadorDto.associacao
-  }
+  };
     const catador = await this.prismaService.catador.create({data});
   
     if (!catador) {

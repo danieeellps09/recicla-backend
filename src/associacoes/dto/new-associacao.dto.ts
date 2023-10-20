@@ -17,8 +17,8 @@ export class NewAssociacao{
         description: 'O CJPJ da associação',
     })
 
-    @IsCnpjValid()
     @IsString()
+    @IsCnpjValid({message: "CNPJ inválido."})
     cnpj?:string;
 
     @ApiProperty({

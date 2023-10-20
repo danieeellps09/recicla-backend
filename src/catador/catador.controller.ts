@@ -48,4 +48,5 @@ export class CatadorController {
   async remove(@Param('id') id: string): Promise<void> {
     await this.catadorService.remove(+id);
   }
+  
 }

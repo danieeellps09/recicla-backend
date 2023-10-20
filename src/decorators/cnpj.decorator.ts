@@ -15,42 +15,63 @@ export class IsCnpjValidConstraint implements ValidatorConstraintInterface {
             return false;
         }
 
-        // Remova caracteres não numéricos do CNPJ
-        cnpj = cnpj.replace(/[^\d]/g, '');
+        // Remove characters that are not digits
+        cnpj = cnpj.replace(/\D/g, '');
 
-        // Valide o tamanho do CNPJ
+        // Check if the CNPJ has 14 digits
         if (cnpj.length !== 14) {
             return false;
         }
 
-        // Verifique se todos os dígitos são iguais (CNPJs inválidos)
-        if (/^(\d)\1+$/.test(cnpj)) {
+        // Check for known invalid CNPJs
+        if (
+            cnpj === '00000000000000' ||
+            cnpj === '11111111111111' ||
+            cnpj === '22222222222222' ||
+            cnpj === '33333333333333' ||
+            cnpj === '44444444444444' ||
+            cnpj === '55555555555555' ||
+            cnpj === '66666666666666' ||
+            cnpj === '77777777777777' ||
+            cnpj === '88888888888888' ||
+            cnpj === '99999999999999'
+        ) {
             return false;
         }
 
-        // Calcula o primeiro dígito verificador
+        // Validate the first digit
         let sum = 0;
+        let weight = 5;
         for (let i = 0; i < 12; i++) {
-            sum += parseInt(cnpj[i]) * (5 - (i % 4));
+            sum += parseInt(cnpj.charAt(i)) * weight;
+            weight--;
+            if (weight < 2) {
+                weight = 9;
+            }
         }
-        let digit = 11 - (sum % 11);
-        if (digit > 9) {
-            digit = 0;
-        }
-        if (parseInt(cnpj[12]) !== digit) {
+
+        let remainder = sum % 11;
+        let digit1 = remainder < 2 ? 0 : 11 - remainder;
+
+        if (parseInt(cnpj.charAt(12)) !== digit1) {
             return false;
         }
 
-        // Calcula o segundo dígito verificador
+        // Validate the second digit
         sum = 0;
+        weight = 6;
         for (let i = 0; i < 13; i++) {
-            sum += parseInt(cnpj[i]) * (6 - (i % 4));
+            sum += parseInt(cnpj.charAt(i)) * weight;
+            weight--;
+            if (weight < 2) {
+                weight = 9;
+            }
         }
-        digit = 11 - (sum % 11);
-        if (digit > 9) {
-            digit = 0;
-        }
-        return parseInt(cnpj[13]) === digit;
+
+        remainder = sum % 11;
+        let digit2 = remainder < 2 ? 0 : 11 - remainder;
+
+        return parseInt(cnpj.charAt(13)) === digit2;
     }
 }
 

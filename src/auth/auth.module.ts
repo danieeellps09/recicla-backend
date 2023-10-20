@@ -31,10 +31,6 @@ export class AuthModule implements NestModule {
 
     constructor(private configService: ConfigService) {}
 
-    async onModuleInit() {
-        const jwtSecretKey = this.configService.get<string>('jwtSecretKey');
-        console.log(`JWT_SECRET_KEY: ${jwtSecretKey}`);
-      
 }
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(LoginValidationMiddleware).forRoutes('login')

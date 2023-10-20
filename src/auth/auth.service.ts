@@ -104,7 +104,7 @@ async generateResetToken(users:User):Promise<string>{
       if(!token){
       throw new NotFoundException('Token não encontrado')
       }
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const decodedToken = jwt.verify(token, this.configService.get<string>('jwtSecretKey'));
       return true;
     } catch (error) {
       console.error('Erro ao validar token:', error.message);

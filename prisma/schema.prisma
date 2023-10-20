@@ -69,6 +69,7 @@ model Associacao {
   id       Int    @id @default(autoincrement())
   userId   Int    @unique
   cnpj  String    @unique
+  endereco String
   @@map("associacoes")
   user            User      @relation("AssociacaoToUser", fields: [userId], references: [id])
 

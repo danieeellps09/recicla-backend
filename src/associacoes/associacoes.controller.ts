@@ -4,6 +4,7 @@ import { NewAssociacao } from './dto/new-associacao.dto';
 import { Associacao } from './entities/associacao.entity';
 import { AssociacoesService } from './associacoes.service';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
+import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
 
 @ApiTags("Associações")
 @Controller('api/v1/associacoes')
@@ -35,9 +36,9 @@ export class AssociacoesController {
 
     @ApiOperation({summary: "Atualiza informações de uma associação."})
     @ApiOkResponse({description: "Dados da associação atualizadas com sucesso", type: Associacao})
-    @ApiBody({type: Associacao})
+    @ApiBody({type: UpdateAssociacaoDto})
     @Put(':id')
-    async update(@Param('id') id:number, @Body() associacao: Associacao):Promise<Associacao>{
+    async update(@Param('id') id:number, @Body() associacao: UpdateAssociacaoDto):Promise<Associacao>{
         return await this.associacaoService.update(id, associacao);
     }
 

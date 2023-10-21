@@ -71,3 +71,9 @@ model Associacao {
   @@map("associacoes")
 
 }
+
+model Material {
+  id       Int      @id @default(autoincrement())
+  nome     String   @db.VarChar(255) @unique
+  @@map("materiais")
+}

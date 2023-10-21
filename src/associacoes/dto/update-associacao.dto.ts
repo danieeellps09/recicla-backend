@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsString } from "class-validator";
-import { IsCnpjValid } from "src/decorators/cnpj.decorator";
+import { IsCnpjValid } from "src/associacoes/decorators/cnpj.decorator";
 
 export class UpdateAssociacaoDto{
 

@@ -8,62 +8,83 @@ import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
 
 @Injectable()
 export class AssociacoesService {
-    constructor(private readonly prismaService:PrismaService){}
+    constructor(private readonly prismaService: PrismaService) {}
 
-    async create(newAssociacao:NewAssociacao, req: AuthRequest):Promise<Associacao>{
-        const user = req.user as User;
-        if(!user){
-            throw new NotFoundException(`Não foi possível encontrar usuário de id ${user.id}`);
-        }
-
-        const data = {
-            userId: user.id,
-            cnpj: newAssociacao.cnpj,
-            endereco: newAssociacao.endereco
-        };
-
-        const associacao = await this.prismaService.associacao.create({data});
-
-        if(!associacao){
-            throw new InternalServerErrorException("Ocorreu um erro ao criar associação");
-        }
-
-        return associacao;
-    }
-
-    async findAll():Promise<Associacao[]>{
-        return this.prismaService.associacao.findMany({
-            include: {
-                user:true
+    async create(newAssociacao: NewAssociacao, req: AuthRequest): Promise<Associacao> {
+        try {
+            const user = req.user as User;
+            if (!user) {
+                throw new NotFoundException(`Não foi possível encontrar usuário de id ${user.id}`);
             }
-        });
-    }
 
-    async findById(id:number):Promise<Associacao>{
-        const associacao = await this.prismaService.associacao.findUnique({
-            where: {id},
-            include: {
-                user: true
+            const data = {
+                userId: user.id,
+                cnpj: newAssociacao.cnpj,
+                endereco: newAssociacao.endereco
+            };
+
+            const associacao = await this.prismaService.associacao.create({ data });
+
+            if (!associacao) {
+                throw new InternalServerErrorException("Ocorreu um erro ao criar associação");
             }
-        });
 
-        if(!associacao){
-            throw new NotFoundException("Associação não encontrada");
+            return associacao;
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao criar associação.');
         }
-
-        return associacao;
     }
 
-    async update(id:number, associacao:UpdateAssociacaoDto):Promise<Associacao>{
-        return await this.prismaService.associacao.update({
-            where: {id},
-            data: associacao
-        })
+    async findAll(): Promise<Associacao[]> {
+        try {
+            return this.prismaService.associacao.findMany({
+                include: {
+                    user: true
+                }
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao buscar associações.');
+        }
     }
 
-    async delete(id:number){
-        await this.prismaService.associacao.delete({
-            where: {id}
-        });
+    async findById(id: number): Promise<Associacao> {
+        try {
+            const associacao = await this.prismaService.associacao.findUnique({
+                where: { id },
+                include: {
+                    user: true
+                }
+            });
+
+            if (!associacao) {
+                throw new NotFoundException('Associação não encontrada.');
+            }
+
+            return associacao;
+        } catch (error) {
+            throw new NotFoundException('Associação não encontrada.');
+        }
+    }
+
+    async update(id: number, associacao: UpdateAssociacaoDto): Promise<Associacao> {
+        try {
+            return await this.prismaService.associacao.update({
+                where: { id },
+                data: associacao
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao atualizar associação.');
+        }
+    }
+
+    async delete(id: number): Promise<void> {
+        try {
+            await this.prismaService.associacao.delete({
+                where: { id }
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao apagar associação.');
+        }
     }
 }
+

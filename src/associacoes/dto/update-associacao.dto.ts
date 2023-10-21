@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 import { IsCnpjValid } from "src/associacoes/decorators/cnpj.decorator";
 
 export class UpdateAssociacaoDto{
@@ -8,6 +8,8 @@ export class UpdateAssociacaoDto{
         example: 1,
         description: 'O id de usuário',
     })
+
+    @IsOptional()
     @IsNumber()
     userId?: number;
 

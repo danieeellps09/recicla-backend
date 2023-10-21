@@ -21,6 +21,7 @@ model User {
   updatedAt  DateTime @updatedAt @db.Timestamp() @map(name: "updated_at")
   role       UserRole[]
   catador    Catador? @relation("CatadorToUser")
+  associacao Associacao? @relation("AssociacaoToUser")
 
 
   @@map("users")
@@ -66,9 +67,11 @@ model Veiculo {
 
 model Associacao {
   id       Int    @id @default(autoincrement())
-  nome String?  @db.VarChar(255) @unique
-  CNPJ  String    @unique
+  userId   Int    @unique
+  cnpj  String    @unique
+  endereco String
   @@map("associacoes")
+  user            User      @relation("AssociacaoToUser", fields: [userId], references: [id])
 
 }
 

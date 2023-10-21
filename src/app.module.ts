@@ -17,6 +17,7 @@ import { CatadorModule } from './catador/catador.module';
 import { VeiculoModule } from './veiculo/veiculo.module';
 import { EmailModule } from './email/email.module';
 import { MaterialModule } from './material/material.module';
+import { AssociacoesModule } from './associacoes/associacoes.module';
 dotenv.config({ path: `${__dirname}../.env` })
 
 @Module({
@@ -33,7 +34,8 @@ dotenv.config({ path: `${__dirname}../.env` })
   CatadorModule,
   VeiculoModule,
   EmailModule,
-  MaterialModule
+  MaterialModule,
+  AssociacoesModule
     ],
   controllers: [AuthController, AppController], 
   providers: [AuthService, AppService,

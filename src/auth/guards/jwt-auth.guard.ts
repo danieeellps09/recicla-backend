@@ -2,6 +2,7 @@
 import {
   ExecutionContext,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
@@ -29,5 +30,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return canActivate
     }
     return super.canActivate(context) as boolean;
+  }
+
+  
+  handleRequest(err, user, info: Error, context: ExecutionContext) {
+    if (err || info instanceof Error) {
+      throw err || new UnauthorizedException('Você não tem permissão para acessar este recurso, faça o login ou fale com administrador.');
+    }
+    return user;
   }
 }

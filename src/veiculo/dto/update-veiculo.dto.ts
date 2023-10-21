@@ -1,7 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsNumber, IsString } from "class-validator";
+import { NewVeiculo } from "./new-veiculo.dto";
 
-export class UpdateVeiculo{
+export class UpdateVeiculo extends  PartialType(NewVeiculo){
     
     @ApiProperty({
         example: 1,

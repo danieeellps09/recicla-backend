@@ -24,7 +24,7 @@ export class RoleService {
       where: { id },
     });
     if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
+      throw new NotFoundException(`Role con ID ${id} não encontrado`);
     }
     return role
   }
@@ -32,7 +32,7 @@ export class RoleService {
   async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
     const role = await this.prisma.role.findUnique({ where: { id } });
     if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
+      throw new NotFoundException(`Role com ID ${id} não encontrado`);
     }
     return await this.prisma.role.update({
       where: { id },
@@ -49,7 +49,7 @@ export class RoleService {
     const role = await this.prisma.role.findUnique({ where: { id } });
 
     if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
+      throw new NotFoundException(`Role com ID ${id} não encontrado`);
     }
     return await this.prisma.role.delete({ where: { id } });
   }

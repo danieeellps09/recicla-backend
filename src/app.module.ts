@@ -6,7 +6,7 @@ import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './role/role.module';
-import {JwtModule} from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from "dotenv";
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -19,32 +19,33 @@ import { EmailModule } from './email/email.module';
 import { MaterialModule } from './material/material.module';
 import { AssociacoesModule } from './associacoes/associacoes.module';
 dotenv.config({ path: `${__dirname}../.env` })
+import config from './config/config';
 
 @Module({
-  imports: [PrismaModule,UserModule,
-    ConfigModule.forRoot(),
+  imports: [PrismaModule, UserModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config]
+    }),
     AuthModule,
     RoleModule,
     UserModule,
-    JwtModule.register({
-      privateKey: process.env.JWT_SECRET_KEY,
-      signOptions: {expiresIn: '30d'} 
-  }),
-  AppModule,
-  CatadorModule,
-  VeiculoModule,
-  EmailModule,
-  MaterialModule,
-  AssociacoesModule
-    ],
-  controllers: [AuthController, AppController], 
-  providers: [AuthService, AppService,
-  {
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard
-  }], 
-  
-}) 
+    JwtModule,
+    CatadorModule,
+    VeiculoModule,
+    EmailModule,
+    MaterialModule,
+    AssociacoesModule,
+    AppModule
+  ],
+  controllers: [ AppController],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    }],
+
+})
 export class AppModule {
 }
 

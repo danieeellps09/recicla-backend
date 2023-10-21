@@ -1,23 +1,26 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
     private readonly transporter;
 
-    constructor() {
+
+    constructor(    private configService: ConfigService
+        ) {
         this.transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST, // e.g., 'Gmail', 'Outlook'
+            host:  this.configService.get<string>('provedor_email'), // e.g., 'Gmail', 'Outlook'
             auth: {
-                user: process.env.EMAIL_USERNAME,
-                pass: process.env.EMAIL_PASSWORD,
+                user: this.configService.get<string>('email_username'),
+                pass: this.configService.get<string>('email_password'),
             },
         });
     }
 
     async sendEmail(to: string, subject: string, text: string) {
         const mailOptions = {
-            from: process.env.EMAIL_USERNAME,
+            from: this.configService.get<string>('email_username'),
             to,
             subject,
             text,

@@ -16,9 +16,9 @@ export class CatadorController {
   @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: CreateCatadorDto })
   @ApiBody({ type: CreateCatadorDto })
   @Post()
-  async create(@Body() catador: CreateCatadorDto, @Req() req: AuthRequest): Promise<Catador> {
+  async create(@Body() catador: CreateCatadorDto): Promise<Catador> {
     try {
-      return await this.catadorService.create(catador, req);
+      return await this.catadorService.create(catador);
     } catch (error) {
       throw new BadRequestException('Erro ao criar o catador. Por favor, verifique os dados fornecidos.');
     }

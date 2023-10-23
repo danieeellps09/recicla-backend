@@ -1,58 +1,106 @@
-import { Injectable, NotFoundException,Request } from '@nestjs/common';
+import { Injectable, NotFoundException, Request } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCatadorDto } from './dto/create-catador.dto';
 import { Catador } from './entities/catador.entity';
-import { User } from 'src/user/entities/user.entity';
-import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { UpdateCatadorDto } from './dto/update-catador.dto';
+import { UserService } from 'src/user/user.service';
+import { AssociacoesService } from 'src/associacoes/associacoes.service';
+import { PasswordGenerator } from 'src/helpers/password-generator';
+import { EmailService } from 'src/email/email.service';
+
+
 @Injectable()
 export class CatadorService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService, 
+    private readonly userService: UserService,
+    private readonly associacaoService: AssociacoesService,
+    private readonly emailService: EmailService) { }
 
-  async create(createCatadorDto: CreateCatadorDto,@Request() req: AuthRequest): Promise<Catador> {
-    const user = req.user as User;
-    
-  const data = {
-    id: createCatadorDto.id,
-    userId: user.id,
-    associacao: createCatadorDto.associacao
-  };
-    const catador = await this.prismaService.catador.create({data});
-  
+  async create(createCatadorDto: CreateCatadorDto): Promise<Catador> {
+    //seta o role como admin
+    createCatadorDto.user.roleNames = ["admin"];
+
+    //cria uma senha alfanumérica randomica para o novo usuário
+    if(!createCatadorDto.user.password){
+      createCatadorDto.user.password = PasswordGenerator.generate(5);
+    }
+
+    //cria o user
+    const user = await this.userService.create(createCatadorDto.user);
+
+    //verifica se a associação existe
+    await this.associacaoService.findById(createCatadorDto.idAssociacao);
+
+    const data = {
+      id: createCatadorDto.id,
+      userId: user.id,
+      bairro: createCatadorDto.bairro,
+      endereco: createCatadorDto.endereco,
+      associacaoId: createCatadorDto.idAssociacao
+    };
+
+    //salva o catador
+    const catador = await this.prismaService.catador.create({ data });
+
     if (!catador) {
       throw new NotFoundException('Failed to create catador');
     }
-  
+
+    //envia um email para o catador contendo sua senha para login
+    //OBS: Mensagem temporária
+    this.emailService.sendEmail(user.email, "Conta criada com sucesso", 
+      `Conta criada com sucesso! Sua senha para login é ${user.password}. 
+      Para trocar de senha, faça login na plataforma, vá em perfil e troque sua senha!`);
+
     return catador;
   }
 
   async findAll(): Promise<Catador[]> {
     return this.prismaService.catador.findMany({
-        include: {
-          user: true, 
-        },
-      });
-}
-
-  async findOne(id: number): Promise<Catador> {
-   const catador = await this.prismaService.catador.findUnique({
-    where: { id },
-    include: {
-      user: true, 
-    },
-  });
-
-  if (!catador) {
-    throw new NotFoundException('Catador not found');
+      include: {
+        user: true,
+        associacao: true
+      },
+    });
   }
 
-  return catador;
+  async findOne(id: number): Promise<Catador> {
+    const catador = await this.prismaService.catador.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        associacao: true
+      },
+    });
+
+    if (!catador) {
+      throw new NotFoundException('Catador not found');
+    }
+
+    return catador;
   }
 
   async update(id: number, updateCatadorDto: UpdateCatadorDto): Promise<Catador> {
+
+    //pega o id do user que está relacionado com o catador
+    const userId = (await this.findOne(id)).userId;
+
+    //atualiza os dados do usuário
+    await this.userService.update(userId, updateCatadorDto.user);
+
+    const data = {
+      id: updateCatadorDto.id,
+      userId: updateCatadorDto.id,
+      bairro: updateCatadorDto.bairro,
+      endereco: updateCatadorDto.endereco,
+      associacaoId: updateCatadorDto.associacaoId
+    };
+
+    //atualiza os dados do catador
     return this.prismaService.catador.update({
       where: { id },
-      data: updateCatadorDto,
+      data: data,
     });
   }
 
@@ -61,9 +109,4 @@ export class CatadorService {
       where: { id },
     });
   }
-
-
- 
-
- 
 }

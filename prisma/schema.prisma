@@ -51,7 +51,7 @@ model Catador {
   id                  Int     @id @default(autoincrement())
   userId              Int     @unique
   associacaoId        Int     
-  cpf        String @db,VarChar(14)
+  cpf        String @db.VarChar(14)
   bairro     String @db.VarChar(255)
   endereco   String @db.VarChar(255)
   @@map("catadores")

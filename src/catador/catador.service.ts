@@ -19,22 +19,23 @@ export class CatadorService {
 
   async create(createCatadorDto: CreateCatadorDto): Promise<Catador> {
     //seta o role como admin
-    createCatadorDto.user.roleNames = ["admin"];
+    createCatadorDto.user.roleNames = ["catador"];
 
     //cria uma senha alfanumérica randomica para o novo usuário
     if(!createCatadorDto.user.password){
       createCatadorDto.user.password = PasswordGenerator.generate(5);
     }
 
-    //cria o user
-    const user = await this.userService.create(createCatadorDto.user);
-
     //verifica se a associação existe
     await this.associacaoService.findById(createCatadorDto.idAssociacao);
+    
+    //cria o user
+    const user = await this.userService.create(createCatadorDto.user);
 
     const data = {
       id: createCatadorDto.id,
       userId: user.id,
+      cpf: createCatadorDto.cpf,
       bairro: createCatadorDto.bairro,
       endereco: createCatadorDto.endereco,
       associacaoId: createCatadorDto.idAssociacao
@@ -92,6 +93,7 @@ export class CatadorService {
     const data = {
       id: updateCatadorDto.id,
       userId: updateCatadorDto.id,
+      cpf: updateCatadorDto.cpf,
       bairro: updateCatadorDto.bairro,
       endereco: updateCatadorDto.endereco,
       associacaoId: updateCatadorDto.associacaoId

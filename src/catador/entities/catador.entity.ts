@@ -4,6 +4,7 @@ import { User } from '../../user/entities/user.entity'; // Importa a entidade Us
 export class Catador extends User {
   id?: number;
   userId?: number;
-  associacao?: string;
+  associacaoId: number;
+  cpf?: string;
   veiculo?: string;
 }

@@ -5,8 +5,6 @@ CREATE TABLE `users` (
     `email` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(255) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
-    `bairro` VARCHAR(255) NOT NULL,
-    `endereco` VARCHAR(255) NOT NULL,
     `status` BOOLEAN NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` TIMESTAMP NOT NULL,
@@ -42,7 +40,10 @@ CREATE TABLE `roles` (
 CREATE TABLE `catadores` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
-    `associacao` VARCHAR(191) NULL,
+    `associacaoId` INTEGER NOT NULL,
+    `cpf` VARCHAR(14) NOT NULL,
+    `bairro` VARCHAR(255) NOT NULL,
+    `endereco` VARCHAR(255) NOT NULL,
 
     UNIQUE INDEX `catadores_userId_key`(`userId`),
     PRIMARY KEY (`id`)
@@ -86,6 +87,9 @@ ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_roleId_fkey` FOREIGN KEY (`roleI
 
 -- AddForeignKey
 ALTER TABLE `catadores` ADD CONSTRAINT `catadores_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `catadores` ADD CONSTRAINT `catadores_associacaoId_fkey` FOREIGN KEY (`associacaoId`) REFERENCES `associacoes`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `associacoes` ADD CONSTRAINT `associacoes_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

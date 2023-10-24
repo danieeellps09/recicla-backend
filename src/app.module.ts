@@ -18,6 +18,7 @@ import { VeiculoModule } from './veiculo/veiculo.module';
 import { EmailModule } from './email/email.module';
 import { MaterialModule } from './material/material.module';
 import { AssociacoesModule } from './associacoes/associacoes.module';
+import { FormsModule } from './forms/forms.module';
 dotenv.config({ path: `${__dirname}../.env` })
 import config from './config/config';
 
@@ -36,7 +37,8 @@ import config from './config/config';
     EmailModule,
     MaterialModule,
     AssociacoesModule,
-    AppModule
+    AppModule,
+    FormsModule
   ],
   controllers: [ AppController],
   providers: [AppService,

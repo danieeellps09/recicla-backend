@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterColetaDto {
 
   @IsOptional()
   @IsNumber()
@@ -37,7 +37,7 @@ export class CreateUserDto {
   })
   
   @IsNumber()
-  Quantidade: number;
+  quantidade: number;
   
 
   @ApiProperty({

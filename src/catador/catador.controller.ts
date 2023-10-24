@@ -54,7 +54,7 @@ export class CatadorController {
     try {
       return await this.catadorService.update(+id, updateCatadorDto);
     } catch (error) {
-      throw new NotFoundException('Catador não encontrado.');
+      throw new NotFoundException(error.message);
     }
   }
 

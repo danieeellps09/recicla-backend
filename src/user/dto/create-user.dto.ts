@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsTelefoneValid } from 'src/decorators/telefone.decorator';
 
 export class CreateUserDto {
 
@@ -38,6 +39,7 @@ export class CreateUserDto {
   })
 
   @IsString()
+  @IsTelefoneValid({message: "Telefone inválido!"})
   phone: string;
   
   @ApiProperty({

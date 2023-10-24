@@ -1,5 +1,5 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -69,10 +69,16 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`Usuario com ${id} não encontrado`);
     }
-    return await this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+    try{
+      return await this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    }
+    catch(error){
+      throw new BadRequestException("E-mail já está em uso por outro usuário.");
+    }
+    
   }
 
   async findAll(): Promise<User[]> {

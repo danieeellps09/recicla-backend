@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsCpfValid } from "src/decorators/cpf.decorator";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 
 export class CreateCatadorDto {
@@ -20,8 +21,8 @@ export class CreateCatadorDto {
   })
 
   @IsOptional()
-  //Depois criar um decorator de cpf
   @IsString()
+  @IsCpfValid({message: "CPF inválido!"})
   cpf: string;
 
   @ApiProperty({ type: CreateUserDto })

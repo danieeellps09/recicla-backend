@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsTelefoneValid } from 'src/decorators/telefone.decorator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
@@ -22,6 +23,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   email?: string;
 
   @ApiProperty({ example: '(11) 99999-9999', description: 'Telefone do usuário' })
+  @IsTelefoneValid({message: "Telefone inválido!"})
   @IsString()
   phone?: string;
 

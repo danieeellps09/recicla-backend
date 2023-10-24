@@ -2,12 +2,9 @@ import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 import { UpdateUserDto } from "src/user/dto/update-user.dto";
 import { Type } from "class-transformer";
+import { IsCpfValid } from "src/decorators/cpf.decorator";
 
 export class UpdateCatadorDto {
-
-
-    @IsNumber()
-    id: number;
 
     @ApiProperty({
         example: '000.000.000-00',
@@ -15,8 +12,8 @@ export class UpdateCatadorDto {
     })
 
     @IsOptional()
-    //Depois criar um decorator de cpf
     @IsString()
+    @IsCpfValid({message: "CPF inválido!"})
     cpf: string;
 
     @ApiProperty({ type: UpdateUserDto })

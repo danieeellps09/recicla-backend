@@ -113,8 +113,8 @@ export class CatadorService {
     await this.userService.update(userId, updateCatadorDto.user);
 
     const data = {
-      id: updateCatadorDto.id,
-      userId: updateCatadorDto.id,
+      id: id,
+      userId: updateCatadorDto.user.id,
       cpf: updateCatadorDto.cpf,
       bairro: updateCatadorDto.bairro,
       endereco: updateCatadorDto.endereco,
@@ -122,7 +122,7 @@ export class CatadorService {
     };
 
     //atualiza os dados do catador
-    return this.prismaService.catador.update({
+    return await this.prismaService.catador.update({
       where: { id },
       data: data,
     });

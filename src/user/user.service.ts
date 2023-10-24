@@ -28,6 +28,8 @@ export class UserService {
       };
   
       const createdUser = await this.prisma.user.create({ data });
+      
+
       return createdUser;
     } catch (error) {
       this.logger.error(`Erro ao criar o usuário: ${error.message}`, error.stack);

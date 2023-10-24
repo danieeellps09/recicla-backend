@@ -20,7 +20,7 @@ export class CatadorController {
     try {
       return await this.catadorService.create(catador);
     } catch (error) {
-      throw new BadRequestException('Erro ao criar o catador. Por favor, verifique os dados fornecidos.');
+      throw new BadRequestException(`${error.message} Não foi possível criar usuário`);
     }
   }
 

@@ -25,7 +25,7 @@ export class CatadorService {
     let rolesIds = [];
 
     try {
-      rolesIds = await this.userService.getRoleIdsByName(createCatadorDto.user.roleNames = ["catador"]);
+      rolesIds = await this.userService.getRoleIdsByName(createCatadorDto.user.roleNames);
     }
     catch (error) {
       const role = await this.roleService.create({
@@ -62,7 +62,13 @@ export class CatadorService {
       };
 
       //salva o catador
-      const catador = await this.prismaService.catador.create({ data });
+      const catador = await this.prismaService.catador.create({ 
+        data: data,
+        include: {
+          user: true,
+          associacao: true
+        } 
+      });
 
       if (!catador) {
         throw new NotFoundException('Failed to create catador');
@@ -125,6 +131,10 @@ export class CatadorService {
     return await this.prismaService.catador.update({
       where: { id },
       data: data,
+      include: {
+        user: true,
+        associacao: true,
+      },
     });
   }
 

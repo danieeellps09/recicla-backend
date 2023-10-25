@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEmail, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class ReturnUserDto {
+    @ApiProperty({ example: 1, description: 'Identificador do usuário' })
     @IsNumber()
     id: number;
 

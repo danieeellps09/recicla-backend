@@ -20,7 +20,7 @@ export class CatadorService {
     private readonly roleService: RoleService) { }
 
   async create(createCatadorDto: CreateCatadorDto): Promise<Catador> {
-    //seta o role como admin
+    //seta o role como catador
     createCatadorDto.user.roleNames = ["catador"];
     let rolesIds = [];
 
@@ -31,7 +31,7 @@ export class CatadorService {
       const role = await this.roleService.create({
         id: null,
         name: "catador",
-        description: "Usuário com permissão para preencher formulário de coleta",
+        description: "Usuário catador",
         status: true
       });
       rolesIds = [role.id];
@@ -139,6 +139,7 @@ export class CatadorService {
   }
 
   async remove(id: number): Promise<void> {
+    //lembrar de apagar as outras tabelas
     await this.prismaService.catador.delete({
       where: { id },
     });

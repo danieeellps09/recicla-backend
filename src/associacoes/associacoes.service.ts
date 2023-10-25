@@ -2,27 +2,52 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewAssociacao } from './dto/new-associacao.dto';
 import { Associacao } from './entities/associacao.entity';
-import { AuthRequest } from 'src/auth/models/AuthRequest';
-import { User } from 'src/user/entities/user.entity';
 import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
+import { UserService } from 'src/user/user.service';
+import { RoleService } from 'src/role/role.service';
+import { PasswordGenerator } from 'src/helpers/password-generator';
 
 @Injectable()
 export class AssociacoesService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly userService: UserService, private readonly roleService: RoleService, private readonly prismaService: PrismaService) { }
 
-    async create(newAssociacao: NewAssociacao, req: AuthRequest): Promise<Associacao> {
+    async create(newAssociacao: NewAssociacao): Promise<Associacao> {
+        //seta o role como catador
+        newAssociacao.user.roleNames = ["associacao"];
+        let rolesIds = [];
+
         try {
-            const user = req.user as User;
-            if (!user) {
-                throw new NotFoundException(`Não foi possível encontrar usuário de id ${user.id}`);
+            rolesIds = await this.userService.getRoleIdsByName(newAssociacao.user.roleNames);
+        }
+        catch (error) {
+            const role = await this.roleService.create({
+                id: null,
+                name: "catador",
+                description: "Usuário catador",
+                status: true
+            });
+            rolesIds = [role.id];
+
+        }
+        finally {
+            //cria uma senha alfanumérica randomica para o novo usuário
+            if (!newAssociacao.user.password) {
+                newAssociacao.user.password = PasswordGenerator.generate(5);
             }
 
+            //cria o user
+            const user = await this.userService.create(newAssociacao.user);
+
+            //adiciona as roles
+            await this.userService.addRolesToUser(user.id, rolesIds);
+
             const data = {
-                userId: user.id,
+                userId: newAssociacao.user.id,
                 cnpj: newAssociacao.cnpj,
                 endereco: newAssociacao.endereco
             };
 
+            //cria a associacao
             const associacao = await this.prismaService.associacao.create({ data });
 
             if (!associacao) {
@@ -30,12 +55,12 @@ export class AssociacoesService {
             }
 
             return associacao;
-        } catch (error) {
-            throw new InternalServerErrorException('Erro ao criar associação.');
+
         }
     }
 
     async findAll(): Promise<Associacao[]> {
+
         try {
             return this.prismaService.associacao.findMany({
                 include: {
@@ -67,10 +92,25 @@ export class AssociacoesService {
     }
 
     async update(id: number, associacao: UpdateAssociacaoDto): Promise<Associacao> {
+
+        //pega o id do user que está relacionado com o catador
+        const userId = (await this.findById(id)).userId;
+
+        await this.userService.update(userId, associacao.user);
+
+        const data = {
+            userId: userId,
+            cnpj: associacao.cnpj,
+            bairro: associacao.bairro,
+            endereco: associacao.endereco
+        }
         try {
             return await this.prismaService.associacao.update({
                 where: { id },
-                data: associacao
+                data: data,
+                include: {
+                    user: true
+                }
             });
         } catch (error) {
             throw new InternalServerErrorException('Erro ao atualizar associação.');

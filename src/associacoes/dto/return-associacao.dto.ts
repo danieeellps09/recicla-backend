@@ -1,15 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { ReturnUserDto } from "src/user/dto/return-user.dto";
 import { Type } from "class-transformer";
-import { IsNumber, IsString, ValidateNested } from "class-validator";
-import { IsCnpjValid } from "src/associacoes/decorators/cnpj.decorator";
-import { CreateUserDto } from "src/user/dto/create-user.dto";
+import { IsString } from "class-validator";
 
-export class NewAssociacao {
+export class ReturnAssociacaoDto{
+    @ApiProperty({
+        example: 1,
+        description: 'O identificador da associação',
+    })
+    id: number;
 
-    @ApiProperty({ type: CreateUserDto })
-    @ValidateNested()
-    @Type(() => CreateUserDto)
-    user: CreateUserDto;
+    @ApiProperty({ type: ReturnUserDto })
+    @Type(() => ReturnUserDto)
+    user: ReturnUserDto;
 
     @ApiProperty({
         example: '12.345.678/0001-90',
@@ -17,7 +20,6 @@ export class NewAssociacao {
     })
 
     @IsString()
-    @IsCnpjValid({ message: "CNPJ inválido." })
     cnpj?: string;
 
     @ApiProperty({

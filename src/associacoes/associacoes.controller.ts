@@ -5,6 +5,8 @@ import { Associacao } from './entities/associacao.entity';
 import { AssociacoesService } from './associacoes.service';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
+import { ReturnAssociacaoDto } from './dto/return-associacao.dto';
+import { AssociacaoConversor } from './dto/associacao-conversor';
 
 @ApiTags("Associações")
 @Controller('api/v1/associacoes')
@@ -16,9 +18,9 @@ export class AssociacoesController {
     @ApiCreatedResponse({ description: 'Associação adicionado com sucesso' })
     @ApiBody({ type: NewAssociacao })
     @Post()
-    async create(@Body() newAssociacao: NewAssociacao, @Req() req: AuthRequest): Promise<Associacao> {
+    async create(@Body() newAssociacao: NewAssociacao): Promise<ReturnAssociacaoDto> {
         try {
-            return await this.associacaoService.create(newAssociacao, req);
+            return AssociacaoConversor.toReturnAssociacaoDto(await this.associacaoService.create(newAssociacao));
         } catch (error) {
             throw new HttpException('Erro ao adicionar associação.', error.message);
         }
@@ -27,9 +29,9 @@ export class AssociacoesController {
     @ApiOperation({ summary: 'Obtém todas as associações.' })
     @ApiOkResponse({ description: 'Lista com todas as associações.', type: Associacao, isArray: true })
     @Get()
-    async findAll(): Promise<Associacao[]> {
+    async findAll(): Promise<ReturnAssociacaoDto[]> {
         try {
-            return await this.associacaoService.findAll();
+            return (await this.associacaoService.findAll()).map(AssociacaoConversor.toReturnAssociacaoDto);
         } catch (error) {
             throw new HttpException('Erro ao buscar associações.', error.message);
         }
@@ -38,9 +40,9 @@ export class AssociacoesController {
     @ApiOperation({ summary: "Encontra uma associação pelo seu id" })
     @ApiOkResponse({ description: "Associação encontrada", type: Associacao })
     @Get(':id')
-    async findByid(@Param('id') id: number): Promise<Associacao> {
+    async findByid(@Param('id') id: number): Promise<ReturnAssociacaoDto> {
         try {
-            return await this.associacaoService.findById(id);
+            return AssociacaoConversor.toReturnAssociacaoDto(await this.associacaoService.findById(id));
         } catch (error) {
             throw new HttpException('Associação não encontrada.', HttpStatus.NOT_FOUND);
         }
@@ -50,9 +52,9 @@ export class AssociacoesController {
     @ApiOkResponse({ description: "Dados da associação atualizadas com sucesso", type: Associacao })
     @ApiBody({ type: UpdateAssociacaoDto })
     @Put(':id')
-    async update(@Param('id') id: number, @Body() associacao: UpdateAssociacaoDto): Promise<Associacao> {
+    async update(@Param('id') id: number, @Body() associacao: UpdateAssociacaoDto): Promise<ReturnAssociacaoDto> {
         try {
-            return await this.associacaoService.update(id, associacao);
+            return AssociacaoConversor.toReturnAssociacaoDto(await this.associacaoService.update(id, associacao));
         } catch (error) {
             throw new HttpException('Erro ao atualizar associação.', error.message);
         }

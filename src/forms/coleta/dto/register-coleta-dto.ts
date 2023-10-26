@@ -32,7 +32,7 @@ export class RegisterColetaDto {
   
 
   @ApiProperty({
-    example: '',
+    example: false,
     description: 'Todos os pontos foram visitados?' ,
   })
 

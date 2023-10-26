@@ -97,6 +97,7 @@ model Coleta {
   catador      Catador    @relation(fields: [idCatador], references: [id])
   associacao   Associacao @relation(fields: [idAssociacao], references: [id])
   veiculo      Veiculo    @relation(fields: [idVeiculo], references: [id])
+  dataColeta   DateTime   @default(now())
 
   @@map("coletas")
 }

@@ -3,18 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class RegisterColetaDto {
-
   @IsOptional()
   @IsNumber()
   id: number;
-
-  @ApiProperty({
-    example: '1',
-    description: 'Id do catador que preenche formulario',
-  })
-  @IsNumber()
-  idCatador: number;
-
 
   @ApiProperty({
     example: '1',
@@ -41,13 +32,19 @@ export class RegisterColetaDto {
   
 
   @ApiProperty({
-    example: 'Todos os pontos foram visitados?',
-    description: 'true=sim, false=não' ,
+    example: '',
+    description: 'Todos os pontos foram visitados?' ,
   })
 
   @IsBoolean()
   pergunta: boolean;
 
- 
+  @ApiProperty({
+    example: 'Não deu certo pois tive que terminar mais cedo',
+    description: 'motivo se a pergunta for falsa' ,
+  })
+
+  @IsString()
+  motivo: string;
 
 }

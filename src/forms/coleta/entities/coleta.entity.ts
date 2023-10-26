@@ -5,6 +5,7 @@ export class User {
     idVeiculo?: number;
     quantidade?: number;
     pergunta?:boolean;
+    motivo?:string;
 
   }
   

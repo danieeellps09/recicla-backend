@@ -1,82 +1,113 @@
 datasource db {
   provider = "mysql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "windows", "linux-musl", "debian-openssl-1.1.x"]
 }
 
 model User {
-  id         Int @id @default(autoincrement())
-  password   String @db.VarChar(255)
-  email      String @db.VarChar(255) @unique
-  phone      String @db.VarChar(255)
-  name       String @db.VarChar(255)
-  bairro     String @db.VarChar(255)
-  endereco   String @db.VarChar(255)
-  status     Boolean  
-  createdAt  DateTime @default(now()) @db.Timestamp() @map(name: "created_at")
-  updatedAt  DateTime @updatedAt @db.Timestamp() @map(name: "updated_at")
+  id         Int         @id @default(autoincrement())
+  password   String      @db.VarChar(255)
+  email      String      @unique @db.VarChar(255)
+  phone      String      @db.VarChar(255)
+  name       String      @db.VarChar(255)
+  bairro     String      @db.VarChar(255)
+  endereco   String      @db.VarChar(255)
+  status     Boolean
+  createdAt  DateTime    @default(now()) @map(name: "created_at") @db.Timestamp()
+  updatedAt  DateTime    @updatedAt @map(name: "updated_at") @db.Timestamp()
   role       UserRole[]
-  catador    Catador? @relation("CatadorToUser")
+  catador    Catador?    @relation("CatadorToUser")
   associacao Associacao? @relation("AssociacaoToUser")
-
 
   @@map("users")
 }
+
 model UserRole {
-  id      Int     @id @default(autoincrement())
-  userId  Int
-  roleId  Int
-  user    User    @relation(fields: [userId], references: [id])
-  role    Role    @relation(fields: [roleId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
 
   @@unique([userId, roleId])
 }
 
 model Role {
-  id                Int @id @default(autoincrement())
-  name              String @db.VarChar(255) @unique
-  description       String @db.VarChar(255)
-  status            Boolean
-  createdAt         DateTime @default(now()) @db.Timestamp() @map(name: "created_at")
-  updatedAt         DateTime @updatedAt @db.Timestamp() @map(name: "updated_at")
-  users             UserRole[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique @db.VarChar(255)
+  description String     @db.VarChar(255)
+  status      Boolean
+  createdAt   DateTime   @default(now()) @map(name: "created_at") @db.Timestamp()
+  updatedAt   DateTime   @updatedAt @map(name: "updated_at") @db.Timestamp()
+  users       UserRole[]
 
   @@map("roles")
 }
 
-
 model Catador {
-  id                  Int     @id @default(autoincrement())
-  userId              Int     @unique
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
   associacao String?
+  coletas    Coleta[]
+  user       User     @relation("CatadorToUser", fields: [userId], references: [id])
+
   @@map("catadores")
-  user                 User   @relation("CatadorToUser",fields: [userId], references: [id])
 }
 
 model Veiculo {
-  id       Int    @id @default(autoincrement())
-  nomeVeiculo String?  @db.VarChar(255) @unique
-  @@map("veiculos")
+  id          Int      @id @default(autoincrement())
+  nomeVeiculo String?  @unique @db.VarChar(255)
+  coletas     Coleta[]
 
+  @@map("veiculos")
 }
 
-
 model Associacao {
-  id       Int    @id @default(autoincrement())
-  userId   Int    @unique
-  cnpj  String    @unique
+  id       Int      @id @default(autoincrement())
+  userId   Int      @unique
+  cnpj     String   @unique
   endereco String
-  @@map("associacoes")
-  user            User      @relation("AssociacaoToUser", fields: [userId], references: [id])
+  coletas  Coleta[]
+  venda    Venda[]
 
+  user User @relation("AssociacaoToUser", fields: [userId], references: [id])
+
+  @@map("associacoes")
 }
 
 model Material {
-  id       Int      @id @default(autoincrement())
-  nome     String   @db.VarChar(255) @unique
+  id   Int    @id @default(autoincrement())
+  nome String @unique @db.VarChar(255)
+
   @@map("materiais")
+}
+
+model Coleta {
+  id           Int        @id @default(autoincrement())
+  quantidade   Int
+  pergunta     Boolean
+  motivo       String
+  idCatador    Int        @map("idCatador")
+  idAssociacao Int        @map("idAssociacao")
+  idVeiculo    Int        @map("idVeiculo")
+  catador      Catador    @relation(fields: [idCatador], references: [id])
+  associacao   Associacao @relation(fields: [idAssociacao], references: [id])
+  veiculo      Veiculo    @relation(fields: [idVeiculo], references: [id])
+
+  @@map("coletas")
+}
+
+model Venda {
+  id Int @id @default(autoincrement())
+
+  idAssociacao      Int        @map("idAssociacao")
+  empresaCompradora String
+  qtdVendida        Int
+  associacao        Associacao @relation(fields: [idAssociacao], references: [id])
+
+  @@map("vendas")
 }

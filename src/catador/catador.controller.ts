@@ -18,6 +18,7 @@ export class CatadorController {
   @Post()
   async create(@Body() catador: CreateCatadorDto, @Req() req: AuthRequest): Promise<Catador> {
     try {
+      console.log('usuario', req.user)
       return await this.catadorService.create(catador, req);
     } catch (error) {
       throw new BadRequestException('Erro ao criar o catador. Por favor, verifique os dados fornecidos.');

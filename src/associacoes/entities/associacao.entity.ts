@@ -6,4 +6,5 @@ export class Associacao extends User{
     cnpj?:string;
     bairro?:string;
     endereco?: string;
+    user?: User;
 }

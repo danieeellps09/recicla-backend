@@ -117,11 +117,24 @@ export class AssociacoesService {
         }
     }
 
+    async disable(id: number) {
+        let associacao = await this.findById(id);
+        const userId = associacao.user.id;
+        associacao.user.status = false;
+        const user = this.prismaService.user.update({
+            where: { id },
+            data: associacao.userId
+        });
+        return associacao;
+    }
+
     async delete(id: number): Promise<void> {
         try {
+            const associacao = await this.findById(id);
             await this.prismaService.associacao.delete({
                 where: { id }
             });
+            await this.userService.delete((associacao).user.id)
         } catch (error) {
             throw new InternalServerErrorException('Erro ao apagar associação.');
         }

@@ -8,6 +8,8 @@ import { AssociacoesService } from 'src/associacoes/associacoes.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
 import { EmailService } from 'src/email/email.service';
 import { RoleService } from 'src/role/role.service';
+import { CatadorController } from './catador.controller';
+import { async } from 'rxjs';
 
 
 @Injectable()
@@ -94,7 +96,7 @@ export class CatadorService {
     });
   }
 
-  async findOne(id: number): Promise<Catador> {
+  async findOne(id: number): Promise<Catador>{
     const catador = await this.prismaService.catador.findUnique({
       where: { id },
       include: {
@@ -138,10 +140,23 @@ export class CatadorService {
     });
   }
 
+  async disable(id: number){
+    let catador = await this.findOne(id);
+    const userId = catador.user.id;
+    catador.user.status = false;
+    const user = this.prismaService.user.update({
+      where: {id},
+      data: catador.userId
+    });
+    return catador;
+  }
+
   async remove(id: number): Promise<void> {
-    //lembrar de apagar as outras tabelas
+    const catador = await this.findOne(id);
     await this.prismaService.catador.delete({
       where: { id },
     });
+
+    await this.userService.delete((catador).user.id);
   }
 }

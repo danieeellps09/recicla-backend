@@ -6,6 +6,7 @@ export class User {
     quantidade?: number;
     pergunta?:boolean;
     motivo?:string;
+    dataColeta?: string;
 
   }
   

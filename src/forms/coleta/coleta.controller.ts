@@ -9,6 +9,7 @@ import { Coleta, User } from '@prisma/client';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
+import { format, isDate, parse } from 'date-fns';
 
 @ApiTags('Formulario de Coletas')
 @ApiBearerAuth()
@@ -30,6 +31,17 @@ private readonly logger = new Logger(ColetaController.name);
 @Post()
 async create(@Body() registerColetaDto: RegisterColetaDto, @Req() req: AuthRequest):Promise<Coleta> {
   try {
+
+    let dataConvertida: Date;
+
+    if (registerColetaDto.dataColeta && isDate(parse(registerColetaDto.dataColeta, 'dd/MM/yyyy', new Date()))) {
+      dataConvertida = parse(registerColetaDto.dataColeta, 'dd/MM/yyyy', new Date());
+    } else {
+      dataConvertida = new Date();
+    }
+
+    const dataFormatada: string = format(dataConvertida, "yyyy-MM-dd'T'HH:mm:ss.SSS");
+
 
     return await this.coletaService.create(registerColetaDto, req)
 

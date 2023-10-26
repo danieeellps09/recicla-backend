@@ -6,6 +6,7 @@ import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { CatadorService } from 'src/catador/catador.service';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
+import {parse, format, isDate} from 'date-fns';
 
 @Injectable()
 export class ColetaService {
@@ -29,7 +30,15 @@ export class ColetaService {
       throw new NotFoundException('Usuário não é um catador.');
     }
 
+    let dataConvertida: Date;
 
+    if (registerColetaDto.dataColeta && isDate(parse(registerColetaDto.dataColeta, 'dd/MM/yyyy', new Date()))) {
+      dataConvertida = parse(registerColetaDto.dataColeta, 'dd/MM/yyyy', new Date());
+    } else {
+      dataConvertida = new Date();
+    }
+
+      const dataPrisma: Date = new Date(dataConvertida.toISOString());
     const data = {
       id: registerColetaDto.id,
       idCatador: idCatador.id,
@@ -37,7 +46,8 @@ export class ColetaService {
       idVeiculo: registerColetaDto.idVeiculo,
       quantidade: registerColetaDto.quantidade,
       pergunta: registerColetaDto.pergunta,
-      motivo: registerColetaDto.motivo
+      motivo: registerColetaDto.motivo,
+      dataColeta: dataPrisma
     };
 
 

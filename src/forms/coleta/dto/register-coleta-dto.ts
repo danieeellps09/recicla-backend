@@ -47,4 +47,13 @@ export class RegisterColetaDto {
   @IsString()
   motivo: string;
 
+  @ApiProperty({
+    example: '22/10/2023',
+    description: 'data do preenchimento do formulario de quando ele faz a coleta',
+    required: false,
+  })
+
+  @IsOptional()
+  @IsString()
+  dataColeta: string;
 }

@@ -87,6 +87,7 @@ CREATE TABLE `coletas` (
     `idCatador` INTEGER NOT NULL,
     `idAssociacao` INTEGER NOT NULL,
     `idVeiculo` INTEGER NOT NULL,
+    `dataColeta` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -97,7 +98,10 @@ CREATE TABLE `vendas` (
     `idAssociacao` INTEGER NOT NULL,
     `empresaCompradora` VARCHAR(191) NOT NULL,
     `qtdVendida` INTEGER NOT NULL,
+    `notaFiscal` VARCHAR(191) NOT NULL,
+    `dataVenda` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `vendas_notaFiscal_key`(`notaFiscal`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

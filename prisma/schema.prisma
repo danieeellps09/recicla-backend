@@ -108,7 +108,9 @@ model Venda {
   idAssociacao      Int        @map("idAssociacao")
   empresaCompradora String
   qtdVendida        Int
+  notaFiscal        String      @unique
   associacao        Associacao @relation(fields: [idAssociacao], references: [id])
+  dataVenda        DateTime   @default(now())
 
   @@map("vendas")
 }

@@ -103,8 +103,7 @@ model Coleta {
 }
 
 model Venda {
-  id Int @id @default(autoincrement())
-
+  id                Int @id @default(autoincrement())
   idAssociacao      Int        @map("idAssociacao")
   empresaCompradora String
   qtdVendida        Int

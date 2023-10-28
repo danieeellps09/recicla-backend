@@ -86,5 +86,20 @@ export class AssociacoesService {
             throw new InternalServerErrorException('Erro ao apagar associação.');
         }
     }
+
+    async getAssociacaoByUserID(userId:number){
+        try {
+            const associacao = await this.prismaService.associacao.findFirst({
+              where: {
+                userId: userId,
+              },
+            });
+            return associacao;
+          } catch (error) {
+            throw new Error('Erro ao obter o Associacao do banco de dados');
+          }
+
+    }
+
 }
 

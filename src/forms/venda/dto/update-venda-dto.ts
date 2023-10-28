@@ -9,43 +9,42 @@ export class UpdateVendaDto extends PartialType(RegisterVendaDto) {
     @ApiProperty({
         example: '1',
         description: 'Id da associacao',
-      })
-      @IsNumber()
-      idAssociacao: number;
-    
-    
-      @ApiProperty({
+    })
+    @IsNumber()
+    idAssociacao: number;
+
+
+    @ApiProperty({
         example: 'Coca-cola',
         description: 'empresa que comprou',
-      })
-      @IsNumber()
-      empresaCompradora: string;
-    
-      @ApiProperty({
+    })
+    @IsNumber()
+    empresaCompradora: string;
+
+    @ApiProperty({
         example: 1202,
         description: 'Quantidade coletada',
-      })
-      
-      @IsNumber()
-      qtdVendida: number;
-      
-      @ApiProperty({
+    })
+
+    @IsNumber()
+    qtdVendida: number;
+
+    @ApiProperty({
         example: 'NF123456789"',
-        description: 'Nota fiscal' ,
-      })
-    
-      @IsString()
-      notaFiscal: string;
-    
-      @ApiProperty({
+        description: 'Nota fiscal',
+    })
+
+    @IsString()
+    notaFiscal: string;
+
+    @ApiProperty({
         example: '22/10/2023',
         description: 'data do preenchimento do formulario de quando ele faz a coleta',
         required: false,
-      })
-    
-      @IsOptional()
-      @IsString()
-      dataVenda: string;
-    }
-    
+    })
+
+    @IsOptional()
+    @IsString()
+    dataVenda: string;
 }
+

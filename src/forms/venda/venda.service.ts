@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, Request } from '@nestjs/common';
-import { Associacao, Catador, Coleta, User } from '@prisma/client';
+import { Associacao, Catador, Coleta, User, Venda } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { RegisterColetaDto } from './dto/register-coleta-dto';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { CatadorService } from 'src/catador/catador.service';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
-import { UpdateColetaDto } from './dto/update-coleta-dto';
 import {parse, format, isDate} from 'date-fns';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
+import { RegisterVendaDto } from './dto/register-venda-dto';
+import { UpdateVendaDto } from './dto/update-venda-dto';
 
 @Injectable()
 export class VendaService {
@@ -19,78 +19,76 @@ export class VendaService {
 
 
 
-  async create(registerColetaDto: RegisterColetaDto, @Request() req: AuthRequest): Promise<Coleta> {
+  async create(registerVendaDto: RegisterVendaDto, @Request() req: AuthRequest): Promise<Venda> {
     const userId = req.user.id;
 
     if (!userId) {
       throw new NotFoundException('user  nao encontrado');
     }
-    const idCatador = await this.associacaoService.getAssociacaoByUserID(userId)
+    const idAssociacao = await this.associacaoService.getAssociacaoByUserID(userId)
 
-    if (!idCatador) {
+    if (!idAssociacao) {
       throw new NotFoundException('Usuário não é um catador.');
     }
 
     let dataConvertida: Date;
 
-    if (registerColetaDto.dataVenda && isDate(parse(registerColetaDto.dataVenda, 'dd/MM/yyyy', new Date()))) {
-      dataConvertida = parse(registerColetaDto.dataColeta, 'dd/MM/yyyy', new Date());
+    if (registerVendaDto.dataVenda && isDate(parse(registerVendaDto.dataVenda, 'dd/MM/yyyy', new Date()))) {
+      dataConvertida = parse(registerVendaDto.dataVenda, 'dd/MM/yyyy', new Date());
     } else {
       dataConvertida = new Date();
     }
 
       const dataPrisma: Date = new Date(dataConvertida.toISOString());
     const data = {
-      id: registerColetaDto.id,
-      idCatador: idCatador.id,
-      idAssociacao: registerColetaDto.idAssociacao,
-      idVeiculo: registerColetaDto.idVeiculo,
-      quantidade: registerColetaDto.quantidade,
-      pergunta: registerColetaDto.pergunta,
-      motivo: registerColetaDto.motivo,
-      dataColeta: dataPrisma
+      id: registerVendaDto.id,
+      idAssociacao: idAssociacao.id,
+      empresaCompradora: registerVendaDto.empresaCompradora,
+      qtdVendida: registerVendaDto.qtdVendida,
+      notaFiscal: registerVendaDto.notaFiscal,
+      dataVenda: dataPrisma
     };
 
 
 
-    const coleta = await this.prismaService.coleta.create({ data });
+    const venda = await this.prismaService.venda.create({ data });
 
-    if (!coleta) {
-      throw new NotFoundException('Failed to create coleta');
+    if (!venda) {
+      throw new NotFoundException('Failed to create venda');
     }
 
-    return coleta;
+    return venda;
   }
 
 
-  async findAll(): Promise<Coleta[]> {
+  async findAll(): Promise<Venda[]> {
     try {
-      return this.prismaService.coleta.findMany();
+      return this.prismaService.venda.findMany();
     } catch (error) {
       throw new InternalServerErrorException('Erro ao buscar associações.');
     }
   }
 
 
-  async findById(id: number): Promise<Coleta> {
+  async findById(id: number): Promise<Venda> {
     try {
-      const coleta = await this.prismaService.coleta.findUnique({
+      const venda = await this.prismaService.venda.findUnique({
         where: { id }
       });
 
-      if (!coleta) {
-        throw new NotFoundException('Coleta  não encontrada.');
+      if (!venda) {
+        throw new NotFoundException('Venda  não encontrada.');
       }
 
-      return coleta;
+      return venda;
     } catch (error) {
-      throw new NotFoundException('Coleta não encontrada.');
+      throw new NotFoundException('Venda não encontrada.');
     }
   }
 
-  async update(id: number, coleta: UpdateColetaDto): Promise<Coleta> {
+  async update(id: number, coleta: UpdateVendaDto): Promise<Venda> {
     try {
-        return await this.prismaService.coleta.update({
+        return await this.prismaService.venda.update({
             where: { id },
             data: coleta
         });
@@ -101,7 +99,7 @@ export class VendaService {
 
 async delete(id: number): Promise<void> {
     try {
-        await this.prismaService.coleta.delete({
+        await this.prismaService.venda.delete({
             where: { id }
         });
     } catch (error) {

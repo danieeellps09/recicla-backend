@@ -42,8 +42,11 @@ export class RegisterColetaDto {
   @ApiProperty({
     example: 'Não deu certo pois tive que terminar mais cedo',
     description: 'motivo se a pergunta for falsa' ,
+    required: false
   })
 
+
+  @IsOptional() 
   @IsString()
   motivo: string;
 

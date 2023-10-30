@@ -38,6 +38,10 @@ export class ColetaService {
       dataConvertida = new Date();
     }
 
+    if (registerColetaDto.pergunta === false && !registerColetaDto.motivo) {
+      throw new BadRequestException('O campo motivo é obrigatório quando pergunta é falsa.');
+    }
+
       const dataPrisma: Date = new Date(dataConvertida.toISOString());
     const data = {
       id: registerColetaDto.id,
@@ -46,7 +50,7 @@ export class ColetaService {
       idVeiculo: registerColetaDto.idVeiculo,
       quantidade: registerColetaDto.quantidade,
       pergunta: registerColetaDto.pergunta,
-      motivo: registerColetaDto.motivo,
+      motivo:  registerColetaDto.motivo || null,
       dataColeta: dataPrisma
     };
 

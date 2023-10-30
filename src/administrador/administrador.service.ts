@@ -85,7 +85,7 @@ export class AdministradorService {
         return admin;
     }
 
-    async update(id: number, updateAdminDto: UpdateAdminDto) {
+    async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admin> {
         const userId = (await this.findById(id)).userId;
         await this.userService.update(userId, updateAdminDto.user);
 

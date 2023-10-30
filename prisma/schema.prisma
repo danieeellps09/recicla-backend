@@ -20,7 +20,7 @@ model User {
   role       UserRole[]
   catador    Catador? @relation("CatadorToUser")
   associacao Associacao? @relation("AssociacaoToUser")
-
+  administrador Administrador? @relation("AdministradorToUser")
 
   @@map("users")
 }
@@ -83,4 +83,13 @@ model Material {
   id       Int      @id @default(autoincrement())
   nome     String   @db.VarChar(255) @unique
   @@map("materiais")
+}
+
+model Administrador {
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  cpf String @db.VarChar(14) @unique
+  user User @relation("AdministradorToUser", fields: [userId], references: [id])
+
+  @@map("administrador")
 }

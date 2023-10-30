@@ -146,7 +146,7 @@ export class CatadorService {
     catador.user.status = false;
     const user = this.prismaService.user.update({
       where: {id},
-      data: catador.userId
+      data: catador.user.status
     });
     return catador;
   }

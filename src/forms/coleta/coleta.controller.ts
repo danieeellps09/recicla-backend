@@ -53,8 +53,8 @@ async create(@Body() registerColetaDto: RegisterColetaDto, @Req() req: AuthReque
 }
 
 
-@ApiOperation({ summary: 'Obtém todas as associações.' })
-@ApiOkResponse({ description: 'Lista com todas as associações.', type: RegisterColetaDto, isArray: true })
+@ApiOperation({ summary: 'Obtém todas as coletas.' })
+@ApiOkResponse({ description: 'Lista com todas as coletas.', type: RegisterColetaDto, isArray: true })
 @Get()
 async findAll(): Promise<Coleta[]> {
     try {
@@ -78,7 +78,7 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
 
 
 
-@ApiOperation({ summary: "Atualiza informações de uma associação." })
+@ApiOperation({ summary: "Atualiza informações de uma coleta." })
     @ApiOkResponse({ description: "Dados da coleta atualizadas com sucesso", type: UpdateColetaDto })
     @ApiBody({ type: UpdateColetaDto })
     @Put(':id')

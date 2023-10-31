@@ -38,7 +38,7 @@ export class ColetaService {
       dataConvertida = new Date();
     }
 
-    if (registerColetaDto.pergunta === (!registerColetaDto.motivo || registerColetaDto.motivo.trim() === '')) {
+    if (registerColetaDto.pergunta === false && (!registerColetaDto.motivo || registerColetaDto.motivo.trim() === '')) {
       throw new BadRequestException('O campo motivo é obrigatório quando pergunta é falsa.');
     }
 
@@ -49,6 +49,7 @@ export class ColetaService {
       idAssociacao: registerColetaDto.idAssociacao,
       idVeiculo: registerColetaDto.idVeiculo,
       quantidade: registerColetaDto.quantidade,
+      numRota: registerColetaDto.numRota,
       pergunta: registerColetaDto.pergunta,
       motivo:  registerColetaDto.motivo || null,
       dataColeta: dataPrisma
@@ -98,7 +99,7 @@ export class ColetaService {
             data: coleta
         });
     } catch (error) {
-        throw new InternalServerErrorException('Erro ao atualizar associação.');
+        throw new InternalServerErrorException('Erro ao atualizar coleta.');
     }
 }
 
@@ -108,7 +109,7 @@ async delete(id: number): Promise<void> {
             where: { id }
         });
     } catch (error) {
-        throw new InternalServerErrorException('Erro ao apagar associação.');
+        throw new InternalServerErrorException('Erro ao apagar coleta.');
     }
 }
 

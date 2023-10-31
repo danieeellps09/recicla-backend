@@ -31,18 +31,21 @@ export class UpdateColetaDto extends PartialType(RegisterColetaDto) {
       
     
       @ApiProperty({
-        example: '',
+        example: false,
         description: 'Todos os pontos foram visitados?' ,
       })
     
       @IsBoolean()
       pergunta: boolean;
     
-      @ApiProperty({
+      @ApiProperty({     
         example: 'Não deu certo pois tive que terminar mais cedo',
         description: 'motivo se a pergunta for falsa' ,
       })
     
       @IsString()
       motivo: string;
+
+      @IsString()
+      dataColeta: string;
 }

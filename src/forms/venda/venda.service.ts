@@ -28,7 +28,7 @@ export class VendaService {
     const idAssociacao = await this.associacaoService.getAssociacaoByUserID(userId)
 
     if (!idAssociacao) {
-      throw new NotFoundException('Usuário não é um catador.');
+      throw new NotFoundException('Usuário não é uma associação.');
     }
 
     let dataConvertida: Date;

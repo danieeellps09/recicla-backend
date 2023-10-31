@@ -91,6 +91,7 @@ model Coleta {
   quantidade   Int
   pergunta     Boolean
   motivo       String
+  numRota      Int
   idCatador    Int        @map("idCatador")
   idAssociacao Int        @map("idAssociacao")
   idVeiculo    Int        @map("idVeiculo")

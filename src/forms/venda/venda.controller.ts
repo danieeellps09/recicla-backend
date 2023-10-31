@@ -76,7 +76,7 @@ export class VendaController {
         try {
             return await this.vendaService.update(id, venda);
         } catch (error) {
-            throw new HttpException('Erro ao atualizar associação.', error.message);
+            throw new HttpException('Erro ao atualizar venda.', error.message);
         }
     }
 
@@ -87,7 +87,7 @@ export class VendaController {
         try {
             await this.vendaService.delete(id);
         } catch (error) {
-            throw new HttpException('Erro ao apagar associação.', error.message);
+            throw new HttpException('Erro ao apagar venda.', error.message);
         }
     }
 }

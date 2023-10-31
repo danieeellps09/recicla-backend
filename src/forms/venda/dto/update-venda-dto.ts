@@ -18,7 +18,7 @@ export class UpdateVendaDto extends PartialType(RegisterVendaDto) {
         example: 'Coca-cola',
         description: 'empresa que comprou',
     })
-    @IsNumber()
+    @IsString()
     empresaCompradora: string;
 
     @ApiProperty({
@@ -37,14 +37,6 @@ export class UpdateVendaDto extends PartialType(RegisterVendaDto) {
     @IsString()
     notaFiscal: string;
 
-    @ApiProperty({
-        example: '22/10/2023',
-        description: 'data do preenchimento do formulario de quando ele faz a coleta',
-        required: false,
-    })
-
-    @IsOptional()
-    @IsString()
-    dataVenda: string;
+  
 }
 

@@ -38,7 +38,7 @@ export class ColetaService {
       dataConvertida = new Date();
     }
 
-    if (registerColetaDto.pergunta === false && !registerColetaDto.motivo) {
+    if (registerColetaDto.pergunta === (!registerColetaDto.motivo || registerColetaDto.motivo.trim() === '')) {
       throw new BadRequestException('O campo motivo é obrigatório quando pergunta é falsa.');
     }
 

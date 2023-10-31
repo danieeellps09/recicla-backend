@@ -60,7 +60,7 @@ async findAll(): Promise<Coleta[]> {
     try {
         return await this.coletaService.findAll();
     } catch (error) {
-        throw new HttpException('Erro ao buscar associações.', error.message);
+        throw new HttpException('Erro ao buscar coleta.', error.message);
     }
 }
 
@@ -86,7 +86,7 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
         try {
             return await this.coletaService.update(id, coleta);
         } catch (error) {
-            throw new HttpException('Erro ao atualizar associação.', error.message);
+            throw new HttpException('Erro ao atualizar coleta.', error.message);
         }
     }
 
@@ -97,7 +97,7 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
         try {
             await this.coletaService.delete(id);
         } catch (error) {
-            throw new HttpException('Erro ao apagar associação.', error.message);
+            throw new HttpException('Erro ao apagar coleta.', error.message);
         }
     }
 

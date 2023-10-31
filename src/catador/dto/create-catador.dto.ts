@@ -53,4 +53,20 @@ export class CreateCatadorDto {
 
   @IsNumber()
   idAssociacao: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'O identificador da etnia',
+  })
+
+  @IsNumber()
+  idEtnia: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'O identificador do gênero',
+  })
+
+  @IsNumber()
+  idGenero: number;
 }

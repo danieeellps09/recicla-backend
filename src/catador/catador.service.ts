@@ -8,8 +8,8 @@ import { AssociacoesService } from 'src/associacoes/associacoes.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
 import { EmailService } from 'src/email/email.service';
 import { RoleService } from 'src/role/role.service';
-import { CatadorController } from './catador.controller';
-import { async } from 'rxjs';
+import { EtniaService } from './etnia/etnia.service';
+import { GeneroService } from './genero/genero.service';
 
 
 @Injectable()
@@ -19,7 +19,9 @@ export class CatadorService {
     private readonly userService: UserService,
     private readonly associacaoService: AssociacoesService,
     private readonly emailService: EmailService,
-    private readonly roleService: RoleService) { }
+    private readonly roleService: RoleService,
+    private readonly etniaService: EtniaService,
+    private readonly generoService:GeneroService) { }
 
   async create(createCatadorDto: CreateCatadorDto): Promise<Catador> {
     //seta o role como catador
@@ -48,6 +50,12 @@ export class CatadorService {
       //verifica se a associação existe
       await this.associacaoService.findById(createCatadorDto.idAssociacao);
 
+      //verifica se o genero existe
+      await this.generoService.findById(createCatadorDto.idGenero);
+
+      //verifica se a etnia existe
+      await this.etniaService.findById(createCatadorDto.idGenero);
+
       //cria o user
       const user = await this.userService.create(createCatadorDto.user);
 
@@ -60,7 +68,9 @@ export class CatadorService {
         cpf: createCatadorDto.cpf,
         bairro: createCatadorDto.bairro,
         endereco: createCatadorDto.endereco,
-        associacaoId: createCatadorDto.idAssociacao
+        associacaoId: createCatadorDto.idAssociacao,
+        etniaId: createCatadorDto.idEtnia,
+        generoId: createCatadorDto.idEtnia
       };
 
       //salva o catador
@@ -120,13 +130,24 @@ export class CatadorService {
     //atualiza os dados do usuário
     await this.userService.update(userId, updateCatadorDto.user);
 
+    //verifica se a associacao existe
+    await this.associacaoService.findById(updateCatadorDto.associacaoId);
+
+    //verifica se a etnia existe
+    await this.etniaService.findById(updateCatadorDto.idEtnia);
+
+    //verifica se o genero existe
+    await this.generoService.findById(updateCatadorDto.idGenero)
+
     const data = {
       id: id,
       userId: updateCatadorDto.user.id,
       cpf: updateCatadorDto.cpf,
       bairro: updateCatadorDto.bairro,
       endereco: updateCatadorDto.endereco,
-      associacaoId: updateCatadorDto.associacaoId
+      associacaoId: updateCatadorDto.associacaoId,
+      generoId: updateCatadorDto.idGenero,
+      etniaId: updateCatadorDto.idEtnia
     };
 
     //atualiza os dados do catador

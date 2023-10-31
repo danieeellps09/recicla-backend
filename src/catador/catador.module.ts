@@ -6,9 +6,11 @@ import { UserService } from 'src/user/user.service';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
 import { EmailService } from 'src/email/email.service';
 import { RoleService } from 'src/role/role.service';
+import { GeneroService } from './genero/genero.service';
+import { EtniaService } from './etnia/etnia.service';
 
 @Module({
   controllers: [CatadorController],
-  providers: [CatadorService, UserService, AssociacoesService, RoleService, PrismaService, EmailService]
+  providers: [CatadorService, UserService, AssociacoesService, RoleService, PrismaService, EmailService, GeneroService, EtniaService]
 })
 export class CatadorModule {}

@@ -50,13 +50,33 @@ model Role {
 model Catador {
   id                  Int     @id @default(autoincrement())
   userId              Int     @unique
-  associacaoId        Int     
+  associacaoId        Int  
+  generoId            Int   
+  etniaId             Int 
   cpf        String @db.VarChar(14)
   bairro     String @db.VarChar(255)
   endereco   String @db.VarChar(255)
   @@map("catadores")
   user                 User   @relation("CatadorToUser",fields: [userId], references: [id])
   associacao           Associacao @relation("CatadorToAssociacao", fields: [associacaoId], references: [id])
+  genero               Genero @relation("GeneroToCatador", fields: [generoId], references: [id])
+  etnia                Etnia  @relation("EtniaToCatador", fields: [etniaId], references: [id])
+}
+
+model Genero {
+  id  Int @id @default(autoincrement())
+  nomenclatura  String @db.VarChar(50)
+  @@map("genero")
+
+  catador Catador[] @relation("GeneroToCatador")
+}
+
+model Etnia {
+  id  Int @id @default(autoincrement())
+  nomenclatura  String @db.VarChar(50)
+  @@map("etnia")
+
+  catador Catador[] @relation("EtniaToCatador")
 }
 
 model Veiculo {

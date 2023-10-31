@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Etnia } from './etnia.entity';
+import { Etnia } from './entities/etnia.entity';
 
 @Injectable()
 export class EtniaService {

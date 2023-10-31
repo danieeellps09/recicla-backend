@@ -8,8 +8,8 @@ import { AssociacoesService } from 'src/associacoes/associacoes.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
 import { EmailService } from 'src/email/email.service';
 import { RoleService } from 'src/role/role.service';
-import { EtniaService } from './etnia/etnia.service';
-import { GeneroService } from './genero/genero.service';
+import { EtniaService } from '../etnia/etnia.service';
+import { GeneroService } from '../genero/genero.service';
 
 
 @Injectable()

@@ -44,7 +44,8 @@ export class AssociacoesService {
             const data = {
                 userId: newAssociacao.user.id,
                 cnpj: newAssociacao.cnpj,
-                endereco: newAssociacao.endereco
+                endereco: newAssociacao.endereco,
+                bairro: newAssociacao.bairro
             };
 
             //cria a associacao

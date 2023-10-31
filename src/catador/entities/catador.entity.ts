@@ -1,7 +1,7 @@
 import { Associacao } from 'src/associacoes/entities/associacao.entity';
 import { User } from '../../user/entities/user.entity';
-import { Etnia } from '../etnia/etnia.entity';
-import { Genero } from '../genero/genero.entity';
+import { Etnia } from '../../etnia/entities/etnia.entity';
+import { Genero } from '../../genero/entities/genero.entity';
 
 
 export class Catador{

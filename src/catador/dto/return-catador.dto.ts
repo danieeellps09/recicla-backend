@@ -4,8 +4,8 @@ import { IsNumber, IsString } from "class-validator";
 import { ReturnAssociacaoDto } from "src/associacoes/dto/return-associacao.dto";
 import { Associacao } from "src/associacoes/entities/associacao.entity";
 import { ReturnUserDto } from "src/user/dto/return-user.dto";
-import { Genero } from "../genero/genero.entity";
-import { Etnia } from "../etnia/etnia.entity";
+import { Genero } from "../../genero/entities/genero.entity";
+import { Etnia } from "../../etnia/entities/etnia.entity";
 
 export class ReturnCatadorDto {
 

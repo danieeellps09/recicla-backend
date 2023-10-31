@@ -56,7 +56,7 @@ export class EtniaService {
     }
 
     async delete(id:number){
-        this.findById(id);
+        await this.findById(id);
         await this.prismaService.etnia.delete({
             where:{id}
         })

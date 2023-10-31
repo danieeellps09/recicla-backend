@@ -53,7 +53,7 @@ model Catador {
   associacaoId        Int  
   generoId            Int   
   etniaId             Int 
-  cpf        String @db.VarChar(14)
+  cpf        String @db.VarChar(14) @unique
   bairro     String @db.VarChar(255)
   endereco   String @db.VarChar(255)
   @@map("catadores")

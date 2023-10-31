@@ -7,10 +7,12 @@ import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
 import { ReturnAssociacaoDto } from './dto/return-associacao.dto';
 import { AssociacaoConversor } from './dto/associacao-conversor';
+import { isPublic } from 'src/auth/decorators/is-public.decorator';
 
 @ApiTags("Associações")
 @Controller('api/v1/associacoes')
-@ApiBearerAuth()
+//@ApiBearerAuth()
+@isPublic()
 export class AssociacoesController {
     constructor(private readonly associacaoService: AssociacoesService) { }
 

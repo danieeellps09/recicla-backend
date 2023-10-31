@@ -6,10 +6,12 @@ import { Admin } from './entities/admin.entity';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { ReturnAdminDto } from './dto/return-admin.dto';
 import { AdminConversor } from './dto/admin-conversor';
+import { isPublic } from 'src/auth/decorators/is-public.decorator';
 
 @ApiTags('Administrador')
 @Controller('api/v1/administrador')
-@ApiBearerAuth()
+@isPublic()
+//@ApiBearerAuth()
 @ApiTags()
 export class AdministradorController {
     constructor(private readonly adminService:AdministradorService){}

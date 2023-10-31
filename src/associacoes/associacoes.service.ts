@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewAssociacao } from './dto/new-associacao.dto';
 import { Associacao } from './entities/associacao.entity';
@@ -22,8 +22,8 @@ export class AssociacoesService {
         catch (error) {
             const role = await this.roleService.create({
                 id: null,
-                name: "catador",
-                description: "Usuário catador",
+                name: "associacao",
+                description: "Usuário associacao",
                 status: true
             });
             rolesIds = [role.id];
@@ -35,6 +35,10 @@ export class AssociacoesService {
                 newAssociacao.user.password = PasswordGenerator.generate(5);
             }
 
+            this.existsByCnpj(newAssociacao.cnpj);
+
+            this.userService.existsByEmail(newAssociacao.user.email);
+
             //cria o user
             const user = await this.userService.create(newAssociacao.user);
 
@@ -42,7 +46,7 @@ export class AssociacoesService {
             await this.userService.addRolesToUser(user.id, rolesIds);
 
             const data = {
-                userId: newAssociacao.user.id,
+                userId: user.id,
                 cnpj: newAssociacao.cnpj,
                 endereco: newAssociacao.endereco,
                 bairro: newAssociacao.bairro
@@ -97,6 +101,10 @@ export class AssociacoesService {
         //pega o id do user que está relacionado com o catador
         const userId = (await this.findById(id)).userId;
 
+        this.existsByCnpj(associacao.cnpj);
+
+        this.userService.existsByEmail(associacao.user.email);
+
         await this.userService.update(userId, associacao.user);
 
         const data = {
@@ -138,6 +146,18 @@ export class AssociacoesService {
             await this.userService.delete((associacao).user.id)
         } catch (error) {
             throw new InternalServerErrorException('Erro ao apagar associação.');
+        }
+    }
+
+    async existsByCnpj(cnpj:string){
+        const associacao = this.prismaService.associacao.findUnique({
+            where:{
+                cnpj:cnpj
+            }
+        });
+
+        if(associacao){
+            throw new BadRequestException("Já existe uma associacão com o CNPJ cadastrado.");
         }
     }
 }

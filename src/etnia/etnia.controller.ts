@@ -3,6 +3,7 @@ import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } fro
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { EtniaService } from './etnia.service';
 import { Etnia } from './entities/etnia.entity';
+import { EtniaDto } from './dto/etnia.dto';
 
 @ApiTags('Etnia')
 @isPublic()
@@ -12,11 +13,11 @@ export class EtniaController {
 
     @ApiOperation({ summary: 'Cadastra uma nova etnia.' })
     @ApiCreatedResponse({ description: 'Etnia cadastrada com sucesso.', type: Etnia })
-    @ApiBody({ type: String })
+    @ApiBody({ type: EtniaDto })
     @Post()
-    async create(@Body() nomenclatura:string): Promise<Etnia> {
+    async create(@Body() etniaDto:EtniaDto): Promise<Etnia> {
         try {
-            return this.etniaService.create(nomenclatura);
+            return this.etniaService.create(etniaDto.nomenclatura);
         } catch (error) {
             throw new BadRequestException(`${error.message} Não foi possível cadastrar etnia.`);
         }
@@ -46,18 +47,18 @@ export class EtniaController {
 
     @ApiOperation({ summary: 'Atualiza uma etnia.' })
     @ApiOkResponse({ description: 'Etnia atualizada com sucesso.', type: Etnia})
-    @ApiBody({ type: String })
+    @ApiBody({ type: EtniaDto })
     @Put(':id')
-    async update(@Param('id') id:number, @Body() nomenclatura:string): Promise<Etnia> {
+    async update(@Param('id') id:number, @Body() etniaDto:EtniaDto): Promise<Etnia> {
         try {
-            return this.etniaService.update(id, nomenclatura);
+            return this.etniaService.update(id, etniaDto.nomenclatura);
         } catch (error) {
             throw new BadRequestException(`${error.message} Não foi possível atualizar etnia.`);
         }
     }
 
     @ApiOperation({ summary: 'Atualiza uma etnia.' })
-    @ApiOkResponse({ description: 'Etnia atualizada com sucesso.'})
+    @ApiOkResponse({ description: 'Etnia deletada com sucesso.'})
     @Delete(':id')
     async delete(@Param('id') id:number){
         try {

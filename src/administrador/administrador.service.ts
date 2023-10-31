@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Admin } from './entities/admin.entity';
@@ -36,6 +36,13 @@ export class AdministradorService {
             if (!createAdminDto.user.password) {
                 createAdminDto.user.password = PasswordGenerator.generate(5);
             }
+
+            //Verifica se já existe um catador com o cpf
+            this.existsByCpf(createAdminDto.cpf);
+
+            //Verifica se já existe um user com o email
+            this.userService.existsByEmail(createAdminDto.user.email);
+
             //cria o user
             const user = await this.userService.create(createAdminDto.user);
 
@@ -87,6 +94,13 @@ export class AdministradorService {
 
     async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admin> {
         const userId = (await this.findById(id)).userId;
+
+        //Verifica se já existe um catador com o cpf
+        this.existsByCpf(updateAdminDto.cpf);
+
+        //Verifica se já existe um user com o email
+        this.userService.existsByEmail(updateAdminDto.user.email);
+        
         await this.userService.update(userId, updateAdminDto.user);
 
         const data = {
@@ -122,4 +136,17 @@ export class AdministradorService {
         });
         await this.userService.delete((admin).user.id);
     }
+
+    async existsByCpf(cpf:string){
+        const administrador =  await this.prismaService.administrador.findUnique({
+            where: {
+                cpf:cpf
+            }
+        });
+
+        if(administrador){
+            throw new BadRequestException('Já existe um administrador com o CPF cadastrado.')
+        }
+    }
+
 }

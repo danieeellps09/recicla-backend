@@ -24,6 +24,7 @@ export class NewAssociacao {
         example: 'Barra do Ceará',
         description: 'O bairro da associação',
     })
+    @IsString()
     bairro?: string;
 
     @ApiProperty({

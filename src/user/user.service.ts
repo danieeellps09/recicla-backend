@@ -28,8 +28,7 @@ export class UserService {
       };
   
       const createdUser = await this.prisma.user.create({ data });
-      
-
+    
       return createdUser;
     } catch (error) {
       this.logger.error(`Erro ao criar o usuário: ${error.message}`, error.stack);
@@ -156,6 +155,15 @@ export class UserService {
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
   
-
+  async existsByEmail(email:string){
+    const user = await this.prisma.user.findUnique({
+      where:{
+        email:email
+      }
+    });
+    if(user){
+      throw new BadRequestException("Já existe um usuário com o email cadastrado.");
+    }   
+  }
 
 }

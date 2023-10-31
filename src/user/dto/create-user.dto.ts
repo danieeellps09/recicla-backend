@@ -5,10 +5,6 @@ import { IsTelefoneValid } from 'src/decorators/telefone.decorator';
 
 export class CreateUserDto {
 
-  @IsOptional()
-  @IsNumber()
-  id: number;
-
   @ApiProperty({
     example: 'Gian Felipe',
     description: 'O nome do usuário',

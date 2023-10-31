@@ -8,16 +8,18 @@ import { UpdateCatadorDto } from './dto/update-catador.dto';
 import { CatadorConversor } from './dto/catador-conversor';
 import { ReturnCatadorDto } from './dto/return-catador.dto';
 import { map } from 'rxjs';
+import { isPublic } from 'src/auth/decorators/is-public.decorator';
 
 @ApiTags('Catadores')
-@ApiBearerAuth()
+//@ApiBearerAuth()
+@isPublic()
 @Controller('api/v1/catadores')
 export class CatadorController {
   constructor(private readonly catadorService: CatadorService) {}
 
   @ApiOperation({ summary: 'Cria um novo catador.' })
-  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: CreateCatadorDto })
-  @ApiBody({ type: ReturnCatadorDto })
+  @ApiCreatedResponse({ description: 'O catador foi criado com sucesso.', type: ReturnCatadorDto })
+  @ApiBody({ type: CreateCatadorDto })
   @Post()
   async create(@Body() catador: CreateCatadorDto): Promise<ReturnCatadorDto> {
     try {

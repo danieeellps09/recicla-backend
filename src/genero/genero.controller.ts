@@ -3,6 +3,7 @@ import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } fro
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { Genero } from './entities/genero.entity';
 import { GeneroService } from './genero.service';
+import { GeneroDto } from './dto/genero.dto';
 
 @isPublic()
 @ApiTags('Genero')
@@ -12,11 +13,11 @@ export class GeneroController {
 
     @ApiOperation({ summary: 'Cadastra uma nova genero.' })
     @ApiCreatedResponse({ description: 'Genero cadastrada com sucesso.', type: Genero })
-    @ApiBody({ type: String })
+    @ApiBody({ type: GeneroDto })
     @Post()
-    async create(@Body() nomenclatura:string): Promise<Genero> {
+    async create(@Body() generoDto:GeneroDto): Promise<Genero> {
         try {
-            return this.generoService.create(nomenclatura);
+            return this.generoService.create(generoDto.nomenclatura);
         } catch (error) {
             throw new BadRequestException(`${error.message} Não foi possível cadastrar genero.`);
         }
@@ -46,18 +47,18 @@ export class GeneroController {
 
     @ApiOperation({ summary: 'Atualiza uma genero.' })
     @ApiOkResponse({ description: 'Genero atualizada com sucesso.', type: Genero})
-    @ApiBody({ type: String })
+    @ApiBody({ type: GeneroDto })
     @Put(':id')
-    async update(@Param('id') id:number, @Body() nomenclatura:string): Promise<Genero> {
+    async update(@Param('id') id:number, @Body() generoDto:GeneroDto): Promise<Genero> {
         try {
-            return this.generoService.update(id, nomenclatura);
+            return this.generoService.update(id, generoDto.nomenclatura);
         } catch (error) {
             throw new BadRequestException(`${error.message} Não foi possível atualizar genero.`);
         }
     }
 
     @ApiOperation({ summary: 'Atualiza uma genero.' })
-    @ApiOkResponse({ description: 'Genero atualizada com sucesso.'})
+    @ApiOkResponse({ description: 'Genero deletado com sucesso.'})
     @Delete(':id')
     async delete(@Param('id') id:number){
         try {

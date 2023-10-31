@@ -6,6 +6,7 @@ import { IsTelefoneValid } from 'src/decorators/telefone.decorator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
+  @IsOptional()
   @IsNumber()
   id: number;
 

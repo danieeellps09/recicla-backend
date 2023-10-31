@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Request } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, Request } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCatadorDto } from './dto/create-catador.dto';
 import { Catador } from './entities/catador.entity';
@@ -46,6 +46,12 @@ export class CatadorService {
       if (!createCatadorDto.user.password) {
         createCatadorDto.user.password = PasswordGenerator.generate(5);
       }
+
+      //Verifica se já existe um catador com o cpf
+      this.existsByCpf(createCatadorDto.cpf);
+
+      //Verifica se já existe um user com o email
+      this.userService.existsByEmail(createCatadorDto.user.email);
 
       //verifica se a associação existe
       await this.associacaoService.findById(createCatadorDto.idAssociacao);
@@ -127,18 +133,24 @@ export class CatadorService {
     //pega o id do user que está relacionado com o catador
     const userId = (await this.findOne(id)).userId;
 
-    //atualiza os dados do usuário
-    await this.userService.update(userId, updateCatadorDto.user);
+    //Verifica se já existe um catador com o cpf
+    this.existsByCpf(updateCatadorDto.cpf);
 
+    //Verifica se já existe um user com o email
+    this.userService.existsByEmail(updateCatadorDto.user.email);
+    
     //verifica se a associacao existe
     await this.associacaoService.findById(updateCatadorDto.associacaoId);
-
+    
     //verifica se a etnia existe
     await this.etniaService.findById(updateCatadorDto.idEtnia);
-
+    
     //verifica se o genero existe
     await this.generoService.findById(updateCatadorDto.idGenero)
 
+    //atualiza os dados do usuário
+    await this.userService.update(userId, updateCatadorDto.user);
+    
     const data = {
       id: id,
       userId: updateCatadorDto.user.id,
@@ -179,5 +191,17 @@ export class CatadorService {
     });
 
     await this.userService.delete((catador).user.id);
+  }
+
+  async existsByCpf(cpf:string){
+    const catador = await this.prismaService.catador.findUnique({
+      where:{
+        cpf:cpf
+      }
+    })
+
+    if(catador){
+      throw new BadRequestException("Já existe um catador com o CPF indicado.");
+    }
   }
 }

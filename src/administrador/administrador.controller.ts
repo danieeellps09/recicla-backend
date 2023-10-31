@@ -7,6 +7,7 @@ import { UpdateAdminDto } from './dto/update-admin.dto';
 import { ReturnAdminDto } from './dto/return-admin.dto';
 import { AdminConversor } from './dto/admin-conversor';
 
+@ApiTags('Administrador')
 @Controller('api/v1/administrador')
 @ApiBearerAuth()
 @ApiTags()

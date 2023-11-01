@@ -38,7 +38,7 @@ export class RegisterColetaDto {
 
 
   @ApiProperty({
-    example: '1',
+    example: 1,
     description: 'rota do dia',
     required: true
   })

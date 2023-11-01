@@ -38,11 +38,24 @@ export class ColetaService {
       dataConvertida = new Date();
     }
 
-    if (registerColetaDto.pergunta === false && (!registerColetaDto.motivo || registerColetaDto.motivo.trim() === '')) {
-      throw new BadRequestException('O campo motivo é obrigatório quando pergunta é falsa.');
-    }
+
 
       const dataPrisma: Date = new Date(dataConvertida.toISOString());
+
+      let motivo: string | null = null;
+
+      if (!registerColetaDto.pergunta) {
+          if (!registerColetaDto.motivo || registerColetaDto.motivo.trim() === '') {
+              throw new BadRequestException('Campo motivo é obrigatório quando pergunta é false.');
+          }
+          motivo = registerColetaDto.motivo.trim();
+      }
+
+
+      if (registerColetaDto.pergunta) {
+        motivo = "";
+    }
+
     const data = {
       id: registerColetaDto.id,
       idCatador: idCatador.id,
@@ -51,8 +64,9 @@ export class ColetaService {
       quantidade: registerColetaDto.quantidade,
       numRota: registerColetaDto.numRota,
       pergunta: registerColetaDto.pergunta,
-      motivo:  registerColetaDto.motivo || null,
+      motivo:  motivo,
       dataColeta: dataPrisma
+
     };
 
 

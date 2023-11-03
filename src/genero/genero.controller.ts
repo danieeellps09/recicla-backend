@@ -57,7 +57,7 @@ export class GeneroController {
         }
     }
 
-    @ApiOperation({ summary: 'Atualiza uma genero.' })
+    @ApiOperation({ summary: 'Deleta um genero.' })
     @ApiOkResponse({ description: 'Genero deletado com sucesso.'})
     @Delete(':id')
     async delete(@Param('id') id:number){

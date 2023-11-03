@@ -3,7 +3,7 @@ import { IsString } from "class-validator";
 
 export class EtniaDto {
     @ApiProperty({
-        example: 'Homem Cisgênero',
+        example: 'Indígena',
         description: 'A nomenclatura da etnia',
     })
     @IsString()

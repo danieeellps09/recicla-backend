@@ -53,7 +53,12 @@ export class AssociacoesService {
             };
 
             //cria a associacao
-            const associacao = await this.prismaService.associacao.create({ data });
+            const associacao = await this.prismaService.associacao.create({ 
+                data:data,
+                include:{
+                    user:true
+                } 
+            });
 
             if (!associacao) {
                 throw new InternalServerErrorException("Ocorreu um erro ao criar associação");

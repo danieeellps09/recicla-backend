@@ -57,7 +57,7 @@ export class EtniaController {
         }
     }
 
-    @ApiOperation({ summary: 'Atualiza uma etnia.' })
+    @ApiOperation({ summary: 'Deleta uma etnia.' })
     @ApiOkResponse({ description: 'Etnia deletada com sucesso.'})
     @Delete(':id')
     async delete(@Param('id') id:number){

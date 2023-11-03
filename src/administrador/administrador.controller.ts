@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, HttpException, Param, Post, Put } from '
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdministradorService } from './administrador.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { Admin } from './entities/admin.entity';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { ReturnAdminDto } from './dto/return-admin.dto';
 import { AdminConversor } from './dto/admin-conversor';

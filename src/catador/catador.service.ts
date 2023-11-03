@@ -84,7 +84,9 @@ export class CatadorService {
         data: data,
         include: {
           user: true,
-          associacao: true
+          associacao: true,
+          etnia:true,
+          genero:true
         } 
       });
 

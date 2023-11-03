@@ -18,5 +18,5 @@ export class CreateAdminDto {
 
     @IsString()
     @IsCpfValid({message: "CPF inválido!"})
-    cpf: string;
+    cpf?: string;
 }

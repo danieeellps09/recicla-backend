@@ -7,6 +7,7 @@ import { RoleService } from 'src/role/role.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
 import { EmailService } from 'src/email/email.service';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { CreateRoleDto } from 'src/role/dto/create-role.dto';
 
 @Injectable()
 export class AdministradorService {
@@ -14,7 +15,8 @@ export class AdministradorService {
         private readonly prismaService: PrismaService,
         private readonly userService: UserService,
         private readonly roleService: RoleService,
-        private readonly emailService: EmailService) { }
+        private readonly emailService: EmailService,
+        private readonly createRoleDto: CreateRoleDto) { }
 
     async create(createAdminDto: CreateAdminDto): Promise<Admin> {
         //seta o role como administrador
@@ -24,10 +26,11 @@ export class AdministradorService {
         try {
             rolesIds = await this.userService.getRoleIdsByName(createAdminDto.user.roleNames);
         } catch (error) {
+            
             const role = await this.roleService.create({
-                id: null,
-                name: "catador",
-                description: "Usuário catador",
+                id: this.createRoleDto.id,
+                name: "admin",
+                description: "Usuário admin",
                 status: true
             });
             rolesIds = [role.id];
@@ -37,7 +40,7 @@ export class AdministradorService {
                 createAdminDto.user.password = PasswordGenerator.generate(5);
             }
 
-            //Verifica se já existe um catador com o cpf
+            //Verifica se já existe um admin com o cpf
             this.existsByCpf(createAdminDto.cpf);
 
             //Verifica se já existe um user com o email
@@ -54,7 +57,12 @@ export class AdministradorService {
                 cpf: createAdminDto.cpf
             }
 
-            const admin = await this.prismaService.administrador.create({ data });
+            const admin = await this.prismaService.administrador.create({ 
+                data:data,
+                include:{
+                    user:true
+                } 
+            });
 
             if (!admin) {
                 throw new InternalServerErrorException("Ocorreu um erro ao cadastrar administrador.");
@@ -145,8 +153,10 @@ export class AdministradorService {
         });
 
         if(administrador){
-            throw new BadRequestException('Já existe um administrador com o CPF cadastrado.')
+            return true;
+            throw new BadRequestException('Já existe um administrador com o CPF cadastrado.');
         }
+        return false;
     }
 
 }

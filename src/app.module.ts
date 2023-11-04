@@ -19,8 +19,12 @@ import { EmailModule } from './email/email.module';
 import { MaterialModule } from './material/material.module';
 import { AssociacoesModule } from './associacoes/associacoes.module';
 import { FormsModule } from './forms/forms.module';
+import { AdministradorModule } from './administrador/administrador.module';
+import { EtniaModule } from './etnia/etnia.module';
+import { GeneroModule } from './genero/genero.module';
 dotenv.config({ path: `${__dirname}../.env` })
 import config from './config/config';
+
 
 @Module({
   imports: [PrismaModule, UserModule,
@@ -38,7 +42,10 @@ import config from './config/config';
     MaterialModule,
     AssociacoesModule,
     AppModule,
-    FormsModule
+    FormsModule,
+    AdministradorModule,
+    EtniaModule,
+    GeneroModule
   ],
   controllers: [ AppController],
   providers: [AppService,

@@ -1,5 +1,5 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -23,13 +23,12 @@ export class UserService {
         status: createUserDto.status,
         email: createUserDto.email,
         name: createUserDto.name,
-        bairro: createUserDto.bairro,
-        endereco: createUserDto.endereco,
         phone: createUserDto.phone,
         password: hashedPassword,
       };
   
       const createdUser = await this.prisma.user.create({ data });
+    
       return createdUser;
     } catch (error) {
       this.logger.error(`Erro ao criar o usuário: ${error.message}`, error.stack);
@@ -69,10 +68,16 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`Usuario com ${id} não encontrado`);
     }
-    return await this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+    try{
+      return await this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    }
+    catch(error){
+      throw new BadRequestException("E-mail já está em uso por outro usuário.");
+    }
+    
   }
 
   async findAll(): Promise<User[]> {
@@ -150,6 +155,15 @@ export class UserService {
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
   
-
+  async existsByEmail(email:string){
+    const user = await this.prisma.user.findUnique({
+      where:{
+        email:email
+      }
+    });
+    if(user){
+      throw new BadRequestException("Já existe um usuário com o email cadastrado.");
+    }   
+  }
 
 }

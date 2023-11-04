@@ -1,12 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsTelefoneValid } from 'src/decorators/telefone.decorator';
 
 export class CreateUserDto {
-
-  @IsOptional()
-  @IsNumber()
-  id: number;
 
   @ApiProperty({
     example: 'Gian Felipe',
@@ -15,23 +12,6 @@ export class CreateUserDto {
   
   @IsString()
   name: string;
-  
-
-  @ApiProperty({
-    example: 'Mucuripe',
-    description: 'O nome do bairro' ,
-  })
-
-  @IsString()
-  bairro: string;
-
-  @ApiProperty({
-    example: 'Rua 305, Conjunto São Cristóvão',
-    description: 'O endereco ' ,
-  })
-
-  @IsString()
-  endereco: string;
 
   @ApiProperty({
     example: 'gianfelipe@example.com',
@@ -40,7 +20,6 @@ export class CreateUserDto {
 
   @IsEmail()
   email: string;
-  
  
   @ApiProperty({
     example: 'suasenha',
@@ -56,6 +35,7 @@ export class CreateUserDto {
   })
 
   @IsString()
+  @IsTelefoneValid({message: "Telefone inválido!"})
   phone: string;
   
   @ApiProperty({
@@ -66,10 +46,7 @@ export class CreateUserDto {
   @IsBoolean()
   status: boolean;
   
-  @ApiProperty({
-    example: ['admin', 'user', 'catador'],
-    description: 'As roles do usuário',
-  })
+  @IsOptional()
   @IsArray()
   roleNames: string[]; 
 

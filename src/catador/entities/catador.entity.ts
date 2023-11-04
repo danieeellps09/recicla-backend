@@ -1,9 +1,20 @@
-import { User } from '../../user/entities/user.entity'; // Importa a entidade User
+import { Associacao } from 'src/associacoes/entities/associacao.entity';
+import { User } from '../../user/entities/user.entity';
+import { Etnia } from '../../etnia/entities/etnia.entity';
+import { Genero } from '../../genero/entities/genero.entity';
 
 
-export class Catador extends User {
+export class Catador{
   id?: number;
   userId?: number;
-  associacao?: string;
-  veiculo?: string;
+  associacaoId: number;
+  etniaId: number;
+  generoId: number;
+  cpf?: string;
+  bairro?: string;
+  endereco:string;
+  user?: User;
+  associacao?: Associacao;
+  etnia?: Etnia;
+  genero?: Genero;
 }

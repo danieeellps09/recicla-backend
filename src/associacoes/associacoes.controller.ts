@@ -24,7 +24,7 @@ export class AssociacoesController {
         try {
             return AssociacaoConversor.toReturnAssociacaoDto(await this.associacaoService.create(newAssociacao));
         } catch (error) {
-            throw new HttpException('Erro ao adicionar associação.', error.message);
+            throw new HttpException( `${error.message} Não foi possível adicionar associação.`, error.status);
         }
     }
 
@@ -35,7 +35,7 @@ export class AssociacoesController {
         try {
             return (await this.associacaoService.findAll()).map(AssociacaoConversor.toReturnAssociacaoDto);
         } catch (error) {
-            throw new HttpException('Erro ao buscar associações.', error.message);
+            throw new HttpException(`${error.message} Não foi possível buscar associações.`, error.status);
         }
     }
 
@@ -46,7 +46,7 @@ export class AssociacoesController {
         try {
             return AssociacaoConversor.toReturnAssociacaoDto(await this.associacaoService.findById(id));
         } catch (error) {
-            throw new HttpException('Associação não encontrada.', HttpStatus.NOT_FOUND);
+            throw new HttpException(`${error.message} Não foi possível encontrar associação.`, error.status);
         }
     }
 
@@ -58,7 +58,7 @@ export class AssociacoesController {
         try {
             return AssociacaoConversor.toReturnAssociacaoDto(await this.associacaoService.update(id, associacao));
         } catch (error) {
-            throw new HttpException('Erro ao atualizar associação.', error.message);
+            throw new HttpException(`${error.message} Não foi possível atualizar associação.`, error.status);
         }
     }
 
@@ -69,7 +69,7 @@ export class AssociacoesController {
         try {
             await this.associacaoService.delete(id);
         } catch (error) {
-            throw new HttpException('Erro ao apagar associação.', error.message);
+            throw new HttpException(`${error.message} Não foi possível apagar associação.`, error.status);
         }
     }
 }

@@ -35,9 +35,9 @@ export class AssociacoesService {
                 newAssociacao.user.password = PasswordGenerator.generate(5);
             }
 
-            this.existsByCnpj(newAssociacao.cnpj);
+            await this.existsByCnpj(newAssociacao.cnpj);
 
-            this.userService.existsByEmail(newAssociacao.user.email);
+            await this.userService.existsByEmail(newAssociacao.user.email);
 
             //cria o user
             const user = await this.userService.create(newAssociacao.user);
@@ -104,11 +104,14 @@ export class AssociacoesService {
     async update(id: number, associacao: UpdateAssociacaoDto): Promise<Associacao> {
 
         //pega o id do user que está relacionado com o catador
-        const userId = (await this.findById(id)).userId;
+        const existingAssociacao = (await this.findById(id));
+        const userId = existingAssociacao.userId;
 
-        this.existsByCnpj(associacao.cnpj);
+        if(associacao.cnpj !== existingAssociacao.cnpj)
+            await this.existsByCnpj(associacao.cnpj);
 
-        this.userService.existsByEmail(associacao.user.email);
+        if(associacao.user.email !== existingAssociacao.user.email)
+            await this.userService.existsByEmail(associacao.user.email);
 
         await this.userService.update(userId, associacao.user);
 
@@ -150,12 +153,12 @@ export class AssociacoesService {
             });
             await this.userService.delete((associacao).user.id)
         } catch (error) {
-            throw new InternalServerErrorException('Erro ao apagar associação.');
+            throw new BadRequestException('Erro ao apagar associação.');
         }
     }
 
     async existsByCnpj(cnpj:string){
-        const associacao = this.prismaService.associacao.findUnique({
+        const associacao = await this.prismaService.associacao.findUnique({
             where:{
                 cnpj:cnpj
             }

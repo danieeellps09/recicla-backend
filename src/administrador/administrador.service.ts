@@ -41,10 +41,10 @@ export class AdministradorService {
             }
 
             //Verifica se já existe um admin com o cpf
-            this.existsByCpf(createAdminDto.cpf);
+            await this.existsByCpf(createAdminDto.cpf);
 
             //Verifica se já existe um user com o email
-            this.userService.existsByEmail(createAdminDto.user.email);
+            await this.userService.existsByEmail(createAdminDto.user.email);
 
             //cria o user
             const user = await this.userService.create(createAdminDto.user);
@@ -101,13 +101,18 @@ export class AdministradorService {
     }
 
     async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admin> {
-        const userId = (await this.findById(id)).userId;
+        const admin = (await this.findById(id));
+        const userId = admin.user.id;
 
-        //Verifica se já existe um catador com o cpf
-        this.existsByCpf(updateAdminDto.cpf);
+        if(updateAdminDto.cpf !== admin.cpf){
+            //Verifica se já existe um catador com o cpf
+            await this.existsByCpf(updateAdminDto.cpf);
+        }
 
-        //Verifica se já existe um user com o email
-        this.userService.existsByEmail(updateAdminDto.user.email);
+        if(updateAdminDto.user.email !== admin.user.email){
+            //Verifica se já existe um user com o email
+            await this.userService.existsByEmail(updateAdminDto.user.email);
+        }
         
         await this.userService.update(userId, updateAdminDto.user);
 
@@ -153,10 +158,8 @@ export class AdministradorService {
         });
 
         if(administrador){
-            return true;
             throw new BadRequestException('Já existe um administrador com o CPF cadastrado.');
         }
-        return false;
     }
 
 }

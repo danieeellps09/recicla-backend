@@ -48,10 +48,10 @@ export class CatadorService {
       }
 
       //Verifica se já existe um catador com o cpf
-      this.existsByCpf(createCatadorDto.cpf);
+      await this.existsByCpf(createCatadorDto.cpf);
 
       //Verifica se já existe um user com o email
-      this.userService.existsByEmail(createCatadorDto.user.email);
+      await this.userService.existsByEmail(createCatadorDto.user.email);
 
       //verifica se a associação existe
       await this.associacaoService.findById(createCatadorDto.idAssociacao);
@@ -109,7 +109,9 @@ export class CatadorService {
     return this.prismaService.catador.findMany({
       include: {
         user: true,
-        associacao: true
+        associacao: true,
+        genero:true,
+        etnia:true
       },
     });
   }
@@ -120,6 +122,8 @@ export class CatadorService {
       include: {
         user: true,
         associacao: true,
+        genero: true,
+        etnia: true
       },
     });
 
@@ -132,14 +136,16 @@ export class CatadorService {
 
   async update(id: number, updateCatadorDto: UpdateCatadorDto): Promise<Catador> {
 
-    //pega o id do user que está relacionado com o catador
-    const userId = (await this.findOne(id)).userId;
+    const catador = (await this.findOne(id));
+    const userId = catador.userId;
 
-    //Verifica se já existe um catador com o cpf
-    this.existsByCpf(updateCatadorDto.cpf);
+    if(catador.cpf !== updateCatadorDto.cpf)
+      //Verifica se já existe um catador com o cpf
+      await this.existsByCpf(updateCatadorDto.cpf);
 
-    //Verifica se já existe um user com o email
-    this.userService.existsByEmail(updateCatadorDto.user.email);
+    if(catador.user.email !== updateCatadorDto.user.email)
+      //Verifica se já existe um user com o email
+      await this.userService.existsByEmail(updateCatadorDto.user.email);
     
     //verifica se a associacao existe
     await this.associacaoService.findById(updateCatadorDto.associacaoId);
@@ -171,6 +177,8 @@ export class CatadorService {
       include: {
         user: true,
         associacao: true,
+        genero:true,
+        etnia:true
       },
     });
   }

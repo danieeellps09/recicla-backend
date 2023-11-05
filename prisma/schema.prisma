@@ -20,6 +20,8 @@ model User {
   role       UserRole[]
   catador    Catador?    @relation("CatadorToUser")
   associacao Associacao? @relation("AssociacaoToUser")
+  administrador Administrador? @relation("AdministradorToUser")
+
 
 
   @@map("users")
@@ -61,6 +63,8 @@ model Catador {
   associacao           Associacao @relation("CatadorToAssociacao", fields: [associacaoId], references: [id])
   genero               Genero @relation("GeneroToCatador", fields: [generoId], references: [id])
   etnia                Etnia  @relation("EtniaToCatador", fields: [etniaId], references: [id])
+  coletas              Coleta[] @relation("CatadorToColeta")
+
 }
 
 model Genero {
@@ -96,7 +100,6 @@ model Associacao {
   coletas  Coleta[]
   venda    Venda[]
 
-  user User @relation("AssociacaoToUser", fields: [userId], references: [id])
 
   @@map("associacoes")
   user            User      @relation("AssociacaoToUser", fields: [userId], references: [id])
@@ -115,7 +118,36 @@ model Administrador {
   id Int @id @default(autoincrement())
   userId Int @unique
   cpf String @db.VarChar(14) @unique
-  user User @relation("AdministradorToUser", fields: [userId], references: [id])
+  user   User @relation("AdministradorToUser", fields: [userId], references: [id])
 
   @@map("administrador")
+}
+
+model Coleta {
+  id           Int        @id @default(autoincrement())
+  quantidade   Int
+  pergunta     Boolean
+  motivo       String
+  numRota      Int
+  idCatador    Int        @map("idCatador")
+  idAssociacao Int        @map("idAssociacao")
+  idVeiculo    Int        @map("idVeiculo")
+  catador Catador @relation("CatadorToColeta", fields: [idCatador], references: [id])
+  associacao   Associacao @relation(fields: [idAssociacao], references: [id])
+  veiculo      Veiculo    @relation(fields: [idVeiculo], references: [id])
+  dataColeta   DateTime   @default(now())
+
+  @@map("coletas")
+}
+
+model Venda {
+  id                Int @id @default(autoincrement())
+  idAssociacao      Int        @map("idAssociacao")
+  empresaCompradora String
+  qtdVendida        Int
+  notaFiscal        String      @unique
+  associacao        Associacao @relation(fields: [idAssociacao], references: [id])
+  dataVenda        DateTime   @default(now())
+
+  @@map("vendas")
 }

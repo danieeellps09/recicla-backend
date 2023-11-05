@@ -41,11 +41,30 @@ CREATE TABLE `catadores` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
     `associacaoId` INTEGER NOT NULL,
+    `generoId` INTEGER NOT NULL,
+    `etniaId` INTEGER NOT NULL,
     `cpf` VARCHAR(14) NOT NULL,
     `bairro` VARCHAR(255) NOT NULL,
     `endereco` VARCHAR(255) NOT NULL,
 
     UNIQUE INDEX `catadores_userId_key`(`userId`),
+    UNIQUE INDEX `catadores_cpf_key`(`cpf`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `genero` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `nomenclatura` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `etnia` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `nomenclatura` VARCHAR(50) NOT NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -63,6 +82,7 @@ CREATE TABLE `associacoes` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
     `cnpj` VARCHAR(191) NOT NULL,
+    `bairro` VARCHAR(191) NOT NULL,
     `endereco` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `associacoes_userId_key`(`userId`),
@@ -80,11 +100,23 @@ CREATE TABLE `materiais` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `administrador` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `cpf` VARCHAR(14) NOT NULL,
+
+    UNIQUE INDEX `administrador_userId_key`(`userId`),
+    UNIQUE INDEX `administrador_cpf_key`(`cpf`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `coletas` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `quantidade` INTEGER NOT NULL,
     `pergunta` BOOLEAN NOT NULL,
     `motivo` VARCHAR(191) NOT NULL,
+    `numRota` INTEGER NOT NULL,
     `idCatador` INTEGER NOT NULL,
     `idAssociacao` INTEGER NOT NULL,
     `idVeiculo` INTEGER NOT NULL,
@@ -119,7 +151,16 @@ ALTER TABLE `catadores` ADD CONSTRAINT `catadores_userId_fkey` FOREIGN KEY (`use
 ALTER TABLE `catadores` ADD CONSTRAINT `catadores_associacaoId_fkey` FOREIGN KEY (`associacaoId`) REFERENCES `associacoes`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `catadores` ADD CONSTRAINT `catadores_generoId_fkey` FOREIGN KEY (`generoId`) REFERENCES `genero`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `catadores` ADD CONSTRAINT `catadores_etniaId_fkey` FOREIGN KEY (`etniaId`) REFERENCES `etnia`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `associacoes` ADD CONSTRAINT `associacoes_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `administrador` ADD CONSTRAINT `administrador_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `coletas` ADD CONSTRAINT `coletas_idCatador_fkey` FOREIGN KEY (`idCatador`) REFERENCES `catadores`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

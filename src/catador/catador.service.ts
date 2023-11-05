@@ -10,6 +10,7 @@ import { EmailService } from 'src/email/email.service';
 import { RoleService } from 'src/role/role.service';
 import { EtniaService } from '../etnia/etnia.service';
 import { GeneroService } from '../genero/genero.service';
+import { Associacao } from 'src/associacoes/entities/associacao.entity';
 
 
 @Injectable()
@@ -94,6 +95,8 @@ export class CatadorService {
         throw new NotFoundException('Failed to create catador');
       }
 
+      (catador.associacao as Associacao).user = (await this.associacaoService.findById(catador.associacaoId)).user;
+
       //envia um email para o catador contendo sua senha para login
       //OBS: Mensagem temporária
       this.emailService.sendEmail(user.email, "Conta criada com sucesso",
@@ -106,11 +109,20 @@ export class CatadorService {
   }
 
   async findAll(): Promise<Catador[]> {
-    return this.prismaService.catador.findMany({
+    let catadores = await this.prismaService.catador.findMany({
       include: {
         user: true,
+        associacao: true,
+        etnia: true,
+        genero:true
       },
     });
+
+    for(let catador of catadores){
+      (catador.associacao as Associacao).user = (await this.associacaoService.findById(catador.associacaoId)).user;
+    }
+
+    return catadores;
   }
 
 
@@ -129,6 +141,8 @@ export class CatadorService {
     if (!catador) {
       throw new NotFoundException('Catador not found');
     }
+
+    (catador.associacao as Associacao).user = (await this.associacaoService.findById(catador.associacaoId)).user;
 
     return catador;
   }
@@ -188,7 +202,7 @@ export class CatadorService {
     };
 
     //atualiza os dados do catador
-    return await this.prismaService.catador.update({
+    let catadorAtualizado =  await this.prismaService.catador.update({
       where: { id },
       data: data,
       include: {
@@ -198,6 +212,10 @@ export class CatadorService {
         etnia:true
       },
     });
+
+    (catadorAtualizado.associacao as Associacao).user = (await this.associacaoService.findById(catador.associacaoId)).user;
+
+    return catadorAtualizado;
   }
 
   async disable(id: number){

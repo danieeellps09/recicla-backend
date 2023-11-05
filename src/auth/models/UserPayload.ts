@@ -2,7 +2,7 @@ export interface UserPayload {
     sub: number,
     email: string,
     name: string,
-    iat?: number,
+    roleNames?: number[],
     exp?: number
 
 }

@@ -154,6 +154,26 @@ export class UserService {
   
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
+
+
+
+  async  getRoleIdsByUserId(userId: number): Promise<number[]> {
+    const userWithRoles = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        role: true,
+      },
+    });
+  
+    if (userWithRoles) {
+      const roleIds = userWithRoles.role.map((userRole) => userRole.id);
+      return roleIds;
+    }
+  
+    return [];
+  }
   
   async existsByEmail(email:string){
     const user = await this.prisma.user.findUnique({

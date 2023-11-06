@@ -1,14 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 
 @Injectable()
 export class PdfService {
 
     async generatePdfExemple(): Promise<Buffer> {
-        const browser = await puppeteer.launch({headless:"new"});
-        const page = await browser.newPage();
 
-        await page.setContent(`
+        try {
+            const browser = await puppeteer.launch({ headless: "new" });
+            const page = await browser.newPage();
+
+            await page.setContent(`
         <html>
           <head>
             <style>
@@ -28,9 +30,14 @@ export class PdfService {
         </html>
       `);
 
-      const pdfBuffer = await page.pdf({format: 'A4'});
-      await browser.close();
+            const pdfBuffer = await page.pdf({ format: 'A4' });
+            await browser.close();
 
-      return pdfBuffer;
+            return pdfBuffer;
+        }
+        catch(error){
+            throw new InternalServerErrorException("Ocorreu um erro ao gerar PDF.")
+        }
+        
     }
 }

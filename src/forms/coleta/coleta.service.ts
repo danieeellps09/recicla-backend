@@ -106,6 +106,35 @@ export class ColetaService {
     }
   }
 
+  async findByCatadorAndBetweenDates(catadorId:number, dataInicio:Date, dataFim:Date):Promise<Coleta[]>{
+    const catador =  await this.catadorService.findOne(catadorId);
+
+    return await this.prismaService.coleta.findMany({
+      where:{
+        idCatador: catador.id,
+        AND:{
+          dataColeta:{
+            gte: dataInicio,
+            lte: dataFim
+          }
+        }
+      }
+    });
+  }
+
+  async findBetweenDates(dataInicio:Date, dataFim:Date){
+    return await this.prismaService.coleta.findMany({
+      where:{
+        AND:{
+          dataColeta:{
+            gte: dataInicio,
+            lte: dataFim
+          }
+        }
+      }
+    });
+  }
+
   async update(id: number, coleta: UpdateColetaDto): Promise<Coleta> {
     try {
         return await this.prismaService.coleta.update({

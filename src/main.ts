@@ -5,6 +5,7 @@ import * as cors from 'cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
 import * as cookieParser from 'cookie-parser';
+import { GlobalExceptionFilter } from './filters/global-exception.filters';
 
 
 config();
@@ -44,6 +45,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Inicia a aplicação
   await app.listen(3000);

@@ -55,6 +55,7 @@ export class AdministradorService {
             const data = {
                 userId: user.id,
                 cpf: createAdminDto.cpf
+                
             }
 
             const admin = await this.prismaService.administrador.create({ 

@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 
 import * as bcrypt from 'bcryptjs';
 import { LoginDTO } from 'src/auth/dto/login-user-dto';
+import { UserRole } from '@prisma/client';
 
 
 @Injectable()
@@ -28,6 +29,8 @@ export class UserService {
       };
   
       const createdUser = await this.prisma.user.create({ data });
+
+      
     
       return createdUser;
     } catch (error) {
@@ -157,22 +160,24 @@ export class UserService {
 
 
 
-  async  getRoleIdsByUserId(userId: number): Promise<number[]> {
-    const userWithRoles = await this.prisma.user.findUnique({
+  async  getRoleIdsByUserId(userId: number): Promise<string[]> {
+    const userRoles: UserRoleDBResult[] = await this.prisma.userRole.findMany({
       where: {
-        id: userId,
+        userId: userId,
       },
-      include: {
-        role: true,
+      select: {
+        roleId: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
   
-    if (userWithRoles) {
-      const roleIds = userWithRoles.role.map((userRole) => userRole.id);
-      return roleIds;
-    }
+    const roleNames: string[] = userRoles.map((userRole) => userRole.role.name);
+    return roleNames;
   
-    return [];
   }
   
   async existsByEmail(email:string){

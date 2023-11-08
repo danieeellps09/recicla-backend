@@ -20,14 +20,14 @@ export class AuthService {
 
  
   async login(user: User, req) {
-    const roleIds = await this.userService
+    const roleNames: string[] = await this.userService
     .getRoleIdsByUserId(user.id);
 
     const payload: UserPayload = {
       sub: user.id,
       email: user.email,
       name: user.name,
-      roleNames: roleIds
+      roleNames: roleNames,
     }
     const jwtToken = this.jwtService.sign(payload);
     req.res.cookie('token', 'Bearer ' + jwtToken, { httpOnly: true });

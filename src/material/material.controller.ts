@@ -18,8 +18,6 @@ export class MaterialController {
     @ApiCreatedResponse({description:'Material adicionado com sucesso'} )
     @ApiBody({type: NewMaterial})
     @ApiBearerAuth()
-    @Roles(UserRole.ADMIN)
-    @UseGuards(RolesGuard)
     @Post()
     async create(@Body() newMaterial:NewMaterial):Promise<Material>{
         return await this.materialService.create(newMaterial.nome);

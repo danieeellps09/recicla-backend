@@ -118,6 +118,9 @@ export class ColetaService {
             lte: dataFim
           }
         }
+      },
+      orderBy:{
+        dataColeta: 'desc'
       }
     });
   }
@@ -129,6 +132,9 @@ export class ColetaService {
             gte: dataInicio,
             lte: dataFim
         }
+      },
+      orderBy:{
+        dataColeta: 'desc'
       }
     });
   }

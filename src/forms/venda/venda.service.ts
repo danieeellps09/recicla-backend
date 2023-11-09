@@ -90,6 +90,9 @@ export class VendaService {
           gte: dataInicio,
           lte: dataFim
         }
+      },
+      orderBy:{
+        dataVenda: 'desc'
       }
     });
   }
@@ -104,6 +107,9 @@ export class VendaService {
             lte: dataFim
           }
         }
+      },
+      orderBy:{
+        dataVenda: 'desc'
       }
     });
   }

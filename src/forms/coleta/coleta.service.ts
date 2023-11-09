@@ -125,11 +125,9 @@ export class ColetaService {
   async findBetweenDates(dataInicio:Date, dataFim:Date){
     return await this.prismaService.coleta.findMany({
       where:{
-        AND:{
-          dataColeta:{
+        dataColeta:{
             gte: dataInicio,
             lte: dataFim
-          }
         }
       }
     });

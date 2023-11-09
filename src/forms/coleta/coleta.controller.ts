@@ -77,7 +77,7 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
 
     @ApiOperation({summary: "Retorna todas as coletas entre duas datas."})
     @ApiOkResponse({description: "Coletas encontradas"})
-    @Get('findBetweenDates')
+    @Get('findBetweenDates/dates')
     async findBetweenDates(
         @Query('datainicio') dataInicio:string = new Date().toString(), 
         @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{

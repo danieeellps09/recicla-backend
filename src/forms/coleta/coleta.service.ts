@@ -109,34 +109,43 @@ export class ColetaService {
   async findByCatadorAndBetweenDates(catadorId:number, dataInicio:Date, dataFim:Date):Promise<Coleta[]>{
     const catador =  await this.catadorService.findOne(catadorId);
 
-    return await this.prismaService.coleta.findMany({
-      where:{
-        idCatador: catador.id,
-        AND:{
-          dataColeta:{
-            gte: dataInicio,
-            lte: dataFim
+    try{
+      return await this.prismaService.coleta.findMany({
+        where:{
+          idCatador: catador.id,
+          AND:{
+            dataColeta:{
+              gte: dataInicio,
+              lte: dataFim
+            }
           }
+        },
+        orderBy:{
+          dataColeta: 'desc'
         }
-      },
-      orderBy:{
-        dataColeta: 'desc'
-      }
-    });
+      });
+    }
+    catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
   }
 
   async findBetweenDates(dataInicio:Date, dataFim:Date){
-    return await this.prismaService.coleta.findMany({
-      where:{
-        dataColeta:{
-            gte: dataInicio,
-            lte: dataFim
+    try{
+      return await this.prismaService.coleta.findMany({
+        where:{
+          dataColeta:{
+              gte: dataInicio,
+              lte: dataFim
+          }
+        },
+        orderBy:{
+          dataColeta: 'desc'
         }
-      },
-      orderBy:{
-        dataColeta: 'desc'
-      }
-    });
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
   }
 
   async update(id: number, coleta: UpdateColetaDto): Promise<Coleta> {

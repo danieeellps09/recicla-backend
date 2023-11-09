@@ -84,34 +84,42 @@ export class VendaService {
   }
 
   async findBetweenDates(dataInicio: Date, dataFim: Date):Promise<Venda[]>{
-    return await this.prismaService.venda.findMany({
-      where:{
-        dataVenda:{
-          gte: dataInicio,
-          lte: dataFim
-        }
-      },
-      orderBy:{
-        dataVenda: 'desc'
-      }
-    });
-  }
-
-  async findByAssociacaoAndBetweenDates(idAssociacao:number, dataInicio: Date, dataFim: Date):Promise<Venda[]>{
-    return await this.prismaService.venda.findMany({
-      where:{
-        idAssociacao: idAssociacao,
-        AND:{
+    try{
+      return await this.prismaService.venda.findMany({
+        where:{
           dataVenda:{
             gte: dataInicio,
             lte: dataFim
           }
+        },
+        orderBy:{
+          dataVenda: 'desc'
         }
-      },
-      orderBy:{
-        dataVenda: 'desc'
-      }
-    });
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
+  }
+
+  async findByAssociacaoAndBetweenDates(idAssociacao:number, dataInicio: Date, dataFim: Date):Promise<Venda[]>{
+    try{
+      return await this.prismaService.venda.findMany({
+        where:{
+          idAssociacao: idAssociacao,
+          AND:{
+            dataVenda:{
+              gte: dataInicio,
+              lte: dataFim
+            }
+          }
+        },
+        orderBy:{
+          dataVenda: 'desc'
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
   }
 
   async update(id: number, coleta: UpdateVendaDto): Promise<Venda> {

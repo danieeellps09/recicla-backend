@@ -7,6 +7,7 @@ export class GeneroService {
     constructor(private readonly prismaService:PrismaService){}
 
     async create(nomenclatura:string):Promise<Genero>{
+        await this.existsNomenclatura(nomenclatura);
         const genero = await this.prismaService.genero.create({
             data: {nomenclatura:nomenclatura}
         });
@@ -61,4 +62,18 @@ export class GeneroService {
             where:{id}
         })
     }
+
+
+    async existsNomenclatura(nomenclatura:string){
+        const nomenclaturaExistente = await this.prismaService.genero.findUnique({
+          where:{
+            nomenclatura:nomenclatura
+          }
+        });
+        if(nomenclaturaExistente){
+          throw new BadRequestException("Já existe uma nomenclatura cadastrada.");
+        }   
+      }
+
+
 }

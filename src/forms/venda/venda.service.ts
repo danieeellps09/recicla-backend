@@ -15,10 +15,7 @@ export class VendaService {
     private readonly associacaoService: AssociacoesService) {
 
   }
-
-
-
-
+  
   async create(registerVendaDto: RegisterVendaDto, @Request() req: AuthRequest): Promise<Venda> {
     const userId = req.user.id;
 
@@ -84,6 +81,31 @@ export class VendaService {
     } catch (error) {
       throw new NotFoundException('Venda não encontrada.');
     }
+  }
+
+  async findBetweenDates(dataInicio: Date, dataFim: Date):Promise<Venda[]>{
+    return await this.prismaService.venda.findMany({
+      where:{
+        dataVenda:{
+          gte: dataInicio,
+          lte: dataFim
+        }
+      }
+    });
+  }
+
+  async findByAssociacaoAndBetweenDates(idAssociacao:number, dataInicio: Date, dataFim: Date):Promise<Venda[]>{
+    return await this.prismaService.venda.findMany({
+      where:{
+        idAssociacao: idAssociacao,
+        AND:{
+          dataVenda:{
+            gte: dataInicio,
+            lte: dataFim
+          }
+        }
+      }
+    });
   }
 
   async update(id: number, coleta: UpdateVendaDto): Promise<Venda> {

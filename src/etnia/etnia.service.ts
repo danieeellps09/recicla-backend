@@ -7,6 +7,7 @@ export class EtniaService {
     constructor(private readonly prismaService:PrismaService){}
 
     async create(nomenclatura:string):Promise<Etnia>{
+        await this.existsEtnia(nomenclatura);
         const etnia = await this.prismaService.etnia.create({
             data: {nomenclatura:nomenclatura}
         });
@@ -61,4 +62,22 @@ export class EtniaService {
             where:{id}
         })
     }
+
+
+    
+    async existsEtnia(etnia:string){
+        const existsEtnia = await this.prismaService.etnia.findUnique({
+          where:{
+            nomenclatura: etnia,
+          }
+        });
+        if(existsEtnia){
+          throw new BadRequestException("Já existe uma nomenclatura cadastrada.");
+        }   
+      }
+
+
+
+
+
 }

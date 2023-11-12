@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NewAssociacao } from './dto/new-associacao.dto';
 import { Associacao } from './entities/associacao.entity';
@@ -8,11 +8,14 @@ import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
 import { ReturnAssociacaoDto } from './dto/return-associacao.dto';
 import { AssociacaoConversor } from './dto/associacao-conversor';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Catador } from '@prisma/client';
+import { CatadorFormatadoJson } from './models/catador-sem-associacao';
 
 @ApiTags("Associações")
 @Controller('api/v1/associacoes')
-//@ApiBearerAuth()
-@isPublic()
+@ApiBearerAuth()
+
 export class AssociacoesController {
     constructor(private readonly associacaoService: AssociacoesService) { }
 
@@ -49,6 +52,13 @@ export class AssociacoesController {
             throw new HttpException(`${error.message} Não foi possível encontrar associação.`, error.status);
         }
     }
+
+    @Get('user/catadores')
+    async getAssociatedCatadoresByUser(@Req() req: AuthRequest): Promise<CatadorFormatadoJson[]> {
+      const userId = req.user.id;
+      return this.associacaoService.getAssociatedCatadoresByUser(userId);
+    }
+  
 
     @ApiOperation({ summary: "Atualiza informações de uma associação." })
     @ApiOkResponse({ description: "Dados da associação atualizadas com sucesso", type: Associacao })

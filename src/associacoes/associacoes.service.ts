@@ -6,10 +6,16 @@ import { UpdateAssociacaoDto } from './dto/update-associacao.dto';
 import { UserService } from 'src/user/user.service';
 import { RoleService } from 'src/role/role.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
+import { Catador } from '@prisma/client';
+import { CatadorFormatadoJson } from './models/catador-sem-associacao';
 
 @Injectable()
 export class AssociacoesService {
-    constructor(private readonly userService: UserService, private readonly roleService: RoleService, private readonly prismaService: PrismaService) { }
+    constructor(
+        private readonly userService: UserService,
+        private readonly roleService: RoleService,
+        private readonly prismaService: PrismaService
+    ) {}
 
     async create(newAssociacao: NewAssociacao): Promise<Associacao> {
         //seta o role como catador
@@ -18,8 +24,7 @@ export class AssociacoesService {
 
         try {
             rolesIds = await this.userService.getRoleIdsByName(newAssociacao.user.roleNames);
-        }
-        catch (error) {
+        } catch (error) {
             const role = await this.roleService.create({
                 id: null,
                 name: "associacao",
@@ -27,9 +32,7 @@ export class AssociacoesService {
                 status: true
             });
             rolesIds = [role.id];
-
-        }
-        finally {
+        } finally {
             //cria uma senha alfanumérica randomica para o novo usuário
             if (!newAssociacao.user.password) {
                 newAssociacao.user.password = PasswordGenerator.generate(5);
@@ -53,11 +56,11 @@ export class AssociacoesService {
             };
 
             //cria a associacao
-            const associacao = await this.prismaService.associacao.create({ 
-                data:data,
-                include:{
-                    user:true
-                } 
+            const associacao = await this.prismaService.associacao.create({
+                data: data,
+                include: {
+                    user: true
+                }
             });
 
             if (!associacao) {
@@ -65,12 +68,10 @@ export class AssociacoesService {
             }
 
             return associacao;
-
         }
     }
 
     async findAll(): Promise<Associacao[]> {
-
         try {
             return this.prismaService.associacao.findMany({
                 include: {
@@ -102,15 +103,14 @@ export class AssociacoesService {
     }
 
     async update(id: number, associacao: UpdateAssociacaoDto): Promise<Associacao> {
-
         //pega o id do user que está relacionado com o catador
-        const existingAssociacao = (await this.findById(id));
+        const existingAssociacao = await this.findById(id);
         const userId = existingAssociacao.userId;
 
-        if(associacao.cnpj !== existingAssociacao.cnpj)
+        if (associacao.cnpj !== existingAssociacao.cnpj)
             await this.existsByCnpj(associacao.cnpj);
 
-        if(associacao.user.email !== existingAssociacao.user.email)
+        if (associacao.user.email !== existingAssociacao.user.email)
             await this.userService.existsByEmail(associacao.user.email);
 
         await this.userService.update(userId, associacao.user);
@@ -120,7 +120,8 @@ export class AssociacoesService {
             cnpj: associacao.cnpj,
             bairro: associacao.bairro,
             endereco: associacao.endereco
-        }
+        };
+
         try {
             return await this.prismaService.associacao.update({
                 where: { id },
@@ -134,14 +135,16 @@ export class AssociacoesService {
         }
     }
 
-    async disable(id: number) {
+    async disable(id: number): Promise<Associacao> {
         let associacao = await this.findById(id);
         const userId = associacao.user.id;
         associacao.user.status = false;
-        const user = this.prismaService.user.update({
+
+        await this.prismaService.user.update({
             where: { id },
             data: associacao.userId
         });
+
         return associacao;
     }
 
@@ -151,37 +154,66 @@ export class AssociacoesService {
             await this.prismaService.associacao.delete({
                 where: { id }
             });
-            await this.userService.delete((associacao).user.id)
+            await this.userService.delete(associacao.user.id);
         } catch (error) {
             throw new BadRequestException('Erro ao apagar associação.');
         }
     }
 
-    async existsByCnpj(cnpj:string){
+    async existsByCnpj(cnpj: string): Promise<void> {
         const associacao = await this.prismaService.associacao.findUnique({
-            where:{
-                cnpj:cnpj
+            where: {
+                cnpj: cnpj
             }
         });
 
-        if(associacao){
+        if (associacao) {
             throw new BadRequestException("Já existe uma associacão com o CNPJ cadastrado.");
         }
     }
 
-    async getAssociacaoByUserID(userId:number){
-        try {
-            const associacao = await this.prismaService.associacao.findFirst({
-              where: {
-                userId: userId,
-              },
-            });
-            return associacao;
-          } catch (error) {
-            throw new Error('Erro ao obter o Associacao do banco de dados');
-          }
+    async getAssociatedCatadoresByUser(userId: number): Promise<CatadorFormatadoJson[]> {
+        const associacao = await this.getAssociacaoByUserID(userId);
+        if (!associacao) {
+            throw new NotFoundException(`Associação não encontrada para o usuário de id ${userId}`);
+        }
 
+        const catadores = await this.prismaService.catador.findMany({
+            where: { associacaoId: associacao.id },
+            include: {
+                user: true,
+                genero: true,
+                etnia: true,
+            },
+        });
+
+        // Mapeia os catadores para omitir a parte do objeto associacao
+        const catadoresWithoutAssociacao = catadores.map(catador => ({
+            id: catador.id,
+            cpf: catador.cpf,
+            bairro: catador.bairro,
+            endereco: catador.endereco,
+            user: catador.user,
+            genero: catador.genero,
+            etnia: catador.etnia,
+        }));
+
+        return catadoresWithoutAssociacao;
     }
 
-}
+    async getAssociacaoByUserID(userId: number): Promise<Associacao> {
+        try {
+            const associacao = await this.prismaService.associacao.findFirst({
+                where: {
+                    userId: userId,
+                },
+            });
 
+            console.log(associacao);
+
+            return associacao;
+        } catch (error) {
+            throw new Error('Erro ao obter a Associação do banco de dados');
+        }
+    }
+}

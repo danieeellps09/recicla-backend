@@ -9,10 +9,10 @@ import { CatadorConversor } from './dto/catador-conversor';
 import { ReturnCatadorDto } from './dto/return-catador.dto';
 import { map } from 'rxjs';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
+import { CatadorFormatadoJson } from './models/catador-sem-associacao';
 
 @ApiTags('Catadores')
-//@ApiBearerAuth()
-@isPublic()
+@ApiBearerAuth()
 @Controller('api/v1/catadores')
 export class CatadorController {
   constructor(private readonly catadorService: CatadorService) {}
@@ -50,6 +50,18 @@ export class CatadorController {
       throw new NotFoundException('Catador não encontrado.');
     }
   }
+
+
+
+  @ApiOperation({ summary: 'Obtém um catador pela associacao que está fazendo a requisicao.' })
+  @ApiOkResponse({ description: 'Retorna um catadores daquela associacao', type: CatadorFormatadoJson })
+  @Get('/pega-catadore/associacao')
+  async getAssociatedCatadoresByUser(@Req() req: AuthRequest): Promise<CatadorFormatadoJson[]> {
+    const userId = req.user.id;
+    return this.catadorService.getAssociatedCatadoresByUser(userId);
+  }
+
+
 
   @ApiOperation({ summary: 'Atualiza um catador pelo ID.' })
   @ApiOkResponse({ description: 'O catador foi atualizado com sucesso.', type: ReturnCatadorDto })

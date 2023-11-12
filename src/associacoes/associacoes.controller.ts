@@ -10,11 +10,11 @@ import { AssociacaoConversor } from './dto/associacao-conversor';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Catador } from '@prisma/client';
-import { CatadorFormatadoJson } from './models/catador-sem-associacao';
+import { CatadorFormatadoJson } from '../catador/models/catador-sem-associacao';
 
 @ApiTags("Associações")
+@isPublic()
 @Controller('api/v1/associacoes')
-@ApiBearerAuth()
 
 export class AssociacoesController {
     constructor(private readonly associacaoService: AssociacoesService) { }
@@ -53,12 +53,6 @@ export class AssociacoesController {
         }
     }
 
-    @Get('user/catadores')
-    async getAssociatedCatadoresByUser(@Req() req: AuthRequest): Promise<CatadorFormatadoJson[]> {
-      const userId = req.user.id;
-      return this.associacaoService.getAssociatedCatadoresByUser(userId);
-    }
-  
 
     @ApiOperation({ summary: "Atualiza informações de uma associação." })
     @ApiOkResponse({ description: "Dados da associação atualizadas com sucesso", type: Associacao })

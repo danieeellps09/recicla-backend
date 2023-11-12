@@ -7,7 +7,7 @@ import { UserService } from 'src/user/user.service';
 import { RoleService } from 'src/role/role.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
 import { Catador } from '@prisma/client';
-import { CatadorFormatadoJson } from './models/catador-sem-associacao';
+import { CatadorFormatadoJson } from '../catador/models/catador-sem-associacao';
 
 @Injectable()
 export class AssociacoesService {
@@ -172,34 +172,7 @@ export class AssociacoesService {
         }
     }
 
-    async getAssociatedCatadoresByUser(userId: number): Promise<CatadorFormatadoJson[]> {
-        const associacao = await this.getAssociacaoByUserID(userId);
-        if (!associacao) {
-            throw new NotFoundException(`Associação não encontrada para o usuário de id ${userId}`);
-        }
-
-        const catadores = await this.prismaService.catador.findMany({
-            where: { associacaoId: associacao.id },
-            include: {
-                user: true,
-                genero: true,
-                etnia: true,
-            },
-        });
-
-        // Mapeia os catadores para omitir a parte do objeto associacao
-        const catadoresWithoutAssociacao = catadores.map(catador => ({
-            id: catador.id,
-            cpf: catador.cpf,
-            bairro: catador.bairro,
-            endereco: catador.endereco,
-            user: catador.user,
-            genero: catador.genero,
-            etnia: catador.etnia,
-        }));
-
-        return catadoresWithoutAssociacao;
-    }
+ 
 
     async getAssociacaoByUserID(userId: number): Promise<Associacao> {
         try {
@@ -209,7 +182,6 @@ export class AssociacoesService {
                 },
             });
 
-            console.log(associacao);
 
             return associacao;
         } catch (error) {

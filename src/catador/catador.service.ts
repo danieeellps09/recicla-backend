@@ -11,6 +11,7 @@ import { RoleService } from 'src/role/role.service';
 import { EtniaService } from '../etnia/etnia.service';
 import { GeneroService } from '../genero/genero.service';
 import { Associacao } from 'src/associacoes/entities/associacao.entity';
+import { CatadorFormatadoJson } from './models/catador-sem-associacao';
 
 
 @Injectable()
@@ -162,7 +163,39 @@ export class CatadorService {
   }
 
 
- 
+  async getAssociatedCatadoresByUser(userId: number): Promise<CatadorFormatadoJson[]> {
+    const associacao = await this.associacaoService.getAssociacaoByUserID(userId);
+    if (!associacao) {
+        throw new NotFoundException(`Associação não encontrada para o usuário de id ${userId}`);
+    }
+
+    const catadores = await this.prismaService.catador.findMany({
+        where: { associacaoId: associacao.id },
+        include: {
+            user: true,
+            genero: true,
+            etnia: true,
+        },
+    });
+
+    // Mapeia os catadores para omitir a parte do objeto associacao
+    const catadoresWithoutAssociacao = catadores.map(catador => ({
+        id: catador.id,
+        cpf: catador.cpf,
+        bairro: catador.bairro,
+        endereco: catador.endereco,
+        user: catador.user,
+        genero: catador.genero,
+        etnia: catador.etnia,
+    }));
+
+    return catadoresWithoutAssociacao;
+}
+
+
+
+
+
 
 
   async update(id: number, updateCatadorDto: UpdateCatadorDto): Promise<Catador> {

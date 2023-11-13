@@ -22,6 +22,7 @@ import { FormsModule } from './forms/forms.module';
 import { AdministradorModule } from './administrador/administrador.module';
 import { EtniaModule } from './etnia/etnia.module';
 import { GeneroModule } from './genero/genero.module';
+import { PdfModule } from './pdf/pdf.module';
 dotenv.config({ path: `${__dirname}../.env` })
 import config from './config/config';
 
@@ -45,7 +46,8 @@ import config from './config/config';
     FormsModule,
     AdministradorModule,
     EtniaModule,
-    GeneroModule
+    GeneroModule,
+    PdfModule
   ],
   controllers: [ AppController],
   providers: [AppService,

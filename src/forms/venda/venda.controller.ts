@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { VendaService } from './venda.service';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -67,6 +67,43 @@ export class VendaController {
             throw new HttpException('Venda não encontrada.', HttpStatus.NOT_FOUND);
         }
     }
+
+    @ApiOperation({summary: "Retorna todas as vendas entre duas datas."})
+    @ApiOkResponse({description: "Vendas encontradas"})
+    @Get('findBetweenDates/dates')
+    async findBetweenDates(
+        @Query('datainicio') dataInicio:string = new Date().toString(), 
+        @Query('datafim') dataFim:string = new Date().toString()):Promise<Venda[]>{
+            let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+            let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+
+            if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
+                if(dataFimConvertida >= dataInicioConvertida){
+                    return await this.vendaService.findBetweenDates(dataInicioConvertida, dataFimConvertida);
+                }
+                throw new BadRequestException("Data de início deve ser anterior a data de fim.");
+            }
+            throw new BadRequestException("Dados fornecidos não são datas válidas");
+        }
+
+        @ApiOperation({summary: "Retorna todas as vendas entre duas datas."})
+        @ApiOkResponse({description: "Vendas encontradas"})
+        @Get('findBetweenDates/:id')
+        async findByIdBetweenDates(
+            @Param('id') idCatador:number,
+            @Query('datainicio') dataInicio:string = new Date().toString(), 
+            @Query('datafim') dataFim:string = new Date().toString()):Promise<Venda[]>{
+                let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+                let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+    
+                if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
+                    if(dataFimConvertida >= dataInicioConvertida){
+                        return await this.vendaService.findByAssociacaoAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
+                    }
+                    throw new BadRequestException("Data de início deve ser anterior a data de fim.");
+                }
+                throw new BadRequestException("Dados fornecidos não são datas válidas");
+            }
 
     @ApiOperation({ summary: "Atualiza informações de uma associação." })
     @ApiOkResponse({ description: "Dados da venda atualizadas com sucesso", type: UpdateVendaDto })

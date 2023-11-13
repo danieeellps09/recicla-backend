@@ -15,10 +15,7 @@ export class VendaService {
     private readonly associacaoService: AssociacoesService) {
 
   }
-
-
-
-
+  
   async create(registerVendaDto: RegisterVendaDto, @Request() req: AuthRequest): Promise<Venda> {
     const userId = req.user.id;
 
@@ -83,6 +80,45 @@ export class VendaService {
       return venda;
     } catch (error) {
       throw new NotFoundException('Venda não encontrada.');
+    }
+  }
+
+  async findBetweenDates(dataInicio: Date, dataFim: Date):Promise<Venda[]>{
+    try{
+      return await this.prismaService.venda.findMany({
+        where:{
+          dataVenda:{
+            gte: dataInicio,
+            lte: dataFim
+          }
+        },
+        orderBy:{
+          dataVenda: 'desc'
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
+  }
+
+  async findByAssociacaoAndBetweenDates(idAssociacao:number, dataInicio: Date, dataFim: Date):Promise<Venda[]>{
+    try{
+      return await this.prismaService.venda.findMany({
+        where:{
+          idAssociacao: idAssociacao,
+          AND:{
+            dataVenda:{
+              gte: dataInicio,
+              lte: dataFim
+            }
+          }
+        },
+        orderBy:{
+          dataVenda: 'desc'
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
     }
   }
 

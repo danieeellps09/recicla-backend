@@ -8,14 +8,15 @@ import { RoleService } from 'src/role/role.service';
 import { PasswordGenerator } from 'src/helpers/password-generator';
 import { Catador } from '@prisma/client';
 import { CatadorFormatadoJson } from '../catador/models/catador-sem-associacao';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AssociacoesService {
     constructor(
-        private readonly userService: UserService,
-        private readonly roleService: RoleService,
-        private readonly prismaService: PrismaService
-    ) {}
+        private readonly userService: UserService, 
+        private readonly roleService: RoleService, 
+        private readonly prismaService: PrismaService,
+        private readonly emailService: EmailService) { }
 
     async create(newAssociacao: NewAssociacao): Promise<Associacao> {
         //seta o role como catador
@@ -66,6 +67,10 @@ export class AssociacoesService {
             if (!associacao) {
                 throw new InternalServerErrorException("Ocorreu um erro ao criar associação");
             }
+
+            this.emailService.sendEmail(user.email, "Conta criada com sucesso",
+                `Conta criada com sucesso! Sua senha para login é ${newAssociacao.user.password}. 
+                Para trocar de senha, faça login na plataforma, vá em perfil e troque sua senha!`);
 
             return associacao;
         }

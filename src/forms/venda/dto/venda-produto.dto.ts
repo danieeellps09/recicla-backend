@@ -8,7 +8,7 @@ export class VendaMaterialDto {
         description: 'Identificador do produto',
     })
     @IsNumber()
-    idProduto: number;
+    idMaterial: number;
 
     @ApiProperty({
         example: 13.25,

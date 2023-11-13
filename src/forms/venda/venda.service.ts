@@ -8,6 +8,7 @@ import { UpdateVendaDto } from './dto/update-venda-dto';
 import { VendaMaterialDto } from './dto/venda-produto.dto';
 import { MaterialService } from 'src/material/material.service';
 import { Venda } from './entities/venda.entity';
+import { VendaMaterial } from './entities/venda-material.entity';
 
 @Injectable()
 export class VendaService {
@@ -45,14 +46,20 @@ export class VendaService {
       dataVenda: dataPrisma
     };
 
-    const venda = await this.prismaService.venda.create({ data });
+    const venda:Venda = await this.prismaService.venda.create({
+      data,
+      include: {
+        associacao: true
+      } 
+    });
 
     if (!venda) {
       throw new NotFoundException('Failed to create venda');
     }
 
     try{
-      const produtos = registerVendaDto.produtos.map(async (produto)=> await this.createMaterialVenda(venda.id, produto));
+      const materiais = await Promise.all(registerVendaDto.produtos.map(async (produto)=> await this.createMaterialVenda(venda.id, produto)));
+      venda.materiais = materiais;
     }catch(error){
       await this.delete(venda.id);
     }
@@ -60,11 +67,11 @@ export class VendaService {
     return venda;
   }
 
-  async createMaterialVenda(idVenda:number, produto:VendaMaterialDto){
-    const material = await this.materialService.findById(produto.idProduto);
+  async createMaterialVenda(idVenda:number, produto:VendaMaterialDto):Promise<VendaMaterial>{
+    const material = await this.materialService.findById(produto.idMaterial);
     const data = {
       idVenda: idVenda,
-      idMaterial: produto.idProduto,
+      idMaterial: produto.idMaterial,
       quantidadeVendida: produto.quantidade
     }
     return await this.prismaService.vendaProduto.create({

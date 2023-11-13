@@ -1,15 +1,12 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req } from '@nestjs/common';
 import { VendaService } from './venda.service';
-import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterVendaDto } from './dto/register-venda-dto';
-import { CatadorService } from 'src/catador/catador.service';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
-import { Venda, User } from '@prisma/client';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
-import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateVendaDto } from './dto/update-venda-dto';
 import { format, isDate, parse } from 'date-fns';
+import { Venda } from './entities/venda.entity';
 
 @ApiTags('Formulario de Vendas')
 @ApiBearerAuth()

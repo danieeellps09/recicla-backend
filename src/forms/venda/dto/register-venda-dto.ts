@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsEmail, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { VendaMaterialDto } from './venda-produto.dto';
+import { Type } from 'class-transformer';
 
 export class RegisterVendaDto {
   @IsOptional()
@@ -28,9 +30,6 @@ export class RegisterVendaDto {
   @IsNumber()
   qtdVendida: number;
   
-
- 
-
   @ApiProperty({
     example: 'NF123456789"',
     description: 'Nota fiscal' ,
@@ -48,4 +47,11 @@ export class RegisterVendaDto {
   @IsOptional()
   @IsString()
   dataVenda: string;
+
+  @IsArray()
+  @ApiProperty({ type: VendaMaterialDto, isArray: true })
+  @ValidateNested()
+  @Type(() => VendaMaterialDto)
+  produtos:VendaMaterialDto[];
+
 }

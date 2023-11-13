@@ -14,11 +14,12 @@ import { EtniaModule } from 'src/etnia/etnia.module';
 import { RoleModule } from 'src/role/role.module';
 import { EtniaService } from 'src/etnia/etnia.service';
 import { GeneroService } from 'src/genero/genero.service';
+import { MaterialService } from 'src/material/material.service';
 
 @Module({
   imports: [UserModule, CatadorModule, EmailModule, GeneroModule,EtniaModule, RoleModule],
   controllers: [ColetaController, VendaController],
-  providers: [ColetaService, PrismaService, CatadorService,EtniaService, GeneroService, VendaService, AssociacoesService]
+  providers: [ColetaService, PrismaService, CatadorService,EtniaService, GeneroService, VendaService, AssociacoesService, MaterialService]
 })
 export class FormsModule {
  

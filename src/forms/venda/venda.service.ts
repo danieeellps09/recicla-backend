@@ -1,23 +1,20 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, Request } from '@nestjs/common';
-import { Associacao, Catador, Coleta, User, Venda } from '@prisma/client';
+import { Injectable, InternalServerErrorException, NotFoundException, Request } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
-import { CatadorService } from 'src/catador/catador.service';
-import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import {parse, format, isDate} from 'date-fns';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
 import { RegisterVendaDto } from './dto/register-venda-dto';
 import { UpdateVendaDto } from './dto/update-venda-dto';
+import { VendaMaterialDto } from './dto/venda-produto.dto';
+import { MaterialService } from 'src/material/material.service';
+import { Venda } from './entities/venda.entity';
 
 @Injectable()
 export class VendaService {
   constructor(private readonly prismaService: PrismaService,
-    private readonly associacaoService: AssociacoesService) {
-
+    private readonly associacaoService: AssociacoesService,
+    private readonly materialService: MaterialService) {
   }
-
-
-
 
   async create(registerVendaDto: RegisterVendaDto, @Request() req: AuthRequest): Promise<Venda> {
     const userId = req.user.id;
@@ -39,17 +36,14 @@ export class VendaService {
       dataConvertida = new Date();
     }
 
-      const dataPrisma: Date = new Date(dataConvertida.toISOString());
+    const dataPrisma: Date = new Date(dataConvertida.toISOString());
     const data = {
       id: registerVendaDto.id,
       idAssociacao: idAssociacao.id,
       empresaCompradora: registerVendaDto.empresaCompradora,
-      qtdVendida: registerVendaDto.qtdVendida,
       notaFiscal: registerVendaDto.notaFiscal,
       dataVenda: dataPrisma
     };
-
-
 
     const venda = await this.prismaService.venda.create({ data });
 
@@ -57,13 +51,38 @@ export class VendaService {
       throw new NotFoundException('Failed to create venda');
     }
 
+    try{
+      const produtos = registerVendaDto.produtos.map(async (produto)=> await this.createMaterialVenda(venda.id, produto));
+    }catch(error){
+      await this.delete(venda.id);
+    }
+
     return venda;
+  }
+
+  async createMaterialVenda(idVenda:number, produto:VendaMaterialDto){
+    const material = await this.materialService.findById(produto.idProduto);
+    const data = {
+      idVenda: idVenda,
+      idMaterial: produto.idProduto,
+      quantidadeVendida: produto.quantidade
+    }
+    return await this.prismaService.vendaProduto.create({
+      data,
+      include:{
+        Material: true
+      }
+    });
   }
 
 
   async findAll(): Promise<Venda[]> {
     try {
-      return this.prismaService.venda.findMany();
+      return this.prismaService.venda.findMany({
+        include:{
+          Materiais: true
+        }
+      });
     } catch (error) {
       throw new InternalServerErrorException('Erro ao buscar associações.');
     }

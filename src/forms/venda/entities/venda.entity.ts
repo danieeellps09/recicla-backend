@@ -1,4 +1,3 @@
-import { VendaMaterialDto } from "../dto/venda-produto.dto";
 import { VendaMaterial } from "./venda-material.entity";
 
 export class Venda {

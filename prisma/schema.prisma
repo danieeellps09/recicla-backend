@@ -150,7 +150,7 @@ model Venda {
   associacao        Associacao @relation(fields: [idAssociacao], references: [id])
   dataVenda         DateTime   @default(now())
 
-  Materiais         VendaProduto[] @relation("VendaToVendaProduto")
+  materiais         VendaProduto[] @relation("VendaToVendaProduto")
 
   @@map("vendas")
 }
@@ -162,6 +162,6 @@ model VendaProduto {
 
   quantidadeVendida Float
 
-  Venda           Venda   @relation("VendaToVendaProduto", fields: [idVenda], references: [id])
-  Material        Material @relation("MaterialToVendaProduto", fields: [idMaterial], references: [id])
+  venda           Venda   @relation("VendaToVendaProduto", fields: [idVenda], references: [id])
+  material        Material @relation("MaterialToVendaProduto", fields: [idMaterial], references: [id])
 }

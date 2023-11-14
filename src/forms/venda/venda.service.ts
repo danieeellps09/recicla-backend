@@ -77,7 +77,7 @@ export class VendaService {
     return await this.prismaService.vendaProduto.create({
       data,
       include:{
-        Material: true
+        material: true
       }
     });
   }
@@ -89,7 +89,7 @@ export class VendaService {
           idVenda: idVenda
         },
         include:{
-          Material:true
+          material:true
         }
       });
     }catch(error){
@@ -102,12 +102,12 @@ export class VendaService {
     try {
       let vendas = await this.prismaService.venda.findMany({
         include:{
-          Materiais: true
+          materiais: true
         }
       });
 
       for (let venda of vendas) {
-        venda.Materiais = await this.findMaterialVendaByIdVenda(venda.id);
+        venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
       }
 
       return vendas;
@@ -122,7 +122,7 @@ export class VendaService {
       let venda = await this.prismaService.venda.findUnique({
         where: { id },
         include:{
-          Materiais:true
+          materiais:true
         }
       });
 
@@ -130,7 +130,7 @@ export class VendaService {
         throw new NotFoundException('Venda  não encontrada.');
       }
 
-      venda.Materiais = await this.findMaterialVendaByIdVenda(venda.id);
+      venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
 
       return venda;
     } catch (error) {

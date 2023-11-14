@@ -67,7 +67,7 @@ export class VendaService {
     return venda;
   }
 
-  async createMaterialVenda(idVenda:number, produto:VendaMaterialDto):Promise<VendaMaterial>{
+  private async createMaterialVenda(idVenda:number, produto:VendaMaterialDto):Promise<VendaMaterial>{
     const material = await this.materialService.findById(produto.idMaterial);
     const data = {
       idVenda: idVenda,
@@ -82,29 +82,55 @@ export class VendaService {
     });
   }
 
+  private async findMaterialVendaByIdVenda(idVenda:number):Promise<VendaMaterial[]>{
+    try{
+      return await this.prismaService.vendaProduto.findMany({
+        where:{
+          idVenda: idVenda
+        },
+        include:{
+          Material:true
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por materiais da venda.");
+    }
+  }
+
 
   async findAll(): Promise<Venda[]> {
     try {
-      return this.prismaService.venda.findMany({
+      let vendas = await this.prismaService.venda.findMany({
         include:{
           Materiais: true
         }
       });
+
+      for (let venda of vendas) {
+        venda.Materiais = await this.findMaterialVendaByIdVenda(venda.id);
+      }
+
+      return vendas;
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar associações.');
+      throw new InternalServerErrorException('Erro ao buscar por vendas.');
     }
   }
 
 
   async findById(id: number): Promise<Venda> {
     try {
-      const venda = await this.prismaService.venda.findUnique({
-        where: { id }
+      let venda = await this.prismaService.venda.findUnique({
+        where: { id },
+        include:{
+          Materiais:true
+        }
       });
 
       if (!venda) {
         throw new NotFoundException('Venda  não encontrada.');
       }
+
+      venda.Materiais = await this.findMaterialVendaByIdVenda(venda.id);
 
       return venda;
     } catch (error) {
@@ -119,17 +145,28 @@ export class VendaService {
             data: coleta
         });
     } catch (error) {
-        throw new InternalServerErrorException('Erro ao atualizar associação.');
+        throw new InternalServerErrorException('Erro ao atualizar venda.');
     }
+}
+
+private async deleteVendaMaterialByIdVenda(idVenda:number){
+  await this.prismaService.vendaProduto.deleteMany({
+    where: {
+      idVenda: idVenda
+    }
+  })
 }
 
 async delete(id: number): Promise<void> {
     try {
+        const venda = await this.findById(id);
+
+        await this.deleteVendaMaterialByIdVenda(venda.id);
         await this.prismaService.venda.delete({
             where: { id }
         });
     } catch (error) {
-        throw new InternalServerErrorException('Erro ao apagar associação.');
+        throw new InternalServerErrorException('Erro ao apagar venda.');
     }
 }
 

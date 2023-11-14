@@ -43,14 +43,14 @@ export class VendaController {
         }
     }
 
-    @ApiOperation({ summary: 'Obtém todas as associações.' })
-    @ApiOkResponse({ description: 'Lista com todas as associações.', type: RegisterVendaDto, isArray: true })
+    @ApiOperation({ summary: 'Obtém todas as vendas.' })
+    @ApiOkResponse({ description: 'Lista com todas as vendas.', type: RegisterVendaDto, isArray: true })
     @Get()
     async findAll(): Promise<Venda[]> {
         try {
             return await this.vendaService.findAll();
         } catch (error) {
-            throw new HttpException('Erro ao buscar associações.', error.message);
+            throw new HttpException('Erro ao buscar vendas.', error.message);
         }
     }
 

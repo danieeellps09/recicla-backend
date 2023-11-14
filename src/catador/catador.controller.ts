@@ -55,7 +55,7 @@ export class CatadorController {
 
   @ApiOperation({ summary: 'Obtém um catador pela associacao que está fazendo a requisicao.' })
   @ApiOkResponse({ description: 'Retorna um catadores daquela associacao', type: CatadorFormatadoJson })
-  @Get('/pega-catadore/associacao')
+  @Get('/pega-catadores/associacao')
   async getAssociatedCatadoresByUser(@Req() req: AuthRequest): Promise<CatadorFormatadoJson[]> {
     const userId = req.user.id;
     return this.catadorService.getAssociatedCatadoresByUser(userId);

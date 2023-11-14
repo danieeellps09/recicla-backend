@@ -62,7 +62,7 @@ export class CatadorService {
       await this.generoService.findById(createCatadorDto.idGenero);
 
       //verifica se a etnia existe
-      await this.etniaService.findById(createCatadorDto.idGenero);
+      await this.etniaService.findById(createCatadorDto.idEtnia);
 
       //cria o user
       const user = await this.userService.create(createCatadorDto.user);
@@ -78,7 +78,7 @@ export class CatadorService {
         endereco: createCatadorDto.endereco,
         associacaoId: createCatadorDto.idAssociacao,
         etniaId: createCatadorDto.idEtnia,
-        generoId: createCatadorDto.idEtnia
+        generoId: createCatadorDto.idGenero
       };
 
       //salva o catador

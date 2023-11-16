@@ -62,6 +62,7 @@ export class VendaService {
       venda.materiais = materiais;
     }catch(error){
       await this.delete(venda.id);
+      throw new NotFoundException("Algum dos materiais referênciados não existe no banco de dados");
     }
 
     return venda;

@@ -1,21 +1,22 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, Request } from '@nestjs/common';
-import { Associacao, Catador, Coleta, User, Venda } from '@prisma/client';
+import { Injectable, InternalServerErrorException, NotFoundException, Request } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
-import { CatadorService } from 'src/catador/catador.service';
-import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import {parse, format, isDate} from 'date-fns';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
 import { RegisterVendaDto } from './dto/register-venda-dto';
 import { UpdateVendaDto } from './dto/update-venda-dto';
+import { VendaMaterialDto } from './dto/venda-produto.dto';
+import { MaterialService } from 'src/material/material.service';
+import { Venda } from './entities/venda.entity';
+import { VendaMaterial } from './entities/venda-material.entity';
 
 @Injectable()
 export class VendaService {
   constructor(private readonly prismaService: PrismaService,
-    private readonly associacaoService: AssociacoesService) {
-
+    private readonly associacaoService: AssociacoesService,
+    private readonly materialService: MaterialService) {
   }
-  
+
   async create(registerVendaDto: RegisterVendaDto, @Request() req: AuthRequest): Promise<Venda> {
     const userId = req.user.id;
 
@@ -36,46 +37,115 @@ export class VendaService {
       dataConvertida = new Date();
     }
 
-      const dataPrisma: Date = new Date(dataConvertida.toISOString());
+    const dataPrisma: Date = new Date(dataConvertida.toISOString());
     const data = {
       id: registerVendaDto.id,
       idAssociacao: idAssociacao.id,
       empresaCompradora: registerVendaDto.empresaCompradora,
-      qtdVendida: registerVendaDto.qtdVendida,
       notaFiscal: registerVendaDto.notaFiscal,
       dataVenda: dataPrisma
     };
 
-
-
-    const venda = await this.prismaService.venda.create({ data });
+    const venda:Venda = await this.prismaService.venda.create({
+      data,
+      include: {
+        associacao: true
+      } 
+    });
 
     if (!venda) {
       throw new NotFoundException('Failed to create venda');
     }
 
+    try{
+      const materiais = await Promise.all(registerVendaDto.produtos.map(async (produto)=> await this.createMaterialVenda(venda.id, produto)));
+      venda.materiais = materiais;
+    }catch(error){
+      await this.delete(venda.id);
+    }
+
     return venda;
+  }
+
+  private async createMaterialVenda(idVenda:number, produto:VendaMaterialDto):Promise<VendaMaterial>{
+    const material = await this.materialService.findById(produto.idMaterial);
+    const data = {
+      idVenda: idVenda,
+      idMaterial: produto.idMaterial,
+      quantidadeVendida: produto.quantidade
+    }
+    return await this.prismaService.vendaProduto.create({
+      data,
+      include:{
+        material: true
+      }
+    });
+  }
+
+  private async findMaterialVendaByIdVenda(idVenda:number):Promise<VendaMaterial[]>{
+    try{
+      return await this.prismaService.vendaProduto.findMany({
+        where:{
+          idVenda: idVenda
+        },
+        include:{
+          material:true
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por materiais da venda.");
+    }
+  }
+
+  private async findMaterialVendaById(id:number):Promise<VendaMaterial[]>{
+    try{
+      return await this.prismaService.vendaProduto.findMany({
+        where:{
+          id
+        },
+        include:{
+          material:true
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por materiais da venda.");
+    }
   }
 
 
   async findAll(): Promise<Venda[]> {
     try {
-      return this.prismaService.venda.findMany();
+      let vendas = await this.prismaService.venda.findMany({
+        include:{
+          materiais: true
+        }
+      });
+
+      for (let venda of vendas) {
+        venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
+      }
+
+      return vendas;
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar associações.');
+      throw new InternalServerErrorException('Erro ao buscar por vendas.');
     }
   }
 
 
   async findById(id: number): Promise<Venda> {
     try {
-      const venda = await this.prismaService.venda.findUnique({
-        where: { id }
+      let venda = await this.prismaService.venda.findUnique({
+        where: { id },
+        include:{
+          materiais:true
+        }
       });
 
       if (!venda) {
         throw new NotFoundException('Venda  não encontrada.');
       }
+
+      venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
 
       return venda;
     } catch (error) {
@@ -122,24 +192,41 @@ export class VendaService {
     }
   }
 
-  async update(id: number, coleta: UpdateVendaDto): Promise<Venda> {
+  async update(id: number, venda: UpdateVendaDto): Promise<Venda> {
     try {
-        return await this.prismaService.venda.update({
-            where: { id },
-            data: coleta
-        });
+      await this.findById(id);
+      return await this.prismaService.venda.update({
+        where: { id },
+        data: {
+          id: id,
+          empresaCompradora: venda.empresaCompradora,
+          idAssociacao: venda.idAssociacao,
+          notaFiscal: venda.notaFiscal
+        }
+      });
     } catch (error) {
-        throw new InternalServerErrorException('Erro ao atualizar associação.');
+        throw new InternalServerErrorException('Erro ao atualizar venda.');
     }
+}
+
+private async deleteVendaMaterialByIdVenda(idVenda:number){
+  await this.prismaService.vendaProduto.deleteMany({
+    where: {
+      idVenda: idVenda
+    }
+  })
 }
 
 async delete(id: number): Promise<void> {
     try {
+        const venda = await this.findById(id);
+
+        await this.deleteVendaMaterialByIdVenda(venda.id);
         await this.prismaService.venda.delete({
             where: { id }
         });
     } catch (error) {
-        throw new InternalServerErrorException('Erro ao apagar associação.');
+        throw new InternalServerErrorException('Erro ao apagar venda.');
     }
 }
 

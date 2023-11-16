@@ -97,6 +97,21 @@ export class VendaService {
     }
   }
 
+  private async findMaterialVendaById(id:number):Promise<VendaMaterial[]>{
+    try{
+      return await this.prismaService.vendaProduto.findMany({
+        where:{
+          id
+        },
+        include:{
+          material:true
+        }
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao buscar por materiais da venda.");
+    }
+  }
+
 
   async findAll(): Promise<Venda[]> {
     try {
@@ -138,12 +153,18 @@ export class VendaService {
     }
   }
 
-  async update(id: number, coleta: UpdateVendaDto): Promise<Venda> {
+  async update(id: number, venda: UpdateVendaDto): Promise<Venda> {
     try {
-        return await this.prismaService.venda.update({
-            where: { id },
-            data: coleta
-        });
+      await this.findById(id);
+      return await this.prismaService.venda.update({
+        where: { id },
+        data: {
+          id: id,
+          empresaCompradora: venda.empresaCompradora,
+          idAssociacao: venda.idAssociacao,
+          notaFiscal: venda.notaFiscal
+        }
+      });
     } catch (error) {
         throw new InternalServerErrorException('Erro ao atualizar venda.');
     }

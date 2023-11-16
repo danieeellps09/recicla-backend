@@ -1,7 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { RegisterVendaDto } from './register-venda-dto';
+import { Type } from 'class-transformer';
+import { VendaMaterialDto } from './venda-produto.dto';
 
 
 export class UpdateVendaDto extends PartialType(RegisterVendaDto) {
@@ -22,14 +24,6 @@ export class UpdateVendaDto extends PartialType(RegisterVendaDto) {
     empresaCompradora: string;
 
     @ApiProperty({
-        example: 1202,
-        description: 'Quantidade coletada',
-    })
-
-    @IsNumber()
-    qtdVendida: number;
-
-    @ApiProperty({
         example: 'NF123456789"',
         description: 'Nota fiscal',
     })
@@ -37,6 +31,5 @@ export class UpdateVendaDto extends PartialType(RegisterVendaDto) {
     @IsString()
     notaFiscal: string;
 
-  
 }
 

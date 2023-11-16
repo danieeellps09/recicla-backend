@@ -9,11 +9,9 @@ export class RegisterVendaDto {
   @IsNumber()
   id: number;
   
-
   @IsOptional()
   @IsNumber()
   idAssociacao: number;
-
 
   @ApiProperty({
     example: 'Coca-cola',
@@ -21,14 +19,6 @@ export class RegisterVendaDto {
   })
   @IsString()
   empresaCompradora: string;
-
-  @ApiProperty({
-    example: '32132',
-    description: 'Quantidade coletada',
-  })
-  
-  @IsNumber()
-  qtdVendida: number;
   
   @ApiProperty({
     example: 'NF123456789"',

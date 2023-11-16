@@ -132,11 +132,20 @@ CREATE TABLE `vendas` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `idAssociacao` INTEGER NOT NULL,
     `empresaCompradora` VARCHAR(191) NOT NULL,
-    `qtdVendida` INTEGER NOT NULL,
     `notaFiscal` VARCHAR(191) NOT NULL,
     `dataVenda` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `vendas_notaFiscal_key`(`notaFiscal`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `VendaProduto` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `idVenda` INTEGER NOT NULL,
+    `idMaterial` INTEGER NOT NULL,
+    `quantidadeVendida` DOUBLE NOT NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -175,3 +184,9 @@ ALTER TABLE `coletas` ADD CONSTRAINT `coletas_idVeiculo_fkey` FOREIGN KEY (`idVe
 
 -- AddForeignKey
 ALTER TABLE `vendas` ADD CONSTRAINT `vendas_idAssociacao_fkey` FOREIGN KEY (`idAssociacao`) REFERENCES `associacoes`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `VendaProduto` ADD CONSTRAINT `VendaProduto_idVenda_fkey` FOREIGN KEY (`idVenda`) REFERENCES `vendas`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `VendaProduto` ADD CONSTRAINT `VendaProduto_idMaterial_fkey` FOREIGN KEY (`idMaterial`) REFERENCES `materiais`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

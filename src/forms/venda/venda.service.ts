@@ -193,6 +193,39 @@ export class VendaService {
     }
   }
 
+  async findVendasByAssociacaoUserId(userId: number): Promise<Venda[]> {
+    try {
+      // Obtenha a associação com base no ID do usuário
+      const associacao = await this.associacaoService.getAssociacaoByUserID(userId);
+
+      if (!associacao) {
+        throw new NotFoundException('Associação não encontrada para o usuário.');
+      }
+
+      // Use o ID da associação para filtrar as vendas
+      let vendas = await this.prismaService.venda.findMany({
+        where: {
+          idAssociacao: associacao.id,
+        },
+        include: {
+          materiais: true,
+        },
+      });
+
+      for (let venda of vendas) {
+        venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
+      }
+
+      return vendas;
+    } catch (error) {
+      throw new Error('Erro ao buscar vendas por associação: ' + error.message);
+    }
+  }
+
+
+
+  
+
   async update(id: number, venda: UpdateVendaDto): Promise<Venda> {
     try {
       await this.findById(id);

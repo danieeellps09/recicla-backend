@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, NotFoundException, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ColetaService } from './coleta.service';
 import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -64,6 +64,7 @@ async findAll(): Promise<Coleta[]> {
     }
 }
 
+
 @ApiOperation({ summary: "Encontra uma coleta pelo seu id" })
 @ApiOkResponse({ description: "Associação encontrada", type: RegisterColetaDto })
 @Get(':id')
@@ -75,65 +76,134 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
     }
 }
 
+
+
+@ApiOperation({summary: "Retorna todas as coletas entre duas datas."})
+@ApiOkResponse({description: "Coletas encontradas"})
+@Get('findBetweenDates/dates')
+async findBetweenDates(
+    @Query('datainicio') dataInicio:string = new Date().toString(), 
+    @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{
+        let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+        let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+        
+        if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
+            if(dataFimConvertida >= dataInicioConvertida){
+                return await this.coletaService.findBetweenDates(dataInicioConvertida, dataFimConvertida);
+            }
+            throw new BadRequestException("Data de início deve ser anterior a data de fim.");
+        }
+        throw new BadRequestException("Dados fornecidos não são datas válidas");
+    }
+    
+   
     @ApiOperation({summary: "Retorna todas as coletas entre duas datas."})
     @ApiOkResponse({description: "Coletas encontradas"})
-    @Get('findBetweenDates/dates')
-    async findBetweenDates(
+    @Get('findBetweenDates/:id')
+    async findByIdBetweenDates(
+        @Param('id') idCatador:number,
         @Query('datainicio') dataInicio:string = new Date().toString(), 
         @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{
             let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
             let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
-
+            
             if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                 if(dataFimConvertida >= dataInicioConvertida){
-                    return await this.coletaService.findBetweenDates(dataInicioConvertida, dataFimConvertida);
+                    return await this.coletaService.findByCatadorAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
                 }
                 throw new BadRequestException("Data de início deve ser anterior a data de fim.");
             }
             throw new BadRequestException("Dados fornecidos não são datas válidas");
         }
-    
-        @ApiOperation({summary: "Retorna todas as coletas entre duas datas."})
-        @ApiOkResponse({description: "Coletas encontradas"})
-        @Get('findBetweenDates/:id')
-        async findByIdBetweenDates(
-            @Param('id') idCatador:number,
-            @Query('datainicio') dataInicio:string = new Date().toString(), 
-            @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{
-                let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-                let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
-    
-                if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
-                    if(dataFimConvertida >= dataInicioConvertida){
-                        return await this.coletaService.findByCatadorAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
-                    }
-                    throw new BadRequestException("Data de início deve ser anterior a data de fim.");
-                }
-                throw new BadRequestException("Dados fornecidos não são datas válidas");
+
+
+
+        @ApiOperation({ summary: 'Obtém todas as coletas do catador logado.' })
+        @ApiOkResponse({ description: 'Lista com todas as coletas do catador logado.', type: RegisterColetaDto, isArray: true })
+        @Get('coletas/coletas-by-catadores')  // Defina um novo endpoint
+        async encontrarMinhasColetas(@Req() req: AuthRequest): Promise<Coleta[]> {
+          const userId = req.user.id;
+        
+          if (!userId) {
+            throw new NotFoundException('Usuário não encontrado');
+          }
+        
+          try {
+            // Obtenha o catador com base no ID do usuário
+            const catador = await this.catadorService.getCatadorByUserID(userId);
+        
+            if (!catador) {
+              throw new NotFoundException('O usuário não é um catador.');
             }
-
-
-@ApiOperation({ summary: "Atualiza informações de uma coleta." })
-    @ApiOkResponse({ description: "Dados da coleta atualizadas com sucesso", type: UpdateColetaDto })
-    @ApiBody({ type: UpdateColetaDto })
-    @Put(':id')
-    async update(@Param('id') id: number, @Body() coleta: UpdateColetaDto): Promise<Coleta> {
-        try {
-            return await this.coletaService.update(id, coleta);
-        } catch (error) {
-            throw new HttpException('Erro ao atualizar coleta.', error.message);
+        
+            // Utilize o serviço de coleta para obter os formulários de coleta preenchidos pelo catador logado
+            return this.coletaService.findMyColetas(catador.id);
+          } catch (error) {
+            throw new InternalServerErrorException('Erro ao buscar as coletas.');
+          }
         }
-    }
 
-    @ApiOperation({ summary: "Apaga informações de uma Coleta" })
-    @ApiOkResponse({ description: "Coleta apagada com sucesso" })
-    @Delete(":id")
-    async delete(@Param("id") id: number) {
-        try {
-            await this.coletaService.delete(id);
-        } catch (error) {
-            throw new HttpException('Erro ao apagar coleta.', error.message);
+        @ApiOperation({ summary: 'Retorna todas as coletas entre duas datas.' })
+        @ApiOkResponse({ description: 'Coletas encontradas', isArray: true })
+        @Get('encontrar-entre-datas/by-catador')
+        async encontrarEntreDatasporCatador(
+          @Query('datainicio') dataInicio: string = new Date().toString(),
+          @Query('datafim') dataFim: string = new Date().toString(),
+          @Req() req: AuthRequest
+        ): Promise<Coleta[]> {
+          const userId = req.user.id;
+      
+          if (!userId) {
+            throw new BadRequestException('Usuário não encontrado');
+          }
+      
+          try {
+            // Obtenha o catador com base no ID do usuário
+            const catador = await this.catadorService.getCatadorByUserID(userId);
+      
+            if (!catador) {
+              throw new BadRequestException('O usuário não é um catador.');
+            }
+      
+            // Converta as datas para objetos Date
+            const dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+            const dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+      
+            // Verifique se as datas são válidas e se a data de fim é posterior à data de início
+            if (isDate(dataInicioConvertida) && isDate(dataFimConvertida) && dataFimConvertida >= dataInicioConvertida) {
+              // Utilize o serviço de coleta para buscar as coletas entre as datas
+              return this.coletaService.findBetweenDatesByCatador(catador.id, dataInicioConvertida, dataFimConvertida);
+            }
+      
+            throw new BadRequestException('Datas fornecidas não são válidas');
+          } catch (error) {
+            // Trate erros de forma apropriada, se necessário
+            throw new BadRequestException('Erro ao buscar as coletas: ' + error.message);
+          }
         }
+        
+        
+        @ApiOperation({ summary: "Atualiza informações de uma coleta." })
+        @ApiOkResponse({ description: "Dados da coleta atualizadas com sucesso", type: UpdateColetaDto })
+        @ApiBody({ type: UpdateColetaDto })
+        @Put(':id')
+        async update(@Param('id') id: number, @Body() coleta: UpdateColetaDto): Promise<Coleta> {
+            try {
+                return await this.coletaService.update(id, coleta);
+            } catch (error) {
+                throw new HttpException('Erro ao atualizar coleta.', error.message);
+            }
+        }
+        
+        @ApiOperation({ summary: "Apaga informações de uma Coleta" })
+        @ApiOkResponse({ description: "Coleta apagada com sucesso" })
+        @Delete(":id")
+        async delete(@Param("id") id: number) {
+            try {
+                await this.coletaService.delete(id);
+            } catch (error) {
+                throw new HttpException('Erro ao apagar coleta.', error.message);
+            }
     }
 
 }

@@ -6,7 +6,7 @@ import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { CatadorService } from 'src/catador/catador.service';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
-import {parse, format, isDate} from 'date-fns';
+import {parse, format, isDate, endOfDay, startOfDay} from 'date-fns';
 
 @Injectable()
 export class ColetaService {
@@ -107,6 +107,22 @@ export class ColetaService {
     }
   }
 
+  async findMyColetas(catadorId: number): Promise<Coleta[]> {
+    try {
+      // Utilize o Prisma para buscar as coletas do catador pelo ID do catador
+      const coletas = await this.prismaService.coleta.findMany({
+        where: {
+          idCatador: catadorId,
+        },
+      });
+
+      return coletas;
+    } catch (error) {
+      // Trate erros de forma apropriada, se necessário
+      throw new Error('Erro ao buscar as coletas: ' + error.message);
+    }
+  }
+
   async findByCatadorAndBetweenDates(catadorId:number, dataInicio:Date, dataFim:Date):Promise<Coleta[]>{
     const catador =  await this.catadorService.findOne(catadorId);
 
@@ -146,6 +162,27 @@ export class ColetaService {
       });
     }catch(error){
       throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
+  }
+
+
+  async findBetweenDatesByCatador(catadorId: number, dataInicio: Date, dataFim: Date): Promise<Coleta[]> {
+    try {
+      // Utilize o Prisma para buscar as coletas entre as datas para o catador específico
+      const coletas = await this.prismaService.coleta.findMany({
+        where: {
+          idCatador: catadorId,
+          dataColeta: {
+            gte: dataInicio,  // Início do dia da data de início
+            lte: dataFim,  // Fim do dia da data de fim
+          },
+        },
+      });
+
+      return coletas;
+    } catch (error) {
+      // Trate erros de forma apropriada, se necessário
+      throw new Error('Erro ao buscar as coletas entre as datas: ' + error.message);
     }
   }
 

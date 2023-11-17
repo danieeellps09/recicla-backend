@@ -27,8 +27,8 @@ services:
       - "3000:3000"
     volumes:
       - .:/app
-      - /app/node_modules
-    command: sh -c "npm install && npx prisma migrate deploy && npm run build && npm run start"
+      # - /app/node_modules
+    # command: sh -c "npm install && npx prisma migrate deploy && npm run build && npm run start"
     networks:
       - internal-network
     depends_on:

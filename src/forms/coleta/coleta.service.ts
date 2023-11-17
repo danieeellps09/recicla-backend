@@ -38,6 +38,7 @@ export class ColetaService {
       dataConvertida = new Date();
     }
 
+    const idAssociacao = idCatador.associacaoId;
 
 
       const dataPrisma: Date = new Date(dataConvertida.toISOString());
@@ -59,7 +60,7 @@ export class ColetaService {
     const data = {
       id: registerColetaDto.id,
       idCatador: idCatador.id,
-      idAssociacao: registerColetaDto.idAssociacao,
+      idAssociacao: idAssociacao,
       idVeiculo: registerColetaDto.idVeiculo,
       quantidade: registerColetaDto.quantidade,
       numRota: registerColetaDto.numRota,

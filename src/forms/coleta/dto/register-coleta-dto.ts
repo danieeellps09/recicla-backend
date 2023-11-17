@@ -50,10 +50,8 @@ export class RegisterColetaDto {
   @IsNumber()
   idCatador: number;
     
-  @ApiProperty({
-    example: '1',
-    description: 'Id da associacao do catador',
-  })
+
+  @IsOptional()
   @IsNumber()
   idAssociacao: number;
 

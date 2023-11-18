@@ -1,5 +1,5 @@
 FROM node:18-alpine
-WORKDIR /app
+WORKDIR /appd
 COPY package*.json ./
 RUN npm install prisma --global
 RUN npm install

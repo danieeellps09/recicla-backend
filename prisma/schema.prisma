@@ -85,7 +85,7 @@ model Etnia {
 
 model Veiculo {
   id          Int      @id @default(autoincrement())
-  nomeVeiculo String?  @unique @db.VarChar(255)
+  nomeVeiculo String?    @db.VarChar(255)  @unique 
   coletas     Coleta[]
 
   @@map("veiculos")

@@ -5,11 +5,12 @@ import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation
 import { RegisterColetaDto } from './dto/register-coleta-dto';
 import { CatadorService } from 'src/catador/catador.service';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
-import { Coleta, User } from '@prisma/client';
+import {  User } from '@prisma/client';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
 import { format, isDate, parse } from 'date-fns';
+import { Coleta } from './entities/coleta.entity';
 
 @ApiTags('Formulario de Coletas')
 @ApiBearerAuth()

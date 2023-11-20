@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, Request } from '@nestjs/common';
-import { Associacao, Catador, Coleta, User } from '@prisma/client';
+import { Associacao, Catador, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterColetaDto } from './dto/register-coleta-dto';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
@@ -7,6 +7,7 @@ import { CatadorService } from 'src/catador/catador.service';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
 import {parse, format, isDate} from 'date-fns';
+import { Coleta } from './entities/coleta.entity';
 
 @Injectable()
 export class ColetaService {

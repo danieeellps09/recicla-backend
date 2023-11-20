@@ -1,4 +1,4 @@
-export class User {
+export class Coleta {
     id?: number;
     idCatador?: number;
     idAssociacao?: number;
@@ -6,7 +6,7 @@ export class User {
     quantidade?: number;
     pergunta?:boolean;
     motivo?:string;
-    dataColeta?: string;
+    dataColeta?: Date;
 
   }
   

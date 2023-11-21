@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { format } from 'date-fns';
 import puppeteer from 'puppeteer';
 import { CatadorService } from 'src/catador/catador.service';
 import { Catador } from 'src/catador/entities/catador.entity';
@@ -22,7 +23,7 @@ export class PdfService {
             <style>
               body {
                 font-size: 18px;
-                color: #333;
+                color: #ff0000;
               }
               body p{
                 text-align: right;
@@ -57,7 +58,28 @@ export class PdfService {
       const browser = await puppeteer.launch({ headless: "new" });
       const page = await browser.newPage();
 
-      await page.setContent(this.formatarColetas(new DadosColeta(catador, resumoColetas, dataInicio, dataFim, coletas), comprovanteCompleto));
+      let html = `
+        <html>
+        <head>
+          <style type="text/css">
+            body {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            }
+            header {
+              border: 1px solid black;
+              padding: 10px;
+              margin-bottom: 10px;
+            }
+          </style>
+        </head>
+        ${this.formatarColetas(new DadosColeta(catador, resumoColetas, dataInicio, dataFim, coletas), comprovanteCompleto)}
+        </html>
+      `;
+
+      await page.setContent(html);
 
       const pdfBuffer = await page.pdf({ format: 'A4' });
       await browser.close();
@@ -71,27 +93,27 @@ export class PdfService {
   }
 
   formatarColetas(dadosColeta: DadosColeta, comprovanteCompleto:boolean): string{
-    const header = `<header><h1>Comprovante de coletas</h1> 
-      <p>Catador: ${dadosColeta.catador.user.name}</p>
-      <p>CPF: ${dadosColeta.catador.cpf}</p>
-      <p>Datas: ${dadosColeta.dataInicio} - ${dadosColeta.dataFim}</p>
-      <p>Quantidade de coletas realizadas: ${dadosColeta.resumoColetas.quantidadeColetas}</p>
-      <p>Quantidade de resíduos coletados: ${dadosColeta.resumoColetas.quantidadeColetada} kg</p>
+    const header = `<header> 
+      <p><b>Catador</b>: ${dadosColeta.catador.user.name}</p>
+      <p><b>CPF</b>: ${dadosColeta.catador.cpf}</p>
+      <p><b>Datas</b>: ${format(dadosColeta.dataInicio, 'dd/MM/yyyy') } - ${format(dadosColeta.dataFim, 'dd/MM/yyyy')}</p>
+      <p><b>Quantidade de coletas realizadas</b>: ${dadosColeta.resumoColetas.quantidadeColetas}</p>
+      <p><b>Quantidade de resíduos coletados</b>: ${dadosColeta.resumoColetas.quantidadeColetada} kg</p>
     </header>`;
 
-    let main = "";
+    let main = "<h2>Coletas realizadas:</h2>";
     if(comprovanteCompleto){
       for(let coleta of dadosColeta.coletas){
         const coletaFormatada = `<div>
-          <p>Data: ${coleta.dataColeta}</p>
-          <p>Quantidade de resíduos coletados: ${coleta.quantidade} kg</p>
-          <p>Todos os pontos coletados: ${coleta.pergunta? 'Sim':'Não'}</p>
-          <p>Motivo: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>
+          <p><b>Data</b>: ${format(coleta.dataColeta, 'dd/MM/yyyy')}</p>
+          <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
+          <p><b>Todos os pontos coletados</b>: ${coleta.pergunta? 'Sim':'Não'}</p>
+          <p><b>Motivo</b>: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>
         </div>`;
         main += coletaFormatada;
       }
     }
-    return header + `<body>${main}</body>`
+    return `<body><h1>Comprovante de coletas</h1>${header}${main}</body>`
   }
 }
 

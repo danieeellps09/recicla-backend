@@ -22,7 +22,7 @@ export class PdfController {
         res.send(pdfBuffer);
     }
 
-    @Get()
+    @Get('coleta/:id')
     @ApiOperation({ summary: 'Gera um PDF com estilos CSS.' })
     @ApiProduces('application/pdf')
     async generatePdfColetasCatador(@Res() res: Response,
@@ -37,9 +37,9 @@ export class PdfController {
             if (dataFimConvertida >= dataInicioConvertida) {
                 const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(idCatador, comprovanteCompleto, dataInicioConvertida, dataFimConvertida);
 
-                res.setHeader('Content-Disposition', 'attachment; filename=downloaded-file.pdf');
-                res.setHeader('Content-Type', 'application/pdf');
-                res.send(pdfBuffer);
+                return res.contentType('application/pdf')
+                .attachment('comprovante.pdf')
+                .send(pdfBuffer);
             }
             throw new BadRequestException("Data de início deve ser anterior a data de fim.");
         }

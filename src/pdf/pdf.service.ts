@@ -15,9 +15,7 @@ export class PdfService {
 
   constructor(
     private readonly catadorService:CatadorService, 
-    private readonly coletaService:ColetaService,
-    private readonly associacaoService:AssociacoesService,
-    private readonly vendaService:VendaService){}
+    private readonly coletaService:ColetaService){}
 
   async generateComprovanteColetasCatador(catadorId:number, comprovanteCompleto:boolean, dataInicio:Date, dataFim:Date):Promise<Buffer>{
 
@@ -80,8 +78,9 @@ export class PdfService {
       <p><b>Quantidade de resíduos coletados</b>: ${dadosColeta.resumoColetas.quantidadeColetada} kg</p>
     </header>`;
 
-    let main = "<h2>Coletas realizadas:</h2>";
+    let main = "";
     if(comprovanteCompleto){
+      main += "<h2>Coletas realizadas:</h2>";
       for(let coleta of dadosColeta.coletas){
         const coletaFormatada = `<div>
           ${dadosColeta.catador != null ? "" : `

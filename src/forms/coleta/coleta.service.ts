@@ -123,6 +123,18 @@ export class ColetaService {
         },
         orderBy:{
           dataColeta: 'desc'
+        },
+        include:{
+          catador: {
+            include:{
+              user:true
+            }
+          },
+          associacao:{
+            include:{
+              user:true
+            }
+          }
         }
       });
     }
@@ -142,6 +154,18 @@ export class ColetaService {
         },
         orderBy:{
           dataColeta: 'desc'
+        },
+        include:{
+          catador: {
+            include:{
+              user:true
+            }
+          },
+          associacao:{
+            include:{
+              user:true
+            }
+          }
         }
       });
     }catch(error){

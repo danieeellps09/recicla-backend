@@ -1,3 +1,6 @@
+import { Associacao } from "src/associacoes/entities/associacao.entity";
+import { Catador } from "src/catador/entities/catador.entity";
+
 export class Coleta {
     id?: number;
     idCatador?: number;
@@ -7,6 +10,7 @@ export class Coleta {
     pergunta?:boolean;
     motivo?:string;
     dataColeta?: Date;
-
+    catador?:Catador;
+    associacao?:Associacao;
   }
   

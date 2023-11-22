@@ -1,15 +1,23 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { format } from 'date-fns';
 import puppeteer from 'puppeteer';
+import { AssociacoesService } from 'src/associacoes/associacoes.service';
+import { Associacao } from 'src/associacoes/entities/associacao.entity';
 import { CatadorService } from 'src/catador/catador.service';
 import { Catador } from 'src/catador/entities/catador.entity';
 import { ColetaService } from 'src/forms/coleta/coleta.service';
 import { Coleta } from 'src/forms/coleta/entities/coleta.entity';
+import { Venda } from 'src/forms/venda/entities/venda.entity';
+import { VendaService } from 'src/forms/venda/venda.service';
 
 @Injectable()
 export class PdfService {
 
-  constructor(private readonly catadorService:CatadorService, private readonly coletaService:ColetaService){}
+  constructor(
+    private readonly catadorService:CatadorService, 
+    private readonly coletaService:ColetaService,
+    private readonly associacaoService:AssociacoesService,
+    private readonly vendaService:VendaService){}
 
   async generateComprovanteColetasCatador(catadorId:number, comprovanteCompleto:boolean, dataInicio:Date, dataFim:Date):Promise<Buffer>{
 
@@ -76,6 +84,12 @@ export class PdfService {
     if(comprovanteCompleto){
       for(let coleta of dadosColeta.coletas){
         const coletaFormatada = `<div>
+          ${dadosColeta.catador != null ? "" : `
+            <p><b>Nome do catador</b>: ${coleta.catador.user.name}</p>
+            <p><b>Cpf do catador</b>: ${coleta.catador.cpf}</p>
+          `}
+          <p><b>Nome do associacao</b>: ${coleta.associacao.user.name}</p>
+          <p><b>CNPJ da associacao</b>: ${coleta.associacao.cnpj}</p>
           <p><b>Data</b>: ${format(coleta.dataColeta, 'dd/MM/yyyy')}</p>
           <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
           <p><b>Todos os pontos coletados</b>: ${coleta.pergunta? 'Sim':'Não'}</p>

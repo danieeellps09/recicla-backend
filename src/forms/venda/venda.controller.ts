@@ -88,7 +88,7 @@ export class VendaController {
         @ApiOkResponse({description: "Vendas encontradas"})
         @Get('findBetweenDates/:id')
         async findByIdBetweenDates(
-            @Param('id') idCatador:number,
+            @Param('id') idAssociacao:number,
             @Query('datainicio') dataInicio:string = new Date().toString(), 
             @Query('datafim') dataFim:string = new Date().toString()):Promise<Venda[]>{
                 let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
@@ -96,12 +96,25 @@ export class VendaController {
     
                 if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                     if(dataFimConvertida >= dataInicioConvertida){
-                        return await this.vendaService.findByAssociacaoAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
+                        return await this.vendaService.findByAssociacaoAndBetweenDates(idAssociacao, dataInicioConvertida, dataFimConvertida);
                     }
                     throw new BadRequestException("Data de início deve ser anterior a data de fim.");
                 }
                 throw new BadRequestException("Dados fornecidos não são datas válidas");
             }
+
+            @ApiOperation({ summary: 'Retorna todas as vendas por 1 associacao.' })
+            @ApiOkResponse({ description: 'Associacoes encontradas',  })
+            @Get('by-associacao/:idAssociacao')
+            async findVendasByAssociacao(@Param('idAssociacao') idAssociacao: number): Promise<Venda[]> {
+              try {
+                return this.vendaService.findVendasByAssociacao(idAssociacao);
+              } catch (error) {
+                throw new HttpException('Erro ao buscar vendas  da Associacao.', error.message);
+              }
+            }
+
+
 
             @ApiOperation({ summary: 'Obtém todas as vendas da associação logada.' })
             @ApiOkResponse({ description: 'Lista com todas as vendas da associação logada.', type: Venda, isArray: true })

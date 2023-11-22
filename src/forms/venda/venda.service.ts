@@ -156,7 +156,7 @@ export class VendaService {
 
   async findBetweenDates(dataInicio: Date, dataFim: Date):Promise<Venda[]>{
     try{
-      return await this.prismaService.venda.findMany({
+      const vendas =  await this.prismaService.venda.findMany({
         where:{
           dataVenda:{
             gte: dataInicio,
@@ -165,8 +165,15 @@ export class VendaService {
         },
         orderBy:{
           dataVenda: 'desc'
-        }
+        }, include: {
+          materiais: true,
+      },
       });
+      for (let venda of vendas) {
+        venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
+    }
+    return vendas
+
     }catch(error){
       throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
     }
@@ -174,7 +181,7 @@ export class VendaService {
 
   async findByAssociacaoAndBetweenDates(idAssociacao:number, dataInicio: Date, dataFim: Date):Promise<Venda[]>{
     try{
-      return await this.prismaService.venda.findMany({
+      const vendas =  await this.prismaService.venda.findMany({
         where:{
           idAssociacao: idAssociacao,
           AND:{
@@ -186,10 +193,38 @@ export class VendaService {
         },
         orderBy:{
           dataVenda: 'desc'
-        }
+        }, include: {
+          materiais: true,
+      },
       });
+
+      
+      for (let venda of vendas) {
+        venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
+    }
+
+
+    return vendas;
     }catch(error){
       throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
+    }
+  }
+
+  async findVendasByAssociacao(idAssociacao: number): Promise<Venda[]> {
+    try {
+      const vendas = await this.prismaService.venda.findMany({
+        where: { idAssociacao: idAssociacao },
+        include: {
+          materiais: true,
+      },
+      });
+
+      for (let venda of vendas) {
+        venda.materiais = await this.findMaterialVendaByIdVenda(venda.id);
+    }
+      return vendas;
+    } catch (error) {
+      throw new Error('Erro ao buscar coletas do catador: ' + error.message);
     }
   }
 

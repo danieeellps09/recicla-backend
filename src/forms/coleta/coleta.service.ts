@@ -186,6 +186,20 @@ export class ColetaService {
     }
   }
 
+
+  async findColetasByCatador(idCatador: number): Promise<Coleta[]> {
+    try {
+      const coletas = await this.prismaService.coleta.findMany({
+        where: { idCatador: idCatador },
+      });
+      return coletas;
+    } catch (error) {
+      throw new Error('Erro ao buscar coletas do catador: ' + error.message);
+    }
+  }
+
+
+
   async update(id: number, coleta: UpdateColetaDto): Promise<Coleta> {
     try {
         return await this.prismaService.coleta.update({

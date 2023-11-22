@@ -66,7 +66,7 @@ async findAll(): Promise<Coleta[]> {
 
 
 @ApiOperation({ summary: "Encontra uma coleta pelo seu id" })
-@ApiOkResponse({ description: "Associação encontrada", type: RegisterColetaDto })
+@ApiOkResponse({ description: "Coleta  encontrada", type: RegisterColetaDto })
 @Get(':id')
 async findByid(@Param('id') id: number): Promise<Coleta> {
     try {
@@ -97,7 +97,7 @@ async findBetweenDates(
     }
     
    
-    @ApiOperation({summary: "Retorna todas as coletas entre duas datas."})
+    @ApiOperation({summary: "Retorna todas as coletas por catador entre duas datas."})
     @ApiOkResponse({description: "Coletas encontradas"})
     @Get('findBetweenDates/:id')
     async findByIdBetweenDates(
@@ -116,7 +116,16 @@ async findBetweenDates(
             throw new BadRequestException("Dados fornecidos não são datas válidas");
         }
 
-
+        @ApiOperation({ summary: 'Retorna todas as coletas por 1 catador.' })
+        @ApiOkResponse({ description: 'Coletas encontradas',  })
+        @Get('by-catador/:idCatador')
+        async findColetasByCatador(@Param('idCatador') idCatador: number): Promise<Coleta[]> {
+          try {
+            return this.coletaService.findColetasByCatador(idCatador);
+          } catch (error) {
+            throw new HttpException('Erro ao buscar coletas do catador.', error.message);
+          }
+        }
 
         @ApiOperation({ summary: 'Obtém todas as coletas do catador logado.' })
         @ApiOkResponse({ description: 'Lista com todas as coletas do catador logado.', type: RegisterColetaDto, isArray: true })
@@ -181,7 +190,10 @@ async findBetweenDates(
             throw new BadRequestException('Erro ao buscar as coletas: ' + error.message);
           }
         }
-        
+
+       
+      
+
         
         @ApiOperation({ summary: "Atualiza informações de uma coleta." })
         @ApiOkResponse({ description: "Dados da coleta atualizadas com sucesso", type: UpdateColetaDto })
@@ -201,7 +213,7 @@ async findBetweenDates(
         async delete(@Param("id") id: number) {
             try {
                 await this.coletaService.delete(id);
-            } catch (error) {
+            } catch (error) { 
                 throw new HttpException('Erro ao apagar coleta.', error.message);
             }
     }

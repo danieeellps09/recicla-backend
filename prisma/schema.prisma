@@ -21,6 +21,7 @@ model User {
   catador    Catador?    @relation("CatadorToUser")
   associacao Associacao? @relation("AssociacaoToUser")
   administrador Administrador? @relation("AdministradorToUser")
+  operadorlogistico Operadorlogistico?  @relation("OperadorlogisticoToUser")
 
 
 
@@ -124,6 +125,16 @@ model Administrador {
 
   @@map("administrador")
 }
+
+model Operadorlogistico {
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  cpf String @db.VarChar(14) @unique
+  user   User @relation("OperadorlogisticoToUser", fields: [userId], references: [id])
+
+  @@map("operadorlogistico")
+}
+
 
 model Coleta {
   id           Int        @id @default(autoincrement())

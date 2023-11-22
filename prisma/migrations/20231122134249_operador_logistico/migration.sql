@@ -113,6 +113,17 @@ CREATE TABLE `administrador` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `operadorlogistico` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `cpf` VARCHAR(14) NOT NULL,
+
+    UNIQUE INDEX `operadorlogistico_userId_key`(`userId`),
+    UNIQUE INDEX `operadorlogistico_cpf_key`(`cpf`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `coletas` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `quantidade` INTEGER NOT NULL,
@@ -172,6 +183,9 @@ ALTER TABLE `associacoes` ADD CONSTRAINT `associacoes_userId_fkey` FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE `administrador` ADD CONSTRAINT `administrador_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `operadorlogistico` ADD CONSTRAINT `operadorlogistico_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `coletas` ADD CONSTRAINT `coletas_idCatador_fkey` FOREIGN KEY (`idCatador`) REFERENCES `catadores`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

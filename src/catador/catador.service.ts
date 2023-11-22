@@ -50,8 +50,11 @@ export class CatadorService {
       }
 
       //Verifica se já existe um catador com o cpf
+ if (createCatadorDto.cpf) {
       await this.existsByCpf(createCatadorDto.cpf);
-
+    } else{
+      createCatadorDto.cpf = ""
+    }
       //Verifica se já existe um user com o email
       await this.userService.existsByEmail(createCatadorDto.user.email);
 

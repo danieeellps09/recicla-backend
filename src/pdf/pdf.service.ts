@@ -11,47 +11,18 @@ export class PdfService {
 
   constructor(private readonly catadorService:CatadorService, private readonly coletaService:ColetaService){}
 
-  async generatePdfExemple(): Promise<Buffer> {
-
-    try {
-      const browser = await puppeteer.launch({ headless: "new" });
-      const page = await browser.newPage();
-
-      await page.setContent(`
-        <html>
-          <head>
-            <style>
-              body {
-                font-size: 18px;
-                color: #ff0000;
-              }
-              body p{
-                text-align: right;
-              }
-            </style>
-          </head>
-          <body>
-            <h1>Meu PDF com Nest.js e CSS</h1>
-            <p>Este é um exemplo de como aplicar estilos CSS a um PDF.</p>
-          </body>
-        </html>
-      `);
-
-      const pdfBuffer = await page.pdf({ format: 'A4' });
-      await browser.close();
-
-      return pdfBuffer;
-    }
-    catch (error) {
-      throw new InternalServerErrorException("Ocorreu um erro ao gerar PDF.")
-    }
-
-  }
-
   async generateComprovanteColetasCatador(catadorId:number, comprovanteCompleto:boolean, dataInicio:Date, dataFim:Date):Promise<Buffer>{
-    const catador = await this.catadorService.findOne(catadorId);
-    const coletas = await this.coletaService.findByCatadorAndBetweenDates(catadorId, dataInicio, dataFim);
 
+    let catador:Catador = null;
+    let coletas:Coleta[];
+    if(catadorId != null){
+      catador = await this.catadorService.findOne(catadorId);
+      coletas = await this.coletaService.findByCatadorAndBetweenDates(catadorId, dataInicio, dataFim);
+    }
+    else{
+      coletas = await this.coletaService.findBetweenDates(dataInicio, dataFim);
+    }
+    
     const resumoColetas = new ResumoColeta(coletas);
 
     try {
@@ -93,9 +64,9 @@ export class PdfService {
   }
 
   formatarColetas(dadosColeta: DadosColeta, comprovanteCompleto:boolean): string{
+    const catadorInfo = dadosColeta.catador == null? "" : `<p><b>Catador</b>: ${dadosColeta.catador.user.name}</p><p><b>CPF</b>: ${dadosColeta.catador.cpf}</p>`;
     const header = `<header> 
-      <p><b>Catador</b>: ${dadosColeta.catador.user.name}</p>
-      <p><b>CPF</b>: ${dadosColeta.catador.cpf}</p>
+      ${catadorInfo}
       <p><b>Datas</b>: ${format(dadosColeta.dataInicio, 'dd/MM/yyyy') } - ${format(dadosColeta.dataFim, 'dd/MM/yyyy')}</p>
       <p><b>Quantidade de coletas realizadas</b>: ${dadosColeta.resumoColetas.quantidadeColetas}</p>
       <p><b>Quantidade de resíduos coletados</b>: ${dadosColeta.resumoColetas.quantidadeColetada} kg</p>

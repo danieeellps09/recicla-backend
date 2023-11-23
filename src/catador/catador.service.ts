@@ -12,6 +12,7 @@ import { EtniaService } from '../etnia/etnia.service';
 import { GeneroService } from '../genero/genero.service';
 import { Associacao } from 'src/associacoes/entities/associacao.entity';
 import { CatadorFormatadoJson } from './models/catador-sem-associacao';
+import { FuncoesCatadorService } from 'src/funcoes-catador/funcoes-catador.service';
 
 
 @Injectable()
@@ -23,7 +24,8 @@ export class CatadorService {
     private readonly emailService: EmailService,
     private readonly roleService: RoleService,
     private readonly etniaService: EtniaService,
-    private readonly generoService:GeneroService) { }
+    private readonly generoService:GeneroService,
+    private readonly funcaoCatadorService: FuncoesCatadorService) { }
 
   async create(createCatadorDto: CreateCatadorDto): Promise<Catador> {
     //seta o role como catador
@@ -66,6 +68,7 @@ export class CatadorService {
 
       //verifica se a etnia existe
       await this.etniaService.findById(createCatadorDto.idEtnia);
+      await this.funcaoCatadorService.findOne(createCatadorDto.funcaoId);
 
       //cria o user
       const user = await this.userService.create(createCatadorDto.user);
@@ -81,7 +84,8 @@ export class CatadorService {
         endereco: createCatadorDto.endereco,
         associacaoId: createCatadorDto.idAssociacao,
         etniaId: createCatadorDto.idEtnia,
-        generoId: createCatadorDto.idGenero
+        generoId: createCatadorDto.idGenero,
+        funcaoId: createCatadorDto.funcaoId
       };
 
       //salva o catador
@@ -91,7 +95,8 @@ export class CatadorService {
           user: true,
           associacao: true,
           etnia:true,
-          genero:true
+          genero:true,
+          funcoescatador:true
         } 
       });
 
@@ -118,7 +123,8 @@ export class CatadorService {
         user: true,
         associacao: true,
         etnia: true,
-        genero:true
+        genero:true,
+        funcoescatador:true,
       },
     });
 
@@ -138,7 +144,8 @@ export class CatadorService {
         user: true,
         associacao: true,
         genero: true,
-        etnia: true
+        etnia: true,
+        funcoescatador:true
       },
     });
 
@@ -178,6 +185,7 @@ export class CatadorService {
             user: true,
             genero: true,
             etnia: true,
+            funcoescatador:true
         },
     });
 
@@ -190,15 +198,12 @@ export class CatadorService {
         user: catador.user,
         genero: catador.genero,
         etnia: catador.etnia,
+        funcao: catador.funcoescatador
+        
     }));
 
     return catadoresWithoutAssociacao;
 }
-
-
-
-
-
 
 
   async update(id: number, updateCatadorDto: UpdateCatadorDto): Promise<Catador> {
@@ -225,6 +230,8 @@ export class CatadorService {
 
     //atualiza os dados do usuário
     await this.userService.update(userId, updateCatadorDto.user);
+
+    await  this.funcaoCatadorService.findOne(updateCatadorDto.funcaoId)
     
     const data = {
       id: id,
@@ -234,7 +241,8 @@ export class CatadorService {
       endereco: updateCatadorDto.endereco,
       associacaoId: updateCatadorDto.associacaoId,
       generoId: updateCatadorDto.idGenero,
-      etniaId: updateCatadorDto.idEtnia
+      etniaId: updateCatadorDto.idEtnia,
+      funcaoId: updateCatadorDto.funcaoId
     };
 
     //atualiza os dados do catador
@@ -245,7 +253,8 @@ export class CatadorService {
         user: true,
         associacao: true,
         genero:true,
-        etnia:true
+        etnia:true,
+        funcoescatador:true
       },
     });
 

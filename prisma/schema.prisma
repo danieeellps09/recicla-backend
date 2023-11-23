@@ -56,6 +56,7 @@ model Catador {
   associacaoId        Int  
   generoId            Int   
   etniaId             Int 
+  funcaoId            Int
   cpf        String @db.VarChar(14) @unique
   bairro     String @db.VarChar(255)
   endereco   String @db.VarChar(255)
@@ -64,8 +65,8 @@ model Catador {
   associacao           Associacao @relation("CatadorToAssociacao", fields: [associacaoId], references: [id])
   genero               Genero @relation("GeneroToCatador", fields: [generoId], references: [id])
   etnia                Etnia  @relation("EtniaToCatador", fields: [etniaId], references: [id])
+  funcoescatador       FuncoesCatador?  @relation("FuncoesCatadorToCatador", fields: [funcaoId], references: [id])
   coletas              Coleta[] @relation("CatadorToColeta")
-
 }
 
 model Genero {
@@ -82,6 +83,14 @@ model Etnia {
   @@map("etnia")
 
   catador Catador[] @relation("EtniaToCatador")
+}
+
+model FuncoesCatador {
+  id  Int @id @default(autoincrement())
+  funcao  String  @db.VarChar(50) @unique
+  @@map("funcoescatador")
+
+  catador Catador[] @relation("FuncoesCatadorToCatador")
 }
 
 model Veiculo {

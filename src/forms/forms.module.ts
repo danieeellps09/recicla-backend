@@ -15,11 +15,12 @@ import { RoleModule } from 'src/role/role.module';
 import { EtniaService } from 'src/etnia/etnia.service';
 import { GeneroService } from 'src/genero/genero.service';
 import { MaterialService } from 'src/material/material.service';
+import { FuncoesCatadorService } from 'src/funcoes-catador/funcoes-catador.service';
 
 @Module({
   imports: [UserModule, CatadorModule, EmailModule, GeneroModule,EtniaModule, RoleModule],
   controllers: [ColetaController, VendaController],
-  providers: [ColetaService, PrismaService, CatadorService,EtniaService, GeneroService, VendaService, AssociacoesService, MaterialService]
+  providers: [ColetaService, PrismaService, CatadorService,EtniaService, GeneroService, VendaService, AssociacoesService, MaterialService,FuncoesCatadorService]
 })
 export class FormsModule {
  

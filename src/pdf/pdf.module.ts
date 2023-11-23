@@ -12,10 +12,26 @@ import { EmailService } from 'src/email/email.service';
 import { GeneroService } from 'src/genero/genero.service';
 import { EtniaService } from 'src/etnia/etnia.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { VendaService } from 'src/forms/venda/venda.service';
+import { MaterialService } from 'src/material/material.service';
+import { MaterialModule } from 'src/material/material.module';
 
 @Module({
-  imports: [CatadorModule, FormsModule],
-  providers: [PdfService, PrismaService, ColetaService, CatadorService, AssociacoesService, UserService, RoleService, EmailService, GeneroService, EtniaService],
+  imports: [CatadorModule, FormsModule, MaterialModule],
+  providers: [
+    PdfService, 
+    PrismaService, 
+    ColetaService, 
+    CatadorService, 
+    AssociacoesService, 
+    UserService, 
+    RoleService, 
+    EmailService, 
+    GeneroService, 
+    EtniaService,
+    VendaService,
+    MaterialService
+  ],
   controllers: [PdfController]
 })
 export class PdfModule {}

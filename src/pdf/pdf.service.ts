@@ -9,13 +9,18 @@ import { ColetaService } from 'src/forms/coleta/coleta.service';
 import { Coleta } from 'src/forms/coleta/entities/coleta.entity';
 import { Venda } from 'src/forms/venda/entities/venda.entity';
 import { VendaService } from 'src/forms/venda/venda.service';
+import { Material } from 'src/material/entities/material.entity';
+import { MaterialService } from 'src/material/material.service';
 
 @Injectable()
 export class PdfService {
 
   constructor(
     private readonly catadorService:CatadorService, 
-    private readonly coletaService:ColetaService){}
+    private readonly coletaService:ColetaService,
+    private readonly associacaoService:AssociacoesService,
+    private readonly vendaService:VendaService,
+    private readonly materialService:MaterialService){}
 
   async generateComprovanteColetasCatador(catadorId:number, comprovanteCompleto:boolean, dataInicio:Date, dataFim:Date):Promise<Buffer>{
 
@@ -69,6 +74,58 @@ export class PdfService {
 
   }
 
+  async generateComprovanteVendaAssociacao(associacaoId:number, comprovanteCompleto:boolean, dataInicio:Date, dataFim:Date):Promise<Buffer>{
+
+    let associacao:Associacao = null;
+    let vendas:Venda[];
+    if(associacaoId != null){
+      associacao = await this.associacaoService.findById(associacaoId);
+      vendas = await this.vendaService.findByAssociacaoAndBetweenDates(associacaoId, dataInicio, dataFim);
+    }
+    else{
+      vendas = await this.vendaService.findBetweenDates(dataInicio, dataFim);
+    }
+    
+    const resumoVendas = new ResumoVenda(vendas, await this.materialService.findAll());
+
+    try {
+      const browser = await puppeteer.launch({ headless: "new" });
+      const page = await browser.newPage();
+
+      let html = `
+        <html>
+        <head>
+          <style type="text/css">
+            body {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            }
+            header {
+              border: 1px solid black;
+              padding: 10px;
+              margin-bottom: 10px;
+            }
+          </style>
+        </head>
+        ${this.formatarVendas(new DadosVenda(associacao, resumoVendas, dataInicio, dataFim, vendas), comprovanteCompleto)}
+        </html>
+      `;
+
+      await page.setContent(html);
+
+      const pdfBuffer = await page.pdf({ format: 'A4' });
+      await browser.close();
+
+      return pdfBuffer;
+    }
+    catch (error) {
+      throw new InternalServerErrorException("Ocorreu um erro ao gerar PDF.")
+    }
+
+  }
+
   formatarColetas(dadosColeta: DadosColeta, comprovanteCompleto:boolean): string{
     const catadorInfo = dadosColeta.catador == null? "" : `<p><b>Catador</b>: ${dadosColeta.catador.user.name}</p><p><b>CPF</b>: ${dadosColeta.catador.cpf}</p>`;
     const header = `<header> 
@@ -99,6 +156,52 @@ export class PdfService {
     }
     return `<body><h1>Comprovante de coletas</h1>${header}${main}</body>`
   }
+
+  formatarVendas(dadosColeta: DadosVenda, comprovanteCompleto:boolean): string{
+    const catadorInfo = dadosColeta.associacao == null? "" : `<p><b>Associação</b>: ${dadosColeta.associacao.user.name}</p><p><b>CNPJ</b>: ${dadosColeta.associacao.cnpj}</p>`;
+    let resumoMateriais = '';
+    dadosColeta.resumoVendas.vendasPorMaterial.forEach((vendaPorMaterial => 
+      resumoMateriais += `<li>
+        <p><b>${vendaPorMaterial.nome}</b>: ${vendaPorMaterial.quantidade} kg</p>
+      </li>`)
+    )
+
+    const header = `<header> 
+      ${catadorInfo}
+      <p><b>Datas</b>: ${format(dadosColeta.dataInicio, 'dd/MM/yyyy') } - ${format(dadosColeta.dataFim, 'dd/MM/yyyy')}</p>
+      <p><b>Quantidade de coletas realizadas</b>: ${dadosColeta.resumoVendas.quantidadeVendas}</p>
+      <h3>Resumo das vendas:</h3>
+      <ul>
+        ${resumoMateriais}
+      </ul>
+    </header>`;
+
+    let main = "";
+    if(comprovanteCompleto){
+      main += "<h2>Vendas realizadas:</h2>";
+      for(let venda of dadosColeta.vendas){
+        let materiais = '';
+        venda.materiais.forEach(material =>{
+          materiais += `<li><p><b>${material.material.nome}</b>: ${material.quantidadeVendida} kg</p></li>`
+        })
+        const coletaFormatada = `<div>
+          ${dadosColeta.associacao != null ? "" : `
+            <p><b>Nome da associação</b>: ${venda.associacao.user.name}</p>
+            <p><b>Cpf da associaçao</b>: ${venda.associacao.cnpj}</p>
+          `}
+          <p><b>Empresa compradora</b>: ${venda.empresaCompradora}</p>
+          <p><b>Nota fiscal</b>: ${venda.notaFiscal}</p>
+          <p><b>Data</b>: ${format(venda.dataVenda, 'dd/MM/yyyy')}</p>
+          <h3>Materiais vendidos:</h3>
+          <ul>
+            ${materiais}
+          </ul>
+        </div>`;
+        main += coletaFormatada;
+      }
+    }
+    return `<body><h1>Comprovante de vendas</h1>${header}${main}</body>`
+  }
 }
 
 class ResumoColeta{
@@ -109,6 +212,39 @@ class ResumoColeta{
 
   quantidadeColetas: number;
   quantidadeColetada: number;
+}
+
+class ResumoVenda{
+  constructor(vendas:Venda[], materiais:Material[]){
+    this.quantidadeVendas = vendas.length;
+
+    let materiaisMap = new Map<Number, VendaMaterial>();
+    materiais.forEach(material => materiaisMap.set(material.id, new VendaMaterial(material)));
+
+    vendas.forEach((venda) => {
+      venda.materiais.forEach(material => {
+        materiaisMap.get(material.material.id).quantidade += material.quantidadeVendida;
+      });
+    })
+
+    this.vendasPorMaterial = Array.from(materiaisMap.values());
+
+  }
+
+  quantidadeVendas:number;
+  vendasPorMaterial:VendaMaterial[];
+}
+
+class VendaMaterial{
+  constructor(material:Material){
+    this.id = material.id;
+    this.nome = material.nome;
+    this.quantidade = 0;
+  }
+
+  id:number;
+  nome:String;
+  quantidade:number
 }
 
 class DadosColeta{
@@ -126,4 +262,21 @@ class DadosColeta{
   catador:Catador;
   coletas:Coleta[];
   resumoColetas: ResumoColeta;
+}
+
+class DadosVenda{
+
+  constructor(associacao:Associacao, resumoVendas: ResumoVenda, dataInicio:Date, dataFim:Date, vendas:Venda[]){
+    this.associacao = associacao;
+    this.vendas = vendas;
+    this.resumoVendas = resumoVendas;
+    this.dataInicio = dataInicio;
+    this.dataFim = dataFim;
+  }
+
+  dataInicio:Date;
+  dataFim:Date;
+  associacao:Associacao;
+  vendas:Venda[];
+  resumoVendas:ResumoVenda;
 }

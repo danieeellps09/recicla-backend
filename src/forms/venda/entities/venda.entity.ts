@@ -1,3 +1,4 @@
+import { Associacao } from "src/associacoes/entities/associacao.entity";
 import { VendaMaterial } from "./venda-material.entity";
 
 export class Venda {
@@ -6,6 +7,8 @@ export class Venda {
     empresaCompradora?: string;
     notaFiscal?:string;
     dataVenda?: Date;
+
+    associacao?:Associacao
 
     materiais?: VendaMaterial[];
   }

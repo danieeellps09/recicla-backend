@@ -165,8 +165,19 @@ export class VendaService {
         },
         orderBy:{
           dataVenda: 'desc'
-        }
-      });
+        },
+        include:{
+          materiais:{
+            include:{
+              material:true
+            }
+          },
+          associacao:{
+            include:{
+              user:true
+            }
+          }
+      }});
     }catch(error){
       throw new InternalServerErrorException("Ocorreu um erro ao buscar por coletas.");
     }
@@ -186,6 +197,18 @@ export class VendaService {
         },
         orderBy:{
           dataVenda: 'desc'
+        },
+        include:{
+          materiais:{
+            include:{
+              material:true
+            }
+          },
+          associacao:{
+            include:{
+              user:true
+            }
+          }
         }
       });
     }catch(error){

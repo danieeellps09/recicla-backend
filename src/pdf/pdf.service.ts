@@ -97,6 +97,8 @@ export class PdfService {
 
     ul{
       margin-left: 20px;
+      color: #E1621E;
+      font-size: 30px;
     }
 </style>`
 

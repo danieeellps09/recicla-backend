@@ -19,20 +19,13 @@ export class PdfController {
         @Query('completo') comprovanteCompleto: boolean = false,
         @Query('datainicio') dataInicio: string = new Date().toString(),
         @Query('datafim') dataFim: string = new Date().toString()) {
-        let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-        let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
 
-        if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
-            if (dataFimConvertida >= dataInicioConvertida) {
-                const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(idCatador, comprovanteCompleto, dataInicioConvertida, dataFimConvertida);
+        const datas = this.converterData(dataInicio, dataFim);
+        const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(idCatador, comprovanteCompleto, datas.dataInicio, datas.dataFim);
 
-                return res.contentType('application/pdf')
-                .attachment('comprovante.pdf')
-                .send(pdfBuffer);
-            }
-            throw new BadRequestException("Data de início deve ser anterior a data de fim.");
-        }
-        throw new BadRequestException("Dados fornecidos não são datas válidas");
+        return res.contentType('application/pdf')
+            .attachment('comprovante.pdf')
+            .send(pdfBuffer);
 
     }
 
@@ -43,20 +36,12 @@ export class PdfController {
         @Query('completo') comprovanteCompleto: boolean = false,
         @Query('datainicio') dataInicio: string = new Date().toString(),
         @Query('datafim') dataFim: string = new Date().toString()) {
-        let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-        let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
-
-        if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
-            if (dataFimConvertida >= dataInicioConvertida) {
-                const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(null, comprovanteCompleto, dataInicioConvertida, dataFimConvertida);
-
-                return res.contentType('application/pdf')
+            const datas = this.converterData(dataInicio, dataFim);
+            const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(null, comprovanteCompleto, datas.dataInicio, datas.dataFim);
+    
+            return res.contentType('application/pdf')
                 .attachment('comprovante.pdf')
                 .send(pdfBuffer);
-            }
-            throw new BadRequestException("Data de início deve ser anterior a data de fim.");
-        }
-        throw new BadRequestException("Dados fornecidos não são datas válidas");
 
     }
 
@@ -68,20 +53,13 @@ export class PdfController {
         @Query('completo') comprovanteCompleto: boolean = false,
         @Query('datainicio') dataInicio: string = new Date().toString(),
         @Query('datafim') dataFim: string = new Date().toString()) {
-        let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-        let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+        
+        const datas = this.converterData(dataInicio, dataFim);
+        const pdfBuffer = await this.pdfService.generateComprovanteVendaAssociacao(idAssociacao, comprovanteCompleto, datas.dataInicio, datas.dataFim);
 
-        if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
-            if (dataFimConvertida >= dataInicioConvertida) {
-                const pdfBuffer = await this.pdfService.generateComprovanteVendaAssociacao(idAssociacao, comprovanteCompleto, dataInicioConvertida, dataFimConvertida);
-
-                return res.contentType('application/pdf')
-                .attachment('comprovante.pdf')
-                .send(pdfBuffer);
-            }
-            throw new BadRequestException("Data de início deve ser anterior a data de fim.");
-        }
-        throw new BadRequestException("Dados fornecidos não são datas válidas");
+        return res.contentType('application/pdf')
+            .attachment('comprovante.pdf')
+            .send(pdfBuffer);
     }
 
     @Get('venda')
@@ -91,19 +69,33 @@ export class PdfController {
         @Query('completo') comprovanteCompleto: boolean = false,
         @Query('datainicio') dataInicio: string = new Date().toString(),
         @Query('datafim') dataFim: string = new Date().toString()) {
+            const datas = this.converterData(dataInicio, dataFim);
+            const pdfBuffer = await this.pdfService.generateComprovanteVendaAssociacao(null, comprovanteCompleto, datas.dataInicio, datas.dataFim);
+    
+            return res.contentType('application/pdf')
+                .attachment('comprovante.pdf')
+                .send(pdfBuffer);
+    }
+
+    converterData(dataInicio:string, dataFim:string):Datas{
         let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
         let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
 
         if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
             if (dataFimConvertida >= dataInicioConvertida) {
-                const pdfBuffer = await this.pdfService.generateComprovanteVendaAssociacao(null, comprovanteCompleto, dataInicioConvertida, dataFimConvertida);
-
-                return res.contentType('application/pdf')
-                .attachment('comprovante.pdf')
-                .send(pdfBuffer);
+                return new Datas(dataInicioConvertida, dataFimConvertida);
             }
             throw new BadRequestException("Data de início deve ser anterior a data de fim.");
         }
         throw new BadRequestException("Dados fornecidos não são datas válidas");
     }
+}
+
+class Datas{
+    constructor(dataInicio:Date, dataFim:Date){
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+    }
+    dataInicio:Date;
+    dataFim:Date;
 }

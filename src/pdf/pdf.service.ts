@@ -22,6 +22,84 @@ export class PdfService {
     private readonly vendaService:VendaService,
     private readonly materialService:MaterialService){}
 
+    style:string = `<style type="text/css">
+    *{
+        margin:0;
+        padding: 0;
+    }
+    html {
+      -webkit-print-color-adjust: exact;
+    }
+    body {
+        font-family: sans-serif;
+        padding: 0 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #container-logo{
+      height: 40px;
+      padding: 30px;
+      min-width: 10px;
+      background-color: #E1621E;
+      border-radius: 30px;
+      margin-bottom: 30px;
+    }
+
+    #container-logo img{
+      height: 100%;
+    }
+
+    h1, h2, h3 {
+        text-transform: uppercase;
+        color: #E1621E;
+        text-align: center;
+        margin-bottom: 30px;
+        width: 100%;
+    }
+
+    .container {
+        border:#E1621E 2px solid;
+        border-radius: 30px;
+        padding: 20px 30px;
+        width:100%;
+        margin-bottom: 50px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+
+    p{
+        color:rgb(95, 95, 95);
+        font-size: 20px;
+        margin-bottom: 10px;
+        width: 100%;
+        font-display: inherit;
+    }
+
+    .linha{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        width: 100%;
+    }
+
+    .linha p{
+        width:50%;
+        font-size: 20px;
+    }
+
+    .margin-top{
+      margin-top: 30px;
+    }
+
+    ul{
+      margin-left: 20px;
+    }
+</style>`
+
   async generateComprovanteColetasCatador(catadorId:number, comprovanteCompleto:boolean, dataInicio:Date, dataFim:Date):Promise<Buffer>{
 
     let catador:Catador = null;
@@ -43,19 +121,7 @@ export class PdfService {
       let html = `
         <html>
         <head>
-          <style type="text/css">
-            body {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-            }
-            header {
-              border: 1px solid black;
-              padding: 10px;
-              margin-bottom: 10px;
-            }
-          </style>
+          ${this.style}
         </head>
         ${this.formatarColetas(new DadosColeta(catador, resumoColetas, dataInicio, dataFim, coletas), comprovanteCompleto)}
         </html>
@@ -63,7 +129,13 @@ export class PdfService {
 
       await page.setContent(html);
 
-      const pdfBuffer = await page.pdf({ format: 'A4' });
+      const pdfBuffer = await page.pdf({ 
+        format: 'A4',
+        margin: {
+          top: '50px',
+          bottom: '50px',
+        }
+      });
       await browser.close();
 
       return pdfBuffer;
@@ -95,19 +167,7 @@ export class PdfService {
       let html = `
         <html>
         <head>
-          <style type="text/css">
-            body {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-            }
-            header {
-              border: 1px solid black;
-              padding: 10px;
-              margin-bottom: 10px;
-            }
-          </style>
+        ${this.style}
         </head>
         ${this.formatarVendas(new DadosVenda(associacao, resumoVendas, dataInicio, dataFim, vendas), comprovanteCompleto)}
         </html>
@@ -115,7 +175,12 @@ export class PdfService {
 
       await page.setContent(html);
 
-      const pdfBuffer = await page.pdf({ format: 'A4' });
+      const pdfBuffer = await page.pdf({ 
+        format: 'A4',
+        margin: {
+          top: '50px',
+          bottom: '50px',
+        } });
       await browser.close();
 
       return pdfBuffer;
@@ -127,19 +192,33 @@ export class PdfService {
   }
 
   formatarColetas(dadosColeta: DadosColeta, comprovanteCompleto:boolean): string{
-    const catadorInfo = dadosColeta.catador == null? "" : `<p><b>Catador</b>: ${dadosColeta.catador.user.name}</p><p><b>CPF</b>: ${dadosColeta.catador.cpf}</p>`;
-    const header = `<header> 
-      ${catadorInfo}
+    const catadorInfo = dadosColeta.catador != null ? `
+      <div class="container">
+        <h2>Dados de catador</h2>
+        <div class="linha">
+          <p><b>Catador</b>: ${dadosColeta.catador.user.name}</p>
+          <p><b>CPF</b>: ${dadosColeta.catador.cpf}</p>
+        </div>
+        <div class="linha">
+          <p><b>Bairro</b>: ${dadosColeta.catador.bairro}</p>
+          <p><b>Endereço</b>: ${dadosColeta.catador.endereco}</p>
+        </div>
+      </div>` : "";
+
+    const resumo = `
+    <div class="container"> 
+      <h2>Resumo da Coleta</h2>
       <p><b>Datas</b>: ${format(dadosColeta.dataInicio, 'dd/MM/yyyy') } - ${format(dadosColeta.dataFim, 'dd/MM/yyyy')}</p>
       <p><b>Quantidade de coletas realizadas</b>: ${dadosColeta.resumoColetas.quantidadeColetas}</p>
       <p><b>Quantidade de resíduos coletados</b>: ${dadosColeta.resumoColetas.quantidadeColetada} kg</p>
-    </header>`;
+    </div>`;
 
     let main = "";
     if(comprovanteCompleto){
       main += "<h2>Coletas realizadas:</h2>";
       for(let coleta of dadosColeta.coletas){
-        const coletaFormatada = `<div>
+        const coletaFormatada = `
+        <div class = "container">
           ${dadosColeta.catador != null ? "" : `
             <p><b>Nome do catador</b>: ${coleta.catador.user.name}</p>
             <p><b>Cpf do catador</b>: ${coleta.catador.cpf}</p>
@@ -154,45 +233,65 @@ export class PdfService {
         main += coletaFormatada;
       }
     }
-    return `<body><h1>Comprovante de coletas</h1>${header}${main}</body>`
+    return `<body>
+              <div id="container-logo">
+                <img src="https://drive.google.com/uc?export=download&id=16E44t6GPW24wkxOBbLIiag1LJptWokk1" alt="">
+              </div>
+              <h1>Comprovante de coletas</h1>
+              ${catadorInfo}
+              ${resumo}
+              ${main}
+            </body>`
   }
 
-  formatarVendas(dadosColeta: DadosVenda, comprovanteCompleto:boolean): string{
-    const catadorInfo = dadosColeta.associacao == null? "" : `<p><b>Associação</b>: ${dadosColeta.associacao.user.name}</p><p><b>CNPJ</b>: ${dadosColeta.associacao.cnpj}</p>`;
+  formatarVendas(dadosVenda: DadosVenda, comprovanteCompleto:boolean): string{
+    const associacaoInfo = dadosVenda.associacao != null ? `
+      <div class="container">
+        <h2>Informações da Associação</h2>
+        <div class="linha">
+          <p><b>Associação</b>: ${dadosVenda.associacao.user.name}</p>
+          <p><b>CNPJ</b>: ${dadosVenda.associacao.cnpj}</p>
+        </div>
+        <div class="linha">
+          <p><b>Bairro</b>: ${dadosVenda.associacao.bairro}</p>
+          <p><b>Endereço</b>: ${dadosVenda.associacao.endereco}</p>
+        </div>
+      </div>`:"";
     let resumoMateriais = '';
-    dadosColeta.resumoVendas.vendasPorMaterial.forEach((vendaPorMaterial => 
+    dadosVenda.resumoVendas.vendasPorMaterial.forEach((vendaPorMaterial => 
       resumoMateriais += `<li>
         <p><b>${vendaPorMaterial.nome}</b>: ${vendaPorMaterial.quantidade} kg</p>
       </li>`)
     )
 
-    const header = `<header> 
-      ${catadorInfo}
-      <p><b>Datas</b>: ${format(dadosColeta.dataInicio, 'dd/MM/yyyy') } - ${format(dadosColeta.dataFim, 'dd/MM/yyyy')}</p>
-      <p><b>Quantidade de coletas realizadas</b>: ${dadosColeta.resumoVendas.quantidadeVendas}</p>
-      <h3>Resumo das vendas:</h3>
+    const resumoVendas = `
+    <div class="container"> 
+      <h2>Resumo Vendas</h2>
+      <p><b>Datas</b>: ${format(dadosVenda.dataInicio, 'dd/MM/yyyy') } - ${format(dadosVenda.dataFim, 'dd/MM/yyyy')}</p>
+      <p><b>Quantidade de coletas realizadas</b>: ${dadosVenda.resumoVendas.quantidadeVendas}</p>
+      <h3 class="margin-top">Total de materiais vendidos:</h3>
       <ul>
         ${resumoMateriais}
       </ul>
-    </header>`;
+    </div>`;
 
     let main = "";
     if(comprovanteCompleto){
       main += "<h2>Vendas realizadas:</h2>";
-      for(let venda of dadosColeta.vendas){
+      for(let venda of dadosVenda.vendas){
         let materiais = '';
         venda.materiais.forEach(material =>{
           materiais += `<li><p><b>${material.material.nome}</b>: ${material.quantidadeVendida} kg</p></li>`
         })
-        const coletaFormatada = `<div>
-          ${dadosColeta.associacao != null ? "" : `
+        const coletaFormatada = `<div class="container">
+          ${dadosVenda.associacao != null ? "" : `
             <p><b>Nome da associação</b>: ${venda.associacao.user.name}</p>
             <p><b>Cpf da associaçao</b>: ${venda.associacao.cnpj}</p>
           `}
           <p><b>Empresa compradora</b>: ${venda.empresaCompradora}</p>
           <p><b>Nota fiscal</b>: ${venda.notaFiscal}</p>
           <p><b>Data</b>: ${format(venda.dataVenda, 'dd/MM/yyyy')}</p>
-          <h3>Materiais vendidos:</h3>
+          <h3 class="margin-top">Materiais vendidos:</h3>
           <ul>
             ${materiais}
           </ul>
@@ -200,7 +299,15 @@ export class PdfService {
         main += coletaFormatada;
       }
     }
-    return `<body><h1>Comprovante de vendas</h1>${header}${main}</body>`
+    return `<body>
+              <div id="container-logo">
+                <img src="https://drive.google.com/uc?export=download&id=16E44t6GPW24wkxOBbLIiag1LJptWokk1" alt="">
+              </div>
+              <h1>Comprovante de vendas</h1>
+              ${associacaoInfo}
+              ${resumoVendas}
+              ${main}
+            </body>`
   }
 }
 

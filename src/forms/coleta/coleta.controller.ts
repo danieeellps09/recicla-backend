@@ -11,6 +11,7 @@ import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
 import { format, isDate, parse } from 'date-fns';
 import { Coleta } from './entities/coleta.entity';
+import { ReturnColetaDto } from './dto/return-coleta.dto';
 
 @ApiTags('Formulario de Coletas')
 @ApiBearerAuth()
@@ -81,13 +82,14 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
     @Get('findBetweenDates/dates')
     async findBetweenDates(
         @Query('datainicio') dataInicio:string = new Date().toString(), 
-        @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{
+        @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnColetaDto[]>{
             let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
             let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
 
             if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                 if(dataFimConvertida >= dataInicioConvertida){
-                    return await this.coletaService.findBetweenDates(dataInicioConvertida, dataFimConvertida);
+                    return (await this.coletaService.findBetweenDates(dataInicioConvertida, dataFimConvertida))
+                        .map(coleta => new ReturnColetaDto(coleta));
                 }
                 throw new BadRequestException("Data de início deve ser anterior a data de fim.");
             }
@@ -100,13 +102,14 @@ async findByid(@Param('id') id: number): Promise<Coleta> {
         async findByIdBetweenDates(
             @Param('id') idCatador:number,
             @Query('datainicio') dataInicio:string = new Date().toString(), 
-            @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{
+            @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnColetaDto[]>{
                 let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
                 let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
     
                 if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                     if(dataFimConvertida >= dataInicioConvertida){
-                        return await this.coletaService.findByCatadorAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
+                        return (await this.coletaService.findByCatadorAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida))
+                            .map(coleta => new ReturnColetaDto(coleta));
                     }
                     throw new BadRequestException("Data de início deve ser anterior a data de fim.");
                 }

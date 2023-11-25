@@ -71,13 +71,14 @@ export class VendaController {
     @Get('findBetweenDates/dates')
     async findBetweenDates(
         @Query('datainicio') dataInicio:string = new Date().toString(), 
-        @Query('datafim') dataFim:string = new Date().toString()):Promise<Venda[]>{
+        @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnVendaDto[]>{
             let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
             let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
 
             if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                 if(dataFimConvertida >= dataInicioConvertida){
-                    return await this.vendaService.findBetweenDates(dataInicioConvertida, dataFimConvertida);
+                    return (await this.vendaService.findBetweenDates(dataInicioConvertida, dataFimConvertida))
+                        .map(venda => new ReturnVendaDto(venda));
                 }
                 throw new BadRequestException("Data de início deve ser anterior a data de fim.");
             }
@@ -90,13 +91,14 @@ export class VendaController {
         async findByIdBetweenDates(
             @Param('id') idCatador:number,
             @Query('datainicio') dataInicio:string = new Date().toString(), 
-            @Query('datafim') dataFim:string = new Date().toString()):Promise<Venda[]>{
+            @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnVendaDto[]>{
                 let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
                 let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
     
                 if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                     if(dataFimConvertida >= dataInicioConvertida){
-                        return await this.vendaService.findByAssociacaoAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
+                        return (await this.vendaService.findByAssociacaoAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida))
+                            .map(venda => new ReturnVendaDto(venda));
                     }
                     throw new BadRequestException("Data de início deve ser anterior a data de fim.");
                 }

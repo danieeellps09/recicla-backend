@@ -10,6 +10,7 @@ export class Coleta {
     pergunta?:boolean;
     motivo?:string;
     dataColeta?: Date;
+    numRota?:number;
     catador?:Catador;
     associacao?:Associacao;
   }

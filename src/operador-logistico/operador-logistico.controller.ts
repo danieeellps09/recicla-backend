@@ -6,7 +6,7 @@ import { ReturnOperadorDto } from './dto/return-operador.dto';
 import { OperadorConversor } from './dto/operador-conversor';
 import { UpdateOperadorDto } from './dto/update-operador.dto';
 
-@Controller('operador-logistico')
+@Controller('api/v1/operador-logistico')
 export class OperadorLogisticoController {
     constructor(private readonly operadorService:OperadorLogisticoService){}
 

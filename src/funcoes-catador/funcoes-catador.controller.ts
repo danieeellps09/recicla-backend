@@ -8,7 +8,7 @@ import { CreateFuncoesCatadorDto } from './dto/create-funcoes-catador.dto';
 import { UpdateFuncoesCatadorDto } from './dto/update-funcoes-catador.dto';
 
 @ApiTags('funcoes-catador')
-@Controller('funcoes-catador')
+@Controller('api/v1/funcoes-catador')
 export class FuncoesCatadorController {
   constructor(private readonly funcoesCatadorService: FuncoesCatadorService) {}
 

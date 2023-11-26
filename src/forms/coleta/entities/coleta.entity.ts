@@ -1,5 +1,6 @@
 import { Associacao } from "src/associacoes/entities/associacao.entity";
 import { Catador } from "src/catador/entities/catador.entity";
+import { Veiculo } from "src/veiculo/entities/veiculo.entity";
 
 export class Coleta {
     id?: number;
@@ -13,5 +14,6 @@ export class Coleta {
     numRota?:number;
     catador?:Catador;
     associacao?:Associacao;
+    veiculo?:Veiculo;
   }
   

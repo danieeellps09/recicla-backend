@@ -228,6 +228,7 @@ export class PdfService {
           <p><b>Nome do associacao</b>: ${coleta.associacao.user.name}</p>
           <p><b>CNPJ da associacao</b>: ${coleta.associacao.cnpj}</p>
           <p><b>Data</b>: ${format(coleta.dataColeta, 'dd/MM/yyyy')}</p>
+          <p><b>Veículo utilizado</b>: ${coleta.veiculo.nomeVeiculo}</p>
           <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
           <p><b>Todos os pontos coletados</b>: ${coleta.pergunta? 'Sim':'Não'}</p>
           <p><b>Motivo</b>: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>

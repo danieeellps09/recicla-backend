@@ -134,7 +134,8 @@ export class ColetaService {
             include:{
               user:true
             }
-          }
+          },
+          veiculo:true
         }
       });
     }
@@ -165,7 +166,8 @@ export class ColetaService {
             include:{
               user:true
             }
-          }
+          },
+          veiculo:true
         }
       });
     }catch(error){

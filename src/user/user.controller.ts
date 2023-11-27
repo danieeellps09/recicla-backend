@@ -13,6 +13,7 @@ import { Logger } from '@nestjs/common';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { UpdateSenha } from './dto/update-senha.dto';
 import { UpdateEmail } from './dto/update-email.dot';
+import { UserConversor } from './dto/user-conversor';
 
 
 
@@ -119,7 +120,7 @@ export class UserController {
   @ApiOkResponse({ description: 'As informações atualizadas do usuário logado.', type: CreateUserDto })
   @Put('update/password')
   async updatePassword(@Req() req: AuthRequest, @Body() updateSenha: UpdateSenha) {
-    return await this.userService.changePassword(req.user.id, updateSenha.password);
+    return UserConversor.toReturnUserDto(await this.userService.changePassword(req.user.id, updateSenha.password));
   }
 
   @ApiBearerAuth()
@@ -129,7 +130,7 @@ export class UserController {
   @ApiOkResponse({ description: 'As informações atualizadas do usuário logado.', type: CreateUserDto })
   @Put('update/email')
   async updateEmail(@Req() req: AuthRequest, @Body() updateEmail: UpdateEmail) {
-    return await this.userService.changeEmail(req.user.id, updateEmail.email);
+    return UserConversor.toReturnUserDto(await this.userService.changeEmail(req.user.id, updateEmail.email));
   }
 
   @isPublic()

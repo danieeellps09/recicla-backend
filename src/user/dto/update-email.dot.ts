@@ -3,8 +3,8 @@ import { IsEmail } from "class-validator";
 
 export class UpdateEmail{
     @ApiProperty({
-        example: 'M1nh453nh4',
-        description: 'A senha do usuário',
+        example: 'fulanodasilva@example.com',
+        description: 'O email do usuário',
     })
 
     @IsEmail()

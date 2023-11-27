@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
@@ -10,18 +10,22 @@ import { UserRole } from 'src/role/enums/roles.enum';
 import { RolesGuard } from 'src/role/guards/role.guard';
 import { AddRolesDto } from './dto/add-roles-user.dto';
 import { Logger } from '@nestjs/common';
+import { AuthRequest } from 'src/auth/models/AuthRequest';
+import { UpdateSenha } from './dto/update-senha.dto';
+import { UpdateEmail } from './dto/update-email.dot';
 
 
 
 @ApiTags('Users')
-@isPublic()
 @Controller('api/v1/users')
 export class UserController {
 
-  constructor(private readonly userService: UserService,) { 
-    
+  constructor(private readonly userService: UserService,) {
+
   }
   private readonly logger = new Logger(UserController.name);
+
+  @isPublic()
   @ApiOperation({ summary: 'Cria um novo usuário.' })
   @ApiCreatedResponse({
     description: 'O usuário foi criado com sucesso.',
@@ -54,7 +58,7 @@ export class UserController {
     }
   }
 
-
+  @isPublic()
   @ApiOperation({ summary: 'Retorna uma lista de todos os usuários cadastrados.' })
   @ApiOkResponse({ description: 'A lista de usuários.', type: [CreateUserDto] })
   @Get()
@@ -63,11 +67,12 @@ export class UserController {
       const users = await this.userService.findAll();
       return users;
     } catch (error) {
-      
+
       throw new InternalServerErrorException('Erro ao buscar a lista de usuários.');
     }
   }
 
+  @isPublic()
   @ApiOperation({ summary: 'Retorna um usuário pelo seu ID.' })
   @ApiOkResponse({ description: 'O usuário encontrado.', type: CreateUserDto })
   @Get(':id')
@@ -85,6 +90,7 @@ export class UserController {
     }
   }
 
+  @isPublic()
   @ApiOperation({ summary: 'Atualiza as informações de um usuário existente.' })
   @ApiOkResponse({ description: 'As informações do usuário atualizado.', type: CreateUserDto })
   @Put(':id')
@@ -99,33 +105,55 @@ export class UserController {
       return updatedUser;
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw error; 
+        throw error;
       } else {
         throw new InternalServerErrorException('Erro ao atualizar as informações do usuário.');
       }
     }
   }
-    @ApiOperation({ summary: 'Deleta um usuário existente.' })
-    @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
-    @Delete(':id')
-    async  delete(@Param('id') id: number) {
-      try {
-        const deletedUser = await this.userService.delete(id);
-        if (!deletedUser) {
-          throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
-        }
-        return deletedUser;
-      } catch (error) {
-        if (error instanceof NotFoundException) {
-          throw error;
-        } else {
-          const errorMessage = error.message || 'Erro desconhecido ao deletar o usuário.';
-         
-          throw new InternalServerErrorException(errorMessage);
-        }
+
+  @ApiBearerAuth()
+  @Roles(UserRole.ADMIN, UserRole.ASSOCIACAO, UserRole.CATADOR) 
+  @UseGuards(RolesGuard)
+  @ApiOperation({ summary: 'Atualiza a senha do usuário logado.' })
+  @ApiOkResponse({ description: 'As informações atualizadas do usuário logado.', type: CreateUserDto })
+  @Put('update/password')
+  async updatePassword(@Req() req: AuthRequest, @Body() updateSenha: UpdateSenha) {
+    return await this.userService.changePassword(req.user.id, updateSenha.password);
+  }
+
+  @ApiBearerAuth()
+  @Roles(UserRole.ADMIN, UserRole.ASSOCIACAO, UserRole.CATADOR) 
+  @UseGuards(RolesGuard)
+  @ApiOperation({ summary: 'Atualiza o email do usuário logado.' })
+  @ApiOkResponse({ description: 'As informações atualizadas do usuário logado.', type: CreateUserDto })
+  @Put('update/email')
+  async updateEmail(@Req() req: AuthRequest, @Body() updateEmail: UpdateEmail) {
+    return await this.userService.changeEmail(req.user.id, updateEmail.email);
+  }
+
+  @isPublic()
+  @ApiOperation({ summary: 'Deleta um usuário existente.' })
+  @ApiOkResponse({ description: 'As informações do usuário deletado.', type: CreateUserDto })
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    try {
+      const deletedUser = await this.userService.delete(id);
+      if (!deletedUser) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+      }
+      return deletedUser;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        const errorMessage = error.message || 'Erro desconhecido ao deletar o usuário.';
+
+        throw new InternalServerErrorException(errorMessage);
       }
     }
-
-
-
   }
+
+
+
+}

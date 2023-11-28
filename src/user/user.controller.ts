@@ -10,6 +10,8 @@ import { UserRole } from 'src/role/enums/roles.enum';
 import { RolesGuard } from 'src/role/guards/role.guard';
 import { AddRolesDto } from './dto/add-roles-user.dto';
 import { Logger } from '@nestjs/common';
+import { UserConversor } from './dto/user-conversor';
+import { AuthRequest } from 'src/auth/models/AuthRequest';
 
 
 
@@ -124,6 +126,21 @@ export class UserController {
           throw new InternalServerErrorException(errorMessage);
         }
       }
+    }
+
+    @ApiOperation({ summary: 'Atualiza a senha do usuário logado.' })
+    @ApiOkResponse({ description: 'As informações atualizadas do usuário logado.', type: CreateUserDto })
+    @Put('update/password')
+    async updatePassword(@Req() req: AuthRequest, @Body() updateSenha: UpdateSenha) {
+      return UserConversor.toReturnUserDto(await this.userService.changePassword(req.user.id, updateSenha.password));
+    }
+  
+    
+    @ApiOperation({ summary: 'Atualiza o email do usuário logado.' })
+    @ApiOkResponse({ description: 'As informações atualizadas do usuário logado.', type: CreateUserDto })
+    @Put('update/email')
+    async updateEmail(@Req() req: AuthRequest, @Body() updateEmail: UpdateEmail) {
+      return UserConversor.toReturnUserDto(await this.userService.changeEmail(req.user.id, updateEmail.email));
     }
 
 

@@ -191,4 +191,41 @@ export class UserService {
     }   
   }
 
+  async changePassword(id:number, senha:string){
+    let user = await this.findById(id);
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(senha, salt);
+
+    user.password = hashedPassword;
+
+    try{
+      return this.prisma.user.update({
+        where: {id},
+        data:user
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao trocar senha. Tente novamente em alguns minutos.");
+    }
+  }
+
+  async changeEmail(id:number, email:string){
+    let user = await this.findById(id);
+
+    await this.existsByEmail(email);
+
+    user.email = email;
+
+    try{
+      return this.prisma.user.update({
+        where: {id},
+        data:user
+      });
+    }catch(error){
+      throw new InternalServerErrorException("Ocorreu um erro ao trocar email. Tente novamente em alguns minutos.");
+    }
+  }
+
+
+
 }

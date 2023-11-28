@@ -86,7 +86,7 @@ async generateResetToken(users:User):Promise<string>{
   async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
 
 
-    const resetLink = `http://seu-app.com/resetar-senha/${resetToken}`; 
+    const resetLink = `http://localhost:3000/resetar-senha/${resetToken}`; 
 
     try {
       await this.emailService.sendEmail(email, 'Redefinição de Senha', `<p>Você solicitou a redefinição de senha. Clique <a href="${resetLink}">aqui</a> para redefinir sua senha.</p>`);

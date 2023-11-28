@@ -139,7 +139,6 @@ async findBetweenDates(
               throw new NotFoundException('O usuário não é um catador.');
                }
         
-            // Utilize o serviço de coleta para obter os formulários de coleta preenchidos pelo catador logado
             return this.coletaService.findMyColetas(catador.id);
           } catch (error) {
             throw new InternalServerErrorException('Erro ao buscar as coletas.');

@@ -1,15 +1,24 @@
-import { BadRequestException, Controller, Get, Param, Query, Res } from '@nestjs/common';
-import { ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Controller, Get, Param, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { PdfService } from './pdf.service';
-import { isPublic } from 'src/auth/decorators/is-public.decorator';
 import { Response } from 'express';
 import { isDate, parse } from 'date-fns';
+import { AuthRequest } from 'src/auth/models/AuthRequest';
+import { Roles } from 'src/role/decorators/role.decorator';
+import { UserRole } from 'src/role/enums/roles.enum';
+import { RolesGuard } from 'src/role/guards/role.guard';
+import { CatadorService } from 'src/catador/catador.service';
+import { AssociacoesService } from 'src/associacoes/associacoes.service';
 
 @Controller('api/v1/pdf')
 @ApiTags('PDF')
-@isPublic()
+@ApiBearerAuth()
 export class PdfController {
-    constructor(private readonly pdfService: PdfService) { }
+    constructor(
+        private readonly pdfService: PdfService,
+        private readonly catadorService:CatadorService,
+        private readonly associacaoService:AssociacoesService
+    ) { }
 
     @Get('coleta/:id')
     @ApiOperation({ summary: 'Gera comprovante de coleta.' })
@@ -22,6 +31,28 @@ export class PdfController {
 
         const datas = this.converterData(dataInicio, dataFim);
         const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(idCatador, comprovanteCompleto, datas.dataInicio, datas.dataFim);
+
+        return res.contentType('application/pdf')
+            .attachment('comprovante.pdf')
+            .send(pdfBuffer);
+
+    }
+
+    @Get('coleta-catador')
+    @ApiOperation({ summary: 'Gera comprovante de coleta.' })
+    @ApiProduces('application/pdf')
+    @Roles(UserRole.CATADOR) 
+    @UseGuards(RolesGuard)
+    async generatePdfColetasCatadorLogado(
+        @Res() res: Response,
+        @Req() req:AuthRequest,
+        @Query('completo') comprovanteCompleto: boolean = false,
+        @Query('datainicio') dataInicio: string = new Date().toString(),
+        @Query('datafim') dataFim: string = new Date().toString()) {
+
+        const datas = this.converterData(dataInicio, dataFim);
+        const catadorId = (await this.catadorService.getCatadorByUserID(req.user.id)).id
+        const pdfBuffer = await this.pdfService.generateComprovanteColetasCatador(catadorId, comprovanteCompleto, datas.dataInicio, datas.dataFim);
 
         return res.contentType('application/pdf')
             .attachment('comprovante.pdf')
@@ -56,6 +87,26 @@ export class PdfController {
         
         const datas = this.converterData(dataInicio, dataFim);
         const pdfBuffer = await this.pdfService.generateComprovanteVendaAssociacao(idAssociacao, comprovanteCompleto, datas.dataInicio, datas.dataFim);
+
+        return res.contentType('application/pdf')
+            .attachment('comprovante.pdf')
+            .send(pdfBuffer);
+    }
+
+    @Get('venda-associacao')
+    @ApiOperation({ summary: 'Gera comprovante de venda.' })
+    @ApiProduces('application/pdf')
+    @Roles(UserRole.ASSOCIACAO) 
+    @UseGuards(RolesGuard)
+    async generatePdfVendaAssociacaoLogada(@Res() res: Response,
+        @Req() req:AuthRequest,
+        @Query('completo') comprovanteCompleto: boolean = false,
+        @Query('datainicio') dataInicio: string = new Date().toString(),
+        @Query('datafim') dataFim: string = new Date().toString()) {
+        
+        const datas = this.converterData(dataInicio, dataFim);
+        const associacaoId = (await this.associacaoService.getAssociacaoByUserID(req.user.id)).id;
+        const pdfBuffer = await this.pdfService.generateComprovanteVendaAssociacao(associacaoId, comprovanteCompleto, datas.dataInicio, datas.dataFim);
 
         return res.contentType('application/pdf')
             .attachment('comprovante.pdf')

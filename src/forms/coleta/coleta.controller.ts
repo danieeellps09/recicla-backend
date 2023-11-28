@@ -5,11 +5,13 @@ import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation
 import { RegisterColetaDto } from './dto/register-coleta-dto';
 import { CatadorService } from 'src/catador/catador.service';
 import { AssociacoesService } from 'src/associacoes/associacoes.service';
-import { Coleta, User } from '@prisma/client';
+import {  User } from '@prisma/client';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
 import { CurrentUserLogged } from 'src/auth/decorators/current-users-decorator';
 import { UpdateColetaDto } from './dto/update-coleta-dto';
 import { format, isDate, parse } from 'date-fns';
+import { Coleta } from './entities/coleta.entity';
+import { ReturnColetaDto } from './dto/return-coleta.dto';
 
 @ApiTags('Formulario de Coletas')
 @ApiBearerAuth()
@@ -103,13 +105,14 @@ async findBetweenDates(
     async findByIdBetweenDates(
         @Param('id') idCatador:number,
         @Query('datainicio') dataInicio:string = new Date().toString(), 
-        @Query('datafim') dataFim:string = new Date().toString()):Promise<Coleta[]>{
+        @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnColetaDto[]>{
             let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
             let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
             
             if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                 if(dataFimConvertida >= dataInicioConvertida){
-                    return await this.coletaService.findByCatadorAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida);
+                    return (await this.coletaService.findBetweenDates(dataInicioConvertida, dataFimConvertida))
+                        .map(coleta => new ReturnColetaDto(coleta));
                 }
                 throw new BadRequestException("Data de início deve ser anterior a data de fim.");
             }
@@ -134,7 +137,7 @@ async findBetweenDates(
         
             if (!catador) {
               throw new NotFoundException('O usuário não é um catador.');
-            }
+               }
         
             // Utilize o serviço de coleta para obter os formulários de coleta preenchidos pelo catador logado
             return this.coletaService.findMyColetas(catador.id);
@@ -142,6 +145,8 @@ async findBetweenDates(
             throw new InternalServerErrorException('Erro ao buscar as coletas.');
           }
         }
+
+    
 
         @ApiOperation({ summary: 'Retorna todas as coletas entre duas datas.' })
         @ApiOkResponse({ description: 'Coletas encontradas', isArray: true })

@@ -16,7 +16,7 @@ export class VendaController {
     constructor(
         private readonly vendaService: VendaService,
         private readonly associacaoService: AssociacoesService,
-    ) {}
+    ) { }
 
     @ApiOperation({ summary: 'Cria um novo registro de venda.' })
     @ApiCreatedResponse({
@@ -66,118 +66,114 @@ export class VendaController {
         }
     }
 
-    @ApiOperation({summary: "Retorna todas as vendas entre duas datas."})
-    @ApiOkResponse({description: "Vendas encontradas"})
+    @ApiOperation({ summary: "Retorna todas as vendas entre duas datas." })
+    @ApiOkResponse({ description: "Vendas encontradas" })
     @Get('findBetweenDates/dates')
     async findBetweenDates(
-        @Query('datainicio') dataInicio:string = new Date().toString(), 
-        @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnVendaDto[]>{
-            let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-            let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+        @Query('datainicio') dataInicio: string = new Date().toString(),
+        @Query('datafim') dataFim: string = new Date().toString()): Promise<ReturnVendaDto[]> {
+        let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+        let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
 
-            if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
-                if(dataFimConvertida >= dataInicioConvertida){
-                    return (await this.vendaService.findBetweenDates(dataInicioConvertida, dataFimConvertida))
+        if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
+            if (dataFimConvertida >= dataInicioConvertida) {
+                return (await this.vendaService.findBetweenDates(dataInicioConvertida, dataFimConvertida))
+                    .map(venda => new ReturnVendaDto(venda));
+            }
+            throw new BadRequestException("Data de início deve ser anterior a data de fim.");
+        }
+        throw new BadRequestException("Dados fornecidos não são datas válidas");
+    }
+
+    @ApiOperation({ summary: "Retorna todas as vendas entre duas datas." })
+    @ApiOkResponse({ description: "Vendas encontradas" })
+    @Get('findBetweenDates/:id')
+    async findByIdBetweenDates(
+        @Param('id') idAssociacao: number,
+        @Query('datainicio') dataInicio: string = new Date().toString(),
+        @Query('datafim') dataFim: string = new Date().toString()): Promise<ReturnVendaDto[]> {
+        let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+        let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+
+        if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
+            if (dataFimConvertida >= dataInicioConvertida) {
+                return (await this.vendaService.findByAssociacaoAndBetweenDates(idAssociacao, dataInicioConvertida, dataFimConvertida))
+                    .map(venda => new ReturnVendaDto(venda));
+            }
+            throw new BadRequestException("Data de início deve ser anterior a data de fim.");
+        }
+        throw new BadRequestException("Dados fornecidos não são datas válidas");
+    }
+
+    @ApiOperation({ summary: 'Retorna todas as vendas por 1 associacao.' })
+    @ApiOkResponse({ description: 'Associacoes encontradas', })
+    @Get('by-associacao/:idAssociacao')
+    async findVendasByAssociacao(@Param('idAssociacao') idAssociacao: number): Promise<Venda[]> {
+        try {
+            return this.vendaService.findVendasByAssociacao(idAssociacao);
+        } catch (error) {
+            throw new HttpException('Erro ao buscar vendas  da Associacao.', error.message);
+        }
+    }
+
+
+
+    @ApiOperation({ summary: 'Obtém todas as vendas da associação logada.' })
+    @ApiOkResponse({ description: 'Lista com todas as vendas da associação logada.', type: Venda, isArray: true })
+    @Get('/vendas/vendas-by-associacao')
+    async encontrarMinhasVendas(@Req() req: AuthRequest): Promise<Venda[]> {
+        try {
+            const userId = req.user.id;
+            if (!userId) {
+                throw new NotFoundException('Usuário não encontrado');
+            }
+
+            const vendas = await this.vendaService.findVendasByAssociacaoUserId(userId);
+
+            return vendas;
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao buscar por vendas: ' + error.message);
+        }
+    }
+
+
+    @ApiOperation({ summary: 'Retorna todas as vendas da associação logada entre duas datas.' })
+    @ApiOkResponse({ description: 'Vendas encontradas', type: Venda, isArray: true })
+    @Get('vendas/vendas-between-dates')
+    async encontrarMinhasVendasEntreDatas(
+        @Query('datainicio') dataInicio: string = new Date().toString(),
+        @Query('datafim') dataFim: string = new Date().toString(),
+        @Req() req: AuthRequest,
+    ): Promise<ReturnVendaDto[]> {
+        try {
+
+
+            const userId = req.user.id;
+            if (!userId) {
+                throw new NotFoundException('Usuário não encontrado');
+            }
+            const idAssociacao = await this.associacaoService.getAssociacaoByUserID(userId);
+
+            if (!idAssociacao) {
+                throw new NotFoundException('Associação não encontrada para o usuário.');
+            }
+
+            const dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
+            const dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
+
+            if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
+                if (dataFimConvertida >= dataInicioConvertida) {
+                    // Chame o método do serviço para buscar as vendas da associação logada entre duas datas
+                    return (await this.vendaService.findByAssociacaoAndBetweenDates(idAssociacao.id, dataInicioConvertida, dataFimConvertida))
                         .map(venda => new ReturnVendaDto(venda));
                 }
-                throw new BadRequestException("Data de início deve ser anterior a data de fim.");
+                throw new BadRequestException('Data de início deve ser anterior à data de fim.');
             }
-            throw new BadRequestException("Dados fornecidos não são datas válidas");
+            throw new BadRequestException('Dados fornecidos não são datas válidas');
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao buscar vendas por associação e entre datas: ' + error.message);
         }
-
-        @ApiOperation({summary: "Retorna todas as vendas entre duas datas."})
-        @ApiOkResponse({description: "Vendas encontradas"})
-        @Get('findBetweenDates/:id')
-        async findByIdBetweenDates(
-            @Param('id') idAssociacao:number,
-            @Query('datainicio') dataInicio:string = new Date().toString(), 
-            @Query('datafim') dataFim:string = new Date().toString()):Promise<ReturnVendaDto[]>{
-                let dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-                let dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
-    
-                if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
-                    if(dataFimConvertida >= dataInicioConvertida){
-                        return (await this.vendaService.findByAssociacaoAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida))
-                            .map(venda => new ReturnVendaDto(venda));
-                    }
-                    throw new BadRequestException("Data de início deve ser anterior a data de fim.");
-                }
-                throw new BadRequestException("Dados fornecidos não são datas válidas");
-            }
-
-            @ApiOperation({ summary: 'Retorna todas as vendas por 1 associacao.' })
-            @ApiOkResponse({ description: 'Associacoes encontradas',  })
-            @Get('by-associacao/:idAssociacao')
-            async findVendasByAssociacao(@Param('idAssociacao') idAssociacao: number): Promise<Venda[]> {
-              try {
-                return this.vendaService.findVendasByAssociacao(idAssociacao);
-              } catch (error) {
-                throw new HttpException('Erro ao buscar vendas  da Associacao.', error.message);
-              }
-            }
-
-
-
-            @ApiOperation({ summary: 'Obtém todas as vendas da associação logada.' })
-            @ApiOkResponse({ description: 'Lista com todas as vendas da associação logada.', type: Venda, isArray: true })
-            @Get('/vendas/vendas-by-associacao')
-            async encontrarMinhasVendas(@Req() req: AuthRequest): Promise<Venda[]> {
-              try {
-                const userId = req.user.id;
-                if (!userId) {
-                  throw new NotFoundException('Usuário não encontrado');
-                }
-          
-                const vendas = await this.vendaService.findVendasByAssociacaoUserId(userId);
-          
-                return vendas;
-              } catch (error) {
-                throw new InternalServerErrorException('Erro ao buscar por vendas: ' + error.message);
-              }
-            }
-
-        
-            @ApiOperation({ summary: 'Retorna todas as vendas da associação logada entre duas datas.' })
-            @ApiOkResponse({ description: 'Vendas encontradas', type: Venda, isArray: true })
-            @Get('vendas/vendas-between-dates')
-            async encontrarMinhasVendasEntreDatas(
-              @Query('datainicio') dataInicio: string = new Date().toString(),
-              @Query('datafim') dataFim: string = new Date().toString(),
-              @Req() req: AuthRequest,
-            ): Promise<Venda[]> {
-              try {
-
-
-                const userId = req.user.id;
-                if (!userId) {
-                  throw new NotFoundException('Usuário não encontrado');
-                }
-                const idAssociacao = await this.associacaoService.getAssociacaoByUserID(userId);
-
-                if (!idAssociacao) {
-                  throw new NotFoundException('Associação não encontrada para o usuário.');
-                }
-          
-                const dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
-                const dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
-                
-                if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
-                  if (dataFimConvertida >= dataInicioConvertida) {
-                    // Chame o método do serviço para buscar as vendas da associação logada entre duas datas
-                    const vendas = await this.vendaService.findByAssociacaoAndBetweenDates(
-                      idAssociacao.id,
-                      dataInicioConvertida,
-                      dataFimConvertida,
-                    );
-                    return vendas;
-                  }
-                  throw new BadRequestException('Data de início deve ser anterior à data de fim.');
-                }
-                throw new BadRequestException('Dados fornecidos não são datas válidas');
-              } catch (error) {
-                throw new InternalServerErrorException('Erro ao buscar vendas por associação e entre datas: ' + error.message);
-              }
-            }
+    }
 
 
 

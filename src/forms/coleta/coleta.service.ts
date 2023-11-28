@@ -196,19 +196,34 @@ export class ColetaService {
   async findBetweenDatesByCatador(catadorId: number, dataInicio: Date, dataFim: Date): Promise<Coleta[]> {
     try {
       // Utilize o Prisma para buscar as coletas entre as datas para o catador específico
-      const coletas = await this.prismaService.coleta.findMany({
-        where: {
+     return await this.prismaService.coleta.findMany({
+        where:{
           idCatador: catadorId,
-          dataColeta: {
-            gte: dataInicio,  // Início do dia da data de início
-            lte: dataFim,  // Fim do dia da data de fim
-          },
+          AND:{
+            dataColeta:{
+              gte: dataInicio,
+              lte: dataFim
+            }
+          }
         },
+        orderBy:{
+          dataColeta: 'desc'
+        },
+        include:{
+          catador: {
+            include:{
+              user:true
+            }
+          },
+          associacao:{
+            include:{
+              user:true
+            }
+          },
+          veiculo:true
+        }
       });
-
-      return coletas;
     } catch (error) {
-      // Trate erros de forma apropriada, se necessário
       throw new Error('Erro ao buscar as coletas entre as datas: ' + error.message);
     }
   }

@@ -111,8 +111,8 @@ async findBetweenDates(
             
             if(isDate(dataInicioConvertida) && isDate(dataFimConvertida)){
                 if(dataFimConvertida >= dataInicioConvertida){
-                    return (await this.coletaService.findBetweenDates(dataInicioConvertida, dataFimConvertida))
-                        .map(coleta => new ReturnColetaDto(coleta));
+                  return (await this.coletaService.findByCatadorAndBetweenDates(idCatador, dataInicioConvertida, dataFimConvertida))
+                  .map(coleta => new ReturnColetaDto(coleta));
                 }
                 throw new BadRequestException("Data de início deve ser anterior a data de fim.");
             }
@@ -163,7 +163,7 @@ async findBetweenDates(
           @Query('datainicio') dataInicio: string = new Date().toString(),
           @Query('datafim') dataFim: string = new Date().toString(),
           @Req() req: AuthRequest
-        ): Promise<Coleta[]> {
+        ): Promise<ReturnColetaDto[]> {
           const userId = req.user.id;
       
           if (!userId) {
@@ -185,8 +185,8 @@ async findBetweenDates(
             // Verifique se as datas são válidas e se a data de fim é posterior à data de início
             if (isDate(dataInicioConvertida) && isDate(dataFimConvertida) && dataFimConvertida >= dataInicioConvertida) {
               // Utilize o serviço de coleta para buscar as coletas entre as datas
-              return this.coletaService.findBetweenDatesByCatador(catador.id, dataInicioConvertida, dataFimConvertida);
-            }
+              return (await this.coletaService.findBetweenDatesByCatador(catador.id, dataInicioConvertida, dataFimConvertida))
+              .map(coleta => new ReturnColetaDto(coleta));            }
       
             throw new BadRequestException('Datas fornecidas não são válidas');
           } catch (error) {

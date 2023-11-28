@@ -12,6 +12,8 @@ import { AddRolesDto } from './dto/add-roles-user.dto';
 import { Logger } from '@nestjs/common';
 import { UserConversor } from './dto/user-conversor';
 import { AuthRequest } from 'src/auth/models/AuthRequest';
+import { UpdateSenha } from './dto/update-senha.dto';
+import { UpdateEmail } from './dto/update-email.dto';
 
 
 

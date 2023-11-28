@@ -14,6 +14,6 @@ import { FuncoesCatadorService } from 'src/funcoes-catador/funcoes-catador.servi
 @Module({
   imports: [CatadorModule, UserModule],
   controllers: [CatadorController],
-  providers: [CatadorService,  AssociacoesService,UserService, RoleService, PrismaService, EmailService, GeneroService, EtniaService, FuncoesCatadorService]
+  providers: [CatadorService,  AssociacoesService,UserService, RoleService, PrismaService, EmailService, GeneroService,FuncoesCatadorService, EtniaService]
 })
 export class CatadorModule {}

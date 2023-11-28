@@ -18,7 +18,7 @@ import { UpdateEmail } from './dto/update-email.dto';
 
 
 @ApiTags('Users')
-@isPublic()
+@ApiBearerAuth()
 @Controller('api/v1/users')
 export class UserController {
 

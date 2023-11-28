@@ -15,6 +15,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { VendaService } from 'src/forms/venda/venda.service';
 import { MaterialService } from 'src/material/material.service';
 import { MaterialModule } from 'src/material/material.module';
+import { FuncoesCatadorService } from 'src/funcoes-catador/funcoes-catador.service';
 
 @Module({
   imports: [CatadorModule, FormsModule, MaterialModule],
@@ -30,7 +31,8 @@ import { MaterialModule } from 'src/material/material.module';
     GeneroService, 
     EtniaService,
     VendaService,
-    MaterialService
+    MaterialService,
+    FuncoesCatadorService
   ],
   controllers: [PdfController]
 })

@@ -49,9 +49,9 @@ import config from './config/config';
     AdministradorModule,
     EtniaModule,
     GeneroModule,
+    FuncoesCatadorModule,
     PdfModule,
     OperadorLogisticoModule,
-    FuncoesCatadorModule
   ],
   controllers: [ AppController],
   providers: [AppService,

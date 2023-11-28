@@ -244,7 +244,6 @@ export class VendaService {
         throw new NotFoundException('Associação não encontrada para o usuário.');
       }
 
-      // Use o ID da associação para filtrar as vendas
       let vendas = await this.prismaService.venda.findMany({
         where: {
           idAssociacao: associacao.id,

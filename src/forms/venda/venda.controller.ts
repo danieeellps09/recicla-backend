@@ -121,16 +121,17 @@ export class VendaController {
     @ApiOperation({ summary: 'Obtém todas as vendas da associação logada.' })
     @ApiOkResponse({ description: 'Lista com todas as vendas da associação logada.', type: Venda, isArray: true })
     @Get('/vendas/vendas-by-associacao')
-    async encontrarMinhasVendas(@Req() req: AuthRequest): Promise<Venda[]> {
+    async encontrarMinhasVendas(@Req() req: AuthRequest): Promise<ReturnVendaDto[]> {
         try {
             const userId = req.user.id;
             if (!userId) {
                 throw new NotFoundException('Usuário não encontrado');
             }
+            return (await this.vendaService.findVendasByAssociacaoUserId(userId)).map((venda) => new ReturnVendaDto(venda));
 
-            const vendas = await this.vendaService.findVendasByAssociacaoUserId(userId);
+            // const vendas = await this.vendaService.findVendasByAssociacaoUserId(userId);
 
-            return vendas;
+            // return vendas;
         } catch (error) {
             throw new InternalServerErrorException('Erro ao buscar por vendas: ' + error.message);
         }

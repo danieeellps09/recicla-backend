@@ -13,7 +13,9 @@ export class CatadorConversor{
             user: UserConversor.toReturnUserDto(catador.user),
             associacao: AssociacaoConversor.toReturnAssociacaoDto(catador.associacao),
             genero: catador.genero,
-            etnia: catador.etnia
+            etnia: catador.etnia,
+            funcoescatador: catador.funcoescatador
+        
         }
     }
 }

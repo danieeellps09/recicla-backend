@@ -57,4 +57,12 @@ export class UpdateCatadorDto {
       @IsNumber()
       idGenero: number;
 
+      @ApiProperty({
+        example: 1,
+        description: 'O identificador da função do catador',
+      })
+    
+      @IsNumber()
+      funcaoId: number;
+
 }

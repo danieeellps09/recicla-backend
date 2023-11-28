@@ -6,6 +6,7 @@ import { Associacao } from "src/associacoes/entities/associacao.entity";
 import { ReturnUserDto } from "src/user/dto/return-user.dto";
 import { Genero } from "../../genero/entities/genero.entity";
 import { Etnia } from "../../etnia/entities/etnia.entity";
+import { FuncoesCatador } from "src/funcoes-catador/entities/funcoesCatador.entity";
 
 export class ReturnCatadorDto {
 
@@ -49,5 +50,7 @@ export class ReturnCatadorDto {
     @Type(() => Etnia)
     etnia:Etnia;
 
-
+    @ApiProperty({type: FuncoesCatador})
+    @Type(() => FuncoesCatador)
+    funcoescatador:FuncoesCatador;
 }

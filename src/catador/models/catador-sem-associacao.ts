@@ -1,4 +1,4 @@
-import { Etnia, Genero, User } from "@prisma/client";
+import { Etnia, FuncoesCatador, Genero, User } from "@prisma/client";
 
 export class CatadorFormatadoJson{
     id?: number;
@@ -10,4 +10,5 @@ export class CatadorFormatadoJson{
     user?: User;
     etnia?: Etnia;
     genero?: Genero;
+    funcao?: FuncoesCatador;
   }

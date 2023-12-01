@@ -89,7 +89,19 @@ async generateResetToken(users:User):Promise<string>{
     const resetLink = `http://localhost:3000/resetar-senha/${resetToken}`; 
 
     try {
-      await this.emailService.sendEmail(email, 'Redefinição de Senha', `<p>Você solicitou a redefinição de senha. Clique <a href="${resetLink}" >aqui</a> para redefinir sua senha.</p>`);
+      await this.emailService.sendEmail(email, 'Redefinição de Senha',
+       `<!DOCTYPE html>
+       <html lang="PT-br">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Redefinição de senha - ReCiclo</title>
+        </head>
+        <body>
+          <p>Você solicitou a redefinição de senha. Clique <a href="${resetLink}" >aqui</a> para redefinir sua senha.</p>
+        </body>
+       </html>
+      `);
 
       console.log('E-mail de redefinição de senha enviado com sucesso.');
     } catch (error) {

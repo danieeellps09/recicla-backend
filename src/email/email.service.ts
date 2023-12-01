@@ -23,7 +23,7 @@ export class EmailService {
             from: this.configService.get<string>('email_username'),
             to,
             subject,
-            text,
+            html:text,
         };
 
         try {

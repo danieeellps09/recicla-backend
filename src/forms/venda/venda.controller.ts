@@ -129,9 +129,7 @@ export class VendaController {
             }
             return (await this.vendaService.findVendasByAssociacaoUserId(userId)).map((venda) => new ReturnVendaDto(venda));
 
-            // const vendas = await this.vendaService.findVendasByAssociacaoUserId(userId);
 
-            // return vendas;
         } catch (error) {
             throw new InternalServerErrorException('Erro ao buscar por vendas: ' + error.message);
         }
@@ -164,7 +162,6 @@ export class VendaController {
 
             if (isDate(dataInicioConvertida) && isDate(dataFimConvertida)) {
                 if (dataFimConvertida >= dataInicioConvertida) {
-                    // Chame o método do serviço para buscar as vendas da associação logada entre duas datas
                     return (await this.vendaService.findByAssociacaoAndBetweenDates(idAssociacao.id, dataInicioConvertida, dataFimConvertida))
                         .map(venda => new ReturnVendaDto(venda));
                 }

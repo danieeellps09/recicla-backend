@@ -237,7 +237,6 @@ export class VendaService {
 
   async findVendasByAssociacaoUserId(userId: number): Promise<Venda[]> {
     try {
-      // Obtenha a associação com base no ID do usuário
       const associacao = await this.associacaoService.getAssociacaoByUserID(userId);
 
       if (!associacao) {

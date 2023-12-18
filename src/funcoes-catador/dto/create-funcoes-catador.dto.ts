@@ -1,4 +1,3 @@
-// src/funcoesCatador/dto/create-funcoes-catador.dto.ts
 
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsNotEmpty } from "class-validator";

@@ -12,11 +12,9 @@ config();
 
 
 async function bootstrap() {
-  // Cria uma instância da aplicação
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
 
-  // Configura o CORS
   const corsOptions: cors.CorsOptions = {
     origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -27,7 +25,6 @@ async function bootstrap() {
   };
   app.use(cors(corsOptions));
 
-  // Define a documentação da API usando o Swagger
   const config = new DocumentBuilder()
     .setTitle('Back-end Service')
     .setDescription('Serviço criado para operações no banco de dados')
@@ -37,7 +34,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);
 
-  // Define o uso de pipes globais para validação
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -48,8 +44,8 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  // Inicia a aplicação
-  await app.listen(3000);
+  
+  await app.listen(5000);
 }
 
 bootstrap();

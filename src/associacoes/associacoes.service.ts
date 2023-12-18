@@ -19,7 +19,6 @@ export class AssociacoesService {
         private readonly emailService: EmailService) { }
 
     async create(newAssociacao: NewAssociacao): Promise<Associacao> {
-        //seta o role como catador
         newAssociacao.user.roleNames = ["associacao"];
         let rolesIds = [];
 
@@ -34,7 +33,6 @@ export class AssociacoesService {
             });
             rolesIds = [role.id];
         } finally {
-            //cria uma senha alfanumérica randomica para o novo usuário
             if (!newAssociacao.user.password) {
                 newAssociacao.user.password = PasswordGenerator.generate(5);
             }
@@ -43,10 +41,8 @@ export class AssociacoesService {
 
             await this.userService.existsByEmail(newAssociacao.user.email);
 
-            //cria o user
             const user = await this.userService.create(newAssociacao.user);
 
-            //adiciona as roles
             await this.userService.addRolesToUser(user.id, rolesIds);
 
             const data = {
@@ -56,7 +52,6 @@ export class AssociacoesService {
                 bairro: newAssociacao.bairro
             };
 
-            //cria a associacao
             const associacao = await this.prismaService.associacao.create({
                 data: data,
                 include: {
@@ -108,7 +103,6 @@ export class AssociacoesService {
     }
 
     async update(id: number, associacao: UpdateAssociacaoDto): Promise<Associacao> {
-        //pega o id do user que está relacionado com o catador
         const existingAssociacao = await this.findById(id);
         const userId = existingAssociacao.userId;
 

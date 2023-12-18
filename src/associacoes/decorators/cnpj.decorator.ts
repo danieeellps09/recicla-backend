@@ -1,4 +1,3 @@
-// cnpj.decorator.ts
 import {
     registerDecorator,
     ValidationArguments,
@@ -11,15 +10,12 @@ import {
 @ValidatorConstraint({ name: 'isCnpjValid', async: false })
 export class IsCnpjValidConstraint implements ValidatorConstraintInterface {
     validate(cnpj: string, args: ValidationArguments) {
-        // Remover caracteres não numéricos
         const cleanedCnpj = cnpj.replace(/\D/g, '');
 
-        // Validar se o CNPJ possui 14 dígitos após remover não numéricos
         if (cleanedCnpj.length !== 14) {
             return false;
         }
 
-        // Lógica de validação dos dígitos
         const calcCnpj = cleanedCnpj.substring(0, 12);
         const digit1 = this.calculateDigit(calcCnpj, 5);
         const digit2 = this.calculateDigit(calcCnpj + digit1, 6);

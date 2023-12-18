@@ -5,7 +5,6 @@ import { IsCnpjValidConstraint } from "./cnpj.decorator";
 export class IsTelefoneValidConstraint implements ValidatorConstraintInterface {
 
     validate(telefone: string, args: ValidationArguments) {
-        // Use uma expressão regular para validar o formato do telefone
         const regex = /^\(\d{2}\) \d{5}-\d{4}$/;
         return regex.test(telefone);
     }

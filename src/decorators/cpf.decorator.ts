@@ -4,20 +4,16 @@ import { ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorC
 export class IsCpfValidConstraint implements ValidatorConstraintInterface {
 
     validate(cpf: string, args: ValidationArguments) {
-        // Remove caracteres não numéricos
         cpf = cpf.replace(/\D/g, '');
 
-        // Verifica se o CPF tem 11 dígitos
         if (cpf.length !== 11) {
             return false;
         }
 
-        // Verifica se todos os dígitos são iguais, o que é inválido
         if (/^(\d)\1{10}$/.test(cpf)) {
             return false;
         }
 
-        // Calcula o primeiro dígito verificador
         let soma = 0;
         for (let i = 0; i < 9; i++) {
             soma += parseInt(cpf.charAt(i)) * (10 - i);
@@ -28,12 +24,10 @@ export class IsCpfValidConstraint implements ValidatorConstraintInterface {
             primeiroDigito = 0;
         }
 
-        // Verifica o primeiro dígito verificador
         if (parseInt(cpf.charAt(9)) !== primeiroDigito) {
             return false;
         }
 
-        // Calcula o segundo dígito verificador
         soma = 0;
         for (let i = 0; i < 10; i++) {
             soma += parseInt(cpf.charAt(i)) * (11 - i);
@@ -44,7 +38,6 @@ export class IsCpfValidConstraint implements ValidatorConstraintInterface {
             segundoDigito = 0;
         }
 
-        // Verifica o segundo dígito verificador
         if (parseInt(cpf.charAt(10)) !== segundoDigito) {
             return false;
         }

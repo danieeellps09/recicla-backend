@@ -20,7 +20,7 @@ export class VeiculoController {
     try {
       return await this.veiculoService.create(newVeiculo);
     } catch (error) {
-      throw new BadRequestException(error.message); //
+      throw new BadRequestException(error.message); 
     }
   }
 

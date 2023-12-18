@@ -132,7 +132,7 @@ async findBetweenDates(
 
         @ApiOperation({ summary: 'Obtém todas as coletas do catador logado.' })
         @ApiOkResponse({ description: 'Lista com todas as coletas do catador logado.', type: RegisterColetaDto, isArray: true })
-        @Get('coletas/coletas-by-catadores')  // Defina um novo endpoint
+        @Get('coletas/coletas-by-catadores')  
         async encontrarMinhasColetas(@Req() req: AuthRequest): Promise<Coleta[]> {
           const userId = req.user.id;
         
@@ -141,7 +141,6 @@ async findBetweenDates(
           }
         
           try {
-            // Obtenha o catador com base no ID do usuário
             const catador = await this.catadorService.getCatadorByUserID(userId);
         
             if (!catador) {
@@ -171,26 +170,21 @@ async findBetweenDates(
           }
       
           try {
-            // Obtenha o catador com base no ID do usuário
             const catador = await this.catadorService.getCatadorByUserID(userId);
       
             if (!catador) {
               throw new BadRequestException('O usuário não é um catador.');
             }
       
-            // Converta as datas para objetos Date
             const dataInicioConvertida = parse(dataInicio, 'dd/MM/yyyy', new Date());
             const dataFimConvertida = parse(dataFim, 'dd/MM/yyyy', new Date());
       
-            // Verifique se as datas são válidas e se a data de fim é posterior à data de início
             if (isDate(dataInicioConvertida) && isDate(dataFimConvertida) && dataFimConvertida >= dataInicioConvertida) {
-              // Utilize o serviço de coleta para buscar as coletas entre as datas
               return (await this.coletaService.findBetweenDatesByCatador(catador.id, dataInicioConvertida, dataFimConvertida))
               .map(coleta => new ReturnColetaDto(coleta));            }
       
             throw new BadRequestException('Datas fornecidas não são válidas');
           } catch (error) {
-            // Trate erros de forma apropriada, se necessário
             throw new BadRequestException('Erro ao buscar as coletas: ' + error.message);
           }
         }

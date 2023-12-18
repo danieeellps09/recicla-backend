@@ -84,7 +84,6 @@ describe('RoleService', () => {
                 },
             ];
 
-            // Mock the behavior of the roleService.findAll method
             jest.spyOn(roleService, 'findAll').mockResolvedValue(roles);
 
             const result = await roleService.findAll();

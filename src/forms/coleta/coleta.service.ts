@@ -110,7 +110,6 @@ export class ColetaService {
 
   async findMyColetas(catadorId: number): Promise<Coleta[]> {
     try {
-      // Utilize o Prisma para buscar as coletas do catador pelo ID do catador
       const coletas = await this.prismaService.coleta.findMany({
         where: {
           idCatador: catadorId,
@@ -119,7 +118,6 @@ export class ColetaService {
 
       return coletas;
     } catch (error) {
-      // Trate erros de forma apropriada, se necessário
       throw new Error('Erro ao buscar as coletas: ' + error.message);
     }
   }
@@ -195,7 +193,6 @@ export class ColetaService {
 
   async findBetweenDatesByCatador(catadorId: number, dataInicio: Date, dataFim: Date): Promise<Coleta[]> {
     try {
-      // Utilize o Prisma para buscar as coletas entre as datas para o catador específico
      return await this.prismaService.coleta.findMany({
         where:{
           idCatador: catadorId,

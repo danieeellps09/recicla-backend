@@ -28,7 +28,6 @@ export class CatadorService {
     private readonly funcaoCatadorService: FuncoesCatadorService) { }
 
   async create(createCatadorDto: CreateCatadorDto): Promise<Catador> {
-    //seta o role como catador
     createCatadorDto.user.roleNames = ["catador"];
     let rolesIds = [];
 
@@ -46,34 +45,26 @@ export class CatadorService {
 
     }
     finally {
-      //cria uma senha alfanumérica randomica para o novo usuário
       if (!createCatadorDto.user.password) {
         createCatadorDto.user.password = PasswordGenerator.generate(5);
       }
 
-      //Verifica se já existe um catador com o cpf
  if (createCatadorDto.cpf) {
       await this.existsByCpf(createCatadorDto.cpf);
     } else{
       createCatadorDto.cpf = ""
     }
-      //Verifica se já existe um user com o email
       await this.userService.existsByEmail(createCatadorDto.user.email);
 
-      //verifica se a associação existe
       await this.associacaoService.findById(createCatadorDto.idAssociacao);
 
-      //verifica se o genero existe
       await this.generoService.findById(createCatadorDto.idGenero);
 
-      //verifica se a etnia existe
       await this.etniaService.findById(createCatadorDto.idEtnia);
       await this.funcaoCatadorService.findOne(createCatadorDto.funcaoId);
 
-      //cria o user
       const user = await this.userService.create(createCatadorDto.user);
 
-      //adiciona as roles
       await this.userService.addRolesToUser(user.id, rolesIds);
 
       const data = {
@@ -88,7 +79,6 @@ export class CatadorService {
         funcaoId: createCatadorDto.funcaoId
       };
 
-      //salva o catador
       const catador = await this.prismaService.catador.create({ 
         data: data,
         include: {
@@ -106,8 +96,7 @@ export class CatadorService {
 
       (catador.associacao as Associacao).user = (await this.associacaoService.findById(catador.associacaoId)).user;
 
-      //envia um email para o catador contendo sua senha para login
-      //OBS: Mensagem temporária
+   
       this.emailService.sendEmail(user.email, "Conta criada com sucesso",
         `Conta criada com sucesso! Sua senha para login é ${createCatadorDto.user.password}. 
       Para trocar de senha, faça login na plataforma, vá em perfil e troque sua senha!`);
@@ -189,7 +178,6 @@ export class CatadorService {
         },
     });
 
-    // Mapeia os catadores para omitir a parte do objeto associacao
     const catadoresWithoutAssociacao = catadores.map(catador => ({
         id: catador.id,
         cpf: catador.cpf,
@@ -212,23 +200,17 @@ export class CatadorService {
     const userId = catador.userId;
 
     if(catador.cpf !== updateCatadorDto.cpf)
-      //Verifica se já existe um catador com o cpf
       await this.existsByCpf(updateCatadorDto.cpf);
 
     if(catador.user.email !== updateCatadorDto.user.email)
-      //Verifica se já existe um user com o email
       await this.userService.existsByEmail(updateCatadorDto.user.email);
     
-    //verifica se a associacao existe
     await this.associacaoService.findById(updateCatadorDto.associacaoId);
     
-    //verifica se a etnia existe
     await this.etniaService.findById(updateCatadorDto.idEtnia);
     
-    //verifica se o genero existe
     await this.generoService.findById(updateCatadorDto.idGenero)
 
-    //atualiza os dados do usuário
     await this.userService.update(userId, updateCatadorDto.user);
 
     await  this.funcaoCatadorService.findOne(updateCatadorDto.funcaoId)
@@ -245,7 +227,6 @@ export class CatadorService {
       funcaoId: updateCatadorDto.funcaoId
     };
 
-    //atualiza os dados do catador
     let catadorAtualizado =  await this.prismaService.catador.update({
       where: { id },
       data: data,

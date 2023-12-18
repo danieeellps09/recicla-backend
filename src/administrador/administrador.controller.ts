@@ -10,7 +10,6 @@ import { isPublic } from 'src/auth/decorators/is-public.decorator';
 @ApiTags('Administrador')
 @Controller('api/v1/administrador')
 @isPublic()
-//@ApiBearerAuth()
 @ApiTags()
 export class AdministradorController {
     constructor(private readonly adminService:AdministradorService){}

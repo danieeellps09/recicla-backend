@@ -19,7 +19,6 @@ export class AdministradorService {
         private readonly createRoleDto: CreateRoleDto) { }
 
     async create(createAdminDto: CreateAdminDto): Promise<Admin> {
-        //seta o role como administrador
         createAdminDto.user.roleNames = ["admin"];
         let rolesIds = [];
 
@@ -35,21 +34,16 @@ export class AdministradorService {
             });
             rolesIds = [role.id];
         } finally {
-            //cria uma senha alfanumérica randomica para o novo usuário
             if (!createAdminDto.user.password) {
                 createAdminDto.user.password = PasswordGenerator.generate(5);
             }
 
-            //Verifica se já existe um admin com o cpf
             await this.existsByCpf(createAdminDto.cpf);
 
-            //Verifica se já existe um user com o email
             await this.userService.existsByEmail(createAdminDto.user.email);
 
-            //cria o user
             const user = await this.userService.create(createAdminDto.user);
 
-            //adiciona as roles
             await this.userService.addRolesToUser(user.id, rolesIds);
 
             const data = {
@@ -106,12 +100,10 @@ export class AdministradorService {
         const userId = admin.user.id;
 
         if(updateAdminDto.cpf !== admin.cpf){
-            //Verifica se já existe um catador com o cpf
             await this.existsByCpf(updateAdminDto.cpf);
         }
 
         if(updateAdminDto.user.email !== admin.user.email){
-            //Verifica se já existe um user com o email
             await this.userService.existsByEmail(updateAdminDto.user.email);
         }
         

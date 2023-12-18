@@ -1,4 +1,3 @@
-// cnpj.decorator.ts
 import {
     registerDecorator,
     ValidationArguments,
@@ -15,15 +14,12 @@ export class IsCnpjValidConstraint implements ValidatorConstraintInterface {
             return false;
         }
 
-        // Remove characters that are not digits
         cnpj = cnpj.replace(/\D/g, '');
 
-        // Check if the CNPJ has 14 digits
         if (cnpj.length !== 14) {
             return false;
         }
 
-        // Check for known invalid CNPJs
         if (
             cnpj === '00000000000000' ||
             cnpj === '11111111111111' ||
@@ -39,7 +35,6 @@ export class IsCnpjValidConstraint implements ValidatorConstraintInterface {
             return false;
         }
 
-        // Validate the first digit
         let sum = 0;
         let weight = 5;
         for (let i = 0; i < 12; i++) {
@@ -57,7 +52,6 @@ export class IsCnpjValidConstraint implements ValidatorConstraintInterface {
             return false;
         }
 
-        // Validate the second digit
         sum = 0;
         weight = 6;
         for (let i = 0; i < 13; i++) {

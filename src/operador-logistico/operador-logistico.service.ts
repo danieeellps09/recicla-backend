@@ -19,7 +19,6 @@ export class OperadorLogisticoService {
         private readonly createRoleDto: CreateRoleDto) { }
 
     async create(createOperadorDto: CreateOperadorDto): Promise<Operador> {
-        //seta o role como Operador
         createOperadorDto.user.roleNames = ["operador"];
         let rolesIds = [];
 
@@ -41,13 +40,10 @@ export class OperadorLogisticoService {
 
             await this.existsByCpf(createOperadorDto.cpf);
 
-            //Verifica se já existe um user com o email
             await this.userService.existsByEmail(createOperadorDto.user.email);
 
-            //cria o user
             const user = await this.userService.create(createOperadorDto.user);
 
-            //adiciona as roles
             await this.userService.addRolesToUser(user.id, rolesIds);
 
             const data = {
@@ -104,12 +100,10 @@ export class OperadorLogisticoService {
         const userId = operador.user.id;
 
         if(updateOperadorDto.cpf !== operador.cpf){
-            //Verifica se já existe um catador com o cpf
             await this.existsByCpf(updateOperadorDto.cpf);
         }
 
         if(updateOperadorDto.user.email !== operador.user.email){
-            //Verifica se já existe um user com o email
             await this.userService.existsByEmail(updateOperadorDto.user.email);
         }
         

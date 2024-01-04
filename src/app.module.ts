@@ -22,7 +22,6 @@ import { FormsModule } from './forms/forms.module';
 import { AdministradorModule } from './administrador/administrador.module';
 import { EtniaModule } from './etnia/etnia.module';
 import { GeneroModule } from './genero/genero.module';
-import { PdfModule } from './pdf/pdf.module';
 import { OperadorLogisticoModule } from './operador-logistico/operador-logistico.module';
 import { FuncoesCatadorModule } from './funcoes-catador/funcoes-catador.module';
 dotenv.config({ path: `${__dirname}../.env` })
@@ -50,7 +49,6 @@ import config from './config/config';
     EtniaModule,
     GeneroModule,
     FuncoesCatadorModule,
-    PdfModule,
     OperadorLogisticoModule,
   ],
   controllers: [ AppController],
